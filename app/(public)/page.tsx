@@ -1,261 +1,216 @@
 'use client'
 
 import Link from 'next/link'
-
-const TELAS = [
-  {
-    emoji: '☀️',
-    nombre: 'Sunscreen',
-    desc: 'Luz natural con visión al exterior',
-    bg: 'linear-gradient(135deg, #2a1f0a 0%, #3d2e10 100%)',
-  },
-  {
-    emoji: '🌙',
-    nombre: 'Blackout',
-    desc: 'Oscuridad total y privacidad',
-    bg: 'linear-gradient(135deg, #0a0a0a 0%, #1a1410 100%)',
-  },
-  {
-    emoji: '✨',
-    nombre: 'Doble',
-    desc: 'Control de luz y estilo',
-    bg: 'linear-gradient(135deg, #151210 0%, #221f1a 100%)',
-  },
-]
+import Image from 'next/image'
 
 const AMBIENTES = [
-  { emoji: '🛏️', label: 'Dormitorios' },
-  { emoji: '🛋️', label: 'Livings' },
-  { emoji: '💼', label: 'Oficinas' },
-  { emoji: '🍽️', label: 'Comedores' },
+  { img: '/images/DORMITORIO.png', label: 'DORMITORIOS', icon: '🛏' },
+  { img: '/images/OFICINA.png', label: 'OFICINAS', icon: '💼' },
+  { img: '/images/COMEDOR.png', label: 'COMEDORES', icon: '🍽' },
+  { img: '/images/COCINA.png', label: 'COCINAS', icon: '🍳' },
 ]
 
-const PROYECTOS = [
+const ACCESOS = [
   {
-    emoji: '🏠',
-    nombre: 'Departamento en Palermo',
-    desc: 'Blackout gris en 3 dormitorios + sunscreen en living.',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>
+      </svg>
+    ),
+    titulo: 'GUÍA DE MEDICIÓN',
+    desc: 'Aprendé a tomar las medidas correctas para tu cortina.',
+    href: '/guia-medicion',
   },
   {
-    emoji: '🏢',
-    nombre: 'Oficina corporativa',
-    desc: 'Sistema doble motorizado en 12 ventanas de planta abierta.',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
+      </svg>
+    ),
+    titulo: 'GUÍA DE INSTALACIÓN',
+    desc: 'Instrucciones simples para instalar tu cortina paso a paso.',
+    href: '/guia-instalacion',
   },
   {
-    emoji: '🏡',
-    nombre: 'Casa en Nordelta',
-    desc: 'Verticales en living + roller blackout en 4 ambientes.',
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+      </svg>
+    ),
+    titulo: 'ELEGÍ LA MEJOR OPCIÓN',
+    desc: 'Conocé las diferencias entre nuestros sistemas y telas.',
+    href: '/configurador',
+  },
+  {
+    icon: (
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    ),
+    titulo: 'PREGUNTAS FRECUENTES',
+    desc: 'Respondemos las dudas más comunes antes de tu compra.',
+    href: '/#',
   },
 ]
+
+const FOOTER_LINKS = {
+  'PRODUCTOS': [
+    { label: 'Cortinas a medida', href: '/configurador' },
+    { label: 'Listas para llevar', href: '/stock' },
+  ],
+  'INFORMACIÓN': [
+    { label: 'Quiénes somos', href: '/#' },
+    { label: 'Envíos', href: '/#' },
+    { label: 'Cambios y devoluciones', href: '/#' },
+  ],
+  'AYUDA': [
+    { label: 'Guía de medición', href: '/guia-medicion' },
+    { label: 'Guía de instalación', href: '/guia-instalacion' },
+    { label: 'Preguntas frecuentes', href: '/#' },
+  ],
+  'CONTACTO': [
+    { label: 'WhatsApp', href: '/#' },
+    { label: 'Email', href: '/#' },
+    { label: 'Formulario de contacto', href: '/#' },
+  ],
+}
 
 export default function HomePage() {
-  const waNumero = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
-  const waMensaje = encodeURIComponent('Hola! Me gustaría recibir asesoramiento sobre cortinas roller.')
-  const waUrl = `https://wa.me/${waNumero}?text=${waMensaje}`
-
   return (
-    <div style={{ backgroundColor: 'var(--bg)' }}>
+    <main style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
-      {/* ─── SECCIÓN 1: HERO ──────────────────────────────────── */}
-      <section
-        className="relative min-h-[90vh] flex items-center pt-16"
-        style={{
-          background: 'radial-gradient(ellipse 60% 50% at 100% 0%, rgba(201,168,76,0.08) 0%, transparent 70%), var(--bg)',
-        }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8 w-full py-16 flex flex-col md:flex-row items-center gap-12">
+      {/* ── HERO ── */}
+      <section style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+        <Image
+          src="/images/LIVING.png"
+          alt="Living con cortinas Insumos Roller"
+          fill
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
+          priority
+        />
+        {/* Overlay gradiente */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+        }} />
 
-          {/* Texto izquierda */}
-          <div className="flex-1 flex flex-col gap-6">
-            {/* Eyebrow */}
-            <span
-              className="self-start text-xs font-semibold px-4 py-1.5"
-              style={{
-                backgroundColor: 'var(--gold-soft)',
-                border: '1px solid var(--gold-border)',
-                color: 'var(--gold)',
-                borderRadius: '100px',
-              }}
-            >
-              ✦ Fabricación a medida · Envíos a todo el país
-            </span>
+        {/* Texto hero */}
+        <div style={{
+          position: 'absolute', top: '50%', left: 0,
+          transform: 'translateY(-60%)',
+          padding: '0 48px',
+          maxWidth: 600,
+        }}>
+          <p style={{
+            color: 'rgba(255,255,255,0.75)',
+            fontSize: 13, fontWeight: 600,
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            marginBottom: 16,
+          }}>
+            CORTINAS QUE TRANSFORMAN
+          </p>
+          <h1 style={{
+            fontFamily: 'system-ui, sans-serif',
+            fontSize: 'clamp(52px, 7vw, 96px)',
+            fontWeight: 900,
+            lineHeight: 0.95,
+            letterSpacing: '-0.03em',
+            color: '#fff',
+            margin: 0,
+          }}>
+            TUS<br />
+            <span style={{ color: 'var(--primary)' }}>ESPACIOS</span>
+          </h1>
+        </div>
 
-            {/* H1 */}
-            <h1
-              className="text-4xl md:text-5xl font-bold leading-tight"
-              style={{ color: 'var(--text)' }}
-            >
-              Encontrá la cortina perfecta para tu{' '}
-              <span style={{ color: 'var(--gold)' }}>espacio.</span>
-            </h1>
-
-            {/* Subtítulo */}
-            <p className="text-lg max-w-lg" style={{ color: 'var(--text-mid)' }}>
-              Diseñala a medida o elegí entre nuestras opciones listas para llevar.
-            </p>
-
-            {/* Cards de acción */}
-            <div className="flex flex-col sm:flex-row gap-4 mt-2">
-              {/* Card a medida */}
-              <Link
-                href="/configurador"
-                className="flex-1 flex flex-col gap-3 p-5 rounded-2xl border transition-all hover:border-yellow-500/50 group"
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.06)',
-                  borderColor: 'rgba(255,255,255,0.12)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <span className="text-2xl">📐</span>
-                <div>
-                  <p className="font-semibold mb-1" style={{ color: 'var(--text)' }}>
-                    Cortinas a medida
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                    Configurá cada detalle a tu gusto y espacio.
-                  </p>
-                </div>
-                <span
-                  className="text-sm font-semibold mt-auto"
-                  style={{ color: 'var(--gold)' }}
-                >
-                  Configurar mi cortina →
-                </span>
-              </Link>
-
-              {/* Card stock */}
-              <Link
-                href="/stock"
-                className="flex-1 flex flex-col gap-3 p-5 rounded-2xl border transition-all hover:border-yellow-500/50"
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.06)',
-                  borderColor: 'rgba(255,255,255,0.12)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <span className="text-2xl">⚡</span>
-                <div>
-                  <p className="font-semibold mb-1" style={{ color: 'var(--text)' }}>
-                    Listas para llevar
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                    Stock disponible con envío inmediato.
-                  </p>
-                </div>
-                <span
-                  className="text-sm font-semibold mt-auto"
-                  style={{ color: 'var(--gold)' }}
-                >
-                  Ver productos →
-                </span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Ilustración derecha — solo desktop */}
-          <div
-            className="hidden md:flex items-center justify-center rounded-3xl overflow-hidden flex-shrink-0"
-            style={{
-              width: '380px',
-              height: '420px',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-            }}
-          >
-            <svg viewBox="0 0 380 420" fill="none" xmlns="http://www.w3.org/2000/svg" width="380" height="420">
-              {/* Pared fondo */}
-              <rect width="380" height="420" fill="#1a1610"/>
-              {/* Piso */}
-              <rect y="310" width="380" height="110" fill="#140f0a"/>
-              {/* Ventana grande */}
-              <rect x="50" y="40" width="200" height="230" rx="4" fill="#0a0f1a" stroke="#2E2A24" strokeWidth="2"/>
-              {/* Luz entrando */}
-              <rect x="53" y="43" width="194" height="224" fill="#e8d5a0" opacity="0.06"/>
-              {/* Cortina roller */}
-              <rect x="48" y="36" width="204" height="10" rx="3" fill="#C9A84C" opacity="0.7"/>
-              <rect x="53" y="46" width="194" height="160" fill="#221f1a" opacity="0.85"/>
-              {/* Sillón */}
-              <rect x="180" y="255" width="160" height="55" rx="12" fill="#2a2218"/>
-              <rect x="170" y="240" width="180" height="30" rx="10" fill="#332a1c"/>
-              <rect x="170" y="255" width="18" height="55" rx="6" fill="#2a2218"/>
-              <rect x="332" y="255" width="18" height="55" rx="6" fill="#2a2218"/>
-              {/* Planta */}
-              <rect x="290" y="250" width="16" height="60" rx="4" fill="#1a1208"/>
-              <ellipse cx="298" cy="240" rx="28" ry="32" fill="#1e3d1e" opacity="0.9"/>
-              <ellipse cx="312" cy="230" rx="18" ry="22" fill="#234a23" opacity="0.8"/>
-              <ellipse cx="280" cy="235" rx="15" ry="20" fill="#1a3a1a" opacity="0.7"/>
-              {/* Lámpara de pie */}
-              <rect x="88" y="190" width="6" height="110" rx="2" fill="#2E2A24"/>
-              <ellipse cx="91" cy="188" rx="24" ry="12" fill="#332a1c"/>
-              <ellipse cx="91" cy="192" rx="18" ry="8" fill="#C9A84C" opacity="0.25"/>
-              {/* Mesa lateral */}
-              <rect x="60" y="285" width="50" height="8" rx="3" fill="#2a2218"/>
-              <rect x="70" y="293" width="6" height="20" rx="2" fill="#221a12"/>
-              <rect x="94" y="293" width="6" height="20" rx="2" fill="#221a12"/>
-              {/* Luz cálida ambiente */}
-              <ellipse cx="91" cy="200" rx="60" ry="40" fill="#C9A84C" opacity="0.04"/>
-            </svg>
-          </div>
+        {/* Cards de acción — parte inferior */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          display: 'flex',
+          gap: 0,
+        }}>
+          <HeroCard
+            href="/configurador"
+            icon={
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
+              </svg>
+            }
+            label="CORTINAS A MEDIDA"
+          />
+          <HeroCard
+            href="/stock"
+            icon={
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+              </svg>
+            }
+            label="LISTAS PARA LLEVAR"
+          />
         </div>
       </section>
 
-      {/* ─── SECCIÓN 2: TIPOS DE TELA ─────────────────────────── */}
-      <section
-        id="productos"
-        className="border-t py-20"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-12 items-start">
-
-          {/* Texto izquierda */}
-          <div className="flex flex-col gap-4 md:w-80 flex-shrink-0">
-            <span
-              className="self-start text-xs font-semibold px-3 py-1"
-              style={{
-                backgroundColor: 'var(--gold-soft)',
-                border: '1px solid var(--gold-border)',
-                color: 'var(--gold)',
-                borderRadius: '100px',
-              }}
-            >
-              ✦ ¿No sabés cuál elegir?
-            </span>
-            <h2 className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
-              Te ayudamos a elegir.
-            </h2>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-              Descubrí el tipo ideal según la luz que necesitás para tu ambiente.
+      {/* ── GALERÍA AMBIENTES ── */}
+      <section style={{ padding: '80px 0', background: 'var(--bg)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{
+              color: 'var(--primary)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10,
+            }}>
+              INSPIRATE EN ESTOS DISEÑOS
             </p>
-            <Link
-              href="/configurador"
-              className="self-start text-sm font-semibold mt-2 transition-opacity hover:opacity-80"
-              style={{ color: 'var(--gold)' }}
-            >
-              Probar simulador de luz →
-            </Link>
+            <h2 style={{
+              fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 800,
+              letterSpacing: '-0.02em', color: 'var(--text)', margin: 0,
+            }}>
+              Descubrí ambientes únicos
+            </h2>
           </div>
 
-          {/* Cards telas */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-            {TELAS.map((tela) => (
-              <Link
-                key={tela.nombre}
-                href="/configurador"
-                className="rounded-2xl p-5 border flex flex-col gap-3 transition-all hover:border-yellow-500/40"
-                style={{
-                  background: tela.bg,
-                  borderColor: 'var(--border)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                <span className="text-3xl">{tela.emoji}</span>
-                <div>
-                  <p className="font-semibold" style={{ color: 'var(--text)' }}>
-                    {tela.nombre}
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                    {tela.desc}
-                  </p>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 16,
+          }}
+            className="grid-ambientes"
+          >
+            {AMBIENTES.map(a => (
+              <Link key={a.label} href="/configurador" style={{ textDecoration: 'none' }}>
+                <div style={{ cursor: 'pointer' }}>
+                  <div style={{
+                    position: 'relative', aspectRatio: '4/3',
+                    overflow: 'hidden', borderRadius: 'var(--radius)',
+                    marginBottom: 12,
+                  }}>
+                    <Image
+                      src={a.img}
+                      alt={a.label}
+                      fill
+                      style={{
+                        objectFit: 'cover',
+                        transition: 'transform 0.4s ease',
+                      }}
+                      className="ambiente-img"
+                    />
+                  </div>
+                  <div style={{
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0 4px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>{a.icon}</span>
+                      <span style={{
+                        fontSize: 13, fontWeight: 700,
+                        letterSpacing: '0.1em', color: 'var(--text)',
+                      }}>
+                        {a.label}
+                      </span>
+                    </div>
+                    <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 16 }}>→</span>
+                  </div>
                 </div>
               </Link>
             ))}
@@ -263,68 +218,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── SECCIÓN 3: GALERÍA DE AMBIENTES ─────────────────── */}
-      <section
-        id="inspiracion"
-        className="border-t py-20"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
-            <div className="flex flex-col gap-2">
-              <span
-                className="self-start text-xs font-semibold px-3 py-1"
-                style={{
-                  backgroundColor: 'var(--gold-soft)',
-                  border: '1px solid var(--gold-border)',
-                  color: 'var(--gold)',
-                  borderRadius: '100px',
-                }}
-              >
-                ✦ Inspiración para tu hogar
-              </span>
-              <h2 className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
-                Así puede quedar tu espacio.
-              </h2>
-            </div>
-            <Link
-              href="/configurador"
-              className="text-sm font-semibold transition-opacity hover:opacity-80 self-start md:self-auto"
-              style={{ color: 'var(--gold)' }}
-            >
-              Ver catálogo →
-            </Link>
-          </div>
-
-          {/* Grilla ambientes */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {AMBIENTES.map((amb) => (
-              <Link
-                key={amb.label}
-                href="/configurador"
-                className="relative rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] duration-200 cursor-pointer"
-                style={{
-                  aspectRatio: '3/4',
-                  backgroundColor: 'var(--surface2)',
+      {/* ── ACCESOS RÁPIDOS ── */}
+      <section style={{ padding: '80px 0', background: 'var(--surface)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: 20,
+          }}
+            className="grid-accesos"
+          >
+            {ACCESOS.map(a => (
+              <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
+                <div style={{
+                  background: 'var(--bg)',
                   border: '1px solid var(--border)',
                   borderRadius: 'var(--radius)',
+                  padding: '28px 24px',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 12,
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
-              >
-                {/* Emoji centrado */}
-                <div className="absolute inset-0 flex items-center justify-center text-5xl">
-                  {amb.emoji}
-                </div>
-                {/* Label con gradiente */}
-                <div
-                  className="absolute bottom-0 left-0 right-0 px-4 py-3"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
-                  }}
+                  className="acceso-card"
                 >
-                  <p className="text-sm font-semibold" style={{ color: 'var(--text)' }}>
-                    {amb.label}
+                  <div style={{ color: 'var(--primary)' }}>{a.icon}</div>
+                  <div style={{
+                    fontSize: 13, fontWeight: 800,
+                    letterSpacing: '0.08em', color: 'var(--text)',
+                  }}>
+                    {a.titulo}
+                  </div>
+                  <p style={{
+                    fontSize: 13, color: 'var(--text-muted)',
+                    lineHeight: 1.55, margin: 0, flex: 1,
+                  }}>
+                    {a.desc}
                   </p>
+                  <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 18 }}>→</span>
                 </div>
               </Link>
             ))}
@@ -332,144 +264,145 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── SECCIÓN 4: GALERÍA DE PROYECTOS ─────────────────── */}
-      <section
-        className="border-t py-20"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="flex flex-col gap-2 mb-10">
-            <span
-              className="self-start text-xs font-semibold px-3 py-1"
-              style={{
-                backgroundColor: 'var(--gold-soft)',
-                border: '1px solid var(--gold-border)',
-                color: 'var(--gold)',
-                borderRadius: '100px',
-              }}
-            >
-              ✦ Trabajos realizados
-            </span>
-            <h2 className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
-              Proyectos reales.
-            </h2>
-          </div>
+      {/* ── FOOTER ── */}
+      <footer style={{ background: '#0D0D0D', color: '#fff' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 32px 40px' }}>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {PROYECTOS.map((p) => (
-              <div
-                key={p.nombre}
-                className="rounded-2xl border overflow-hidden"
-                style={{
-                  backgroundColor: 'var(--surface)',
-                  borderColor: 'var(--border)',
-                  borderRadius: 'var(--radius)',
-                }}
-              >
-                {/* Área imagen */}
-                <div
-                  className="flex items-center justify-center text-5xl"
-                  style={{
-                    height: '160px',
-                    backgroundColor: 'var(--surface2)',
-                  }}
-                >
-                  {p.emoji}
-                </div>
-                {/* Body */}
-                <div className="p-5">
-                  <p className="font-semibold mb-1" style={{ color: 'var(--text)' }}>
-                    {p.nombre}
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                    {p.desc}
-                  </p>
+          {/* Logo + links */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '200px repeat(4, 1fr)',
+            gap: 32,
+            marginBottom: 48,
+            paddingBottom: 48,
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+          }}
+            className="footer-grid"
+          >
+            {/* Logo */}
+            <div>
+              <Image
+                src="/images/logo.png"
+                alt="Insumos Roller"
+                width={140}
+                height={56}
+                style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)', marginBottom: 16 }}
+              />
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+                Fabricación a medida.<br />Envíos a todo el país.
+              </p>
+            </div>
+
+            {/* Links */}
+            {Object.entries(FOOTER_LINKS).map(([titulo, links]) => (
+              <div key={titulo}>
+                <p style={{
+                  fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+                  color: 'rgba(255,255,255,0.4)', marginBottom: 16,
+                  textTransform: 'uppercase',
+                }}>
+                  {titulo}
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {links.map(l => (
+                    <Link key={l.label} href={l.href} style={{
+                      fontSize: 13, color: 'rgba(255,255,255,0.7)',
+                      textDecoration: 'none', transition: 'color 0.15s',
+                    }}>
+                      {l.label}
+                    </Link>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ─── SECCIÓN 5: ACCESOS RÁPIDOS ──────────────────────── */}
-      <section
-        id="guias"
-        className="border-t py-16"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Guía medición */}
-            <Link
-              href="/guia-medicion"
-              className="flex items-center gap-4 p-5 rounded-2xl border transition-all hover:border-yellow-500/40 group"
-              style={{
-                backgroundColor: 'var(--surface)',
-                borderColor: 'var(--border)',
-                borderRadius: 'var(--radius)',
-              }}
-            >
-              <span className="text-3xl flex-shrink-0">📏</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
-                  Guía de medición
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  Aprendé a medir tu ventana paso a paso.
-                </p>
-              </div>
-              <span className="text-lg flex-shrink-0" style={{ color: 'var(--text-muted)' }}>→</span>
-            </Link>
-
-            {/* Guía instalación */}
-            <Link
-              href="/guia-instalacion"
-              className="flex items-center gap-4 p-5 rounded-2xl border transition-all hover:border-yellow-500/40"
-              style={{
-                backgroundColor: 'var(--surface)',
-                borderColor: 'var(--border)',
-                borderRadius: 'var(--radius)',
-              }}
-            >
-              <span className="text-3xl flex-shrink-0">🔧</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
-                  Cómo instalar
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  Tutoriales y consejos para una instalación perfecta.
-                </p>
-              </div>
-              <span className="text-lg flex-shrink-0" style={{ color: 'var(--text-muted)' }}>→</span>
-            </Link>
-
-            {/* WhatsApp */}
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-5 rounded-2xl border transition-all hover:border-yellow-500/40"
-              style={{
-                backgroundColor: 'var(--surface)',
-                borderColor: 'var(--border)',
-                borderRadius: 'var(--radius)',
-              }}
-            >
-              <span className="text-3xl flex-shrink-0">💬</span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm" style={{ color: 'var(--text)' }}>
-                  ¿Tenés dudas?
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  Hablá con nuestro equipo de asesores.
-                </p>
-              </div>
-              <span className="text-lg flex-shrink-0" style={{ color: 'var(--text-muted)' }}>→</span>
-            </a>
+          {/* Bottom */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 16,
+          }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+              © 2025 Insumos Roller. Todos los derechos reservados.
+            </p>
+            <div style={{ display: 'flex', gap: 20 }}>
+              {['Términos y condiciones', 'Política de privacidad'].map(t => (
+                <Link key={t} href="/#" style={{
+                  fontSize: 12, color: 'rgba(255,255,255,0.35)',
+                  textDecoration: 'none',
+                }}>
+                  {t}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      </footer>
 
-    </div>
+      {/* Estilos responsivos */}
+      <style>{`
+        @media (max-width: 768px) {
+          .grid-ambientes { grid-template-columns: repeat(2, 1fr) !important; }
+          .grid-accesos { grid-template-columns: repeat(2, 1fr) !important; }
+          .footer-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          .grid-accesos { grid-template-columns: 1fr !important; }
+        }
+        .ambiente-img:hover { transform: scale(1.05); }
+        .acceso-card:hover { border-color: var(--primary) !important; box-shadow: 0 4px 20px rgba(20,0,140,0.08); }
+      `}</style>
+    </main>
+  )
+}
+
+function HeroCard({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+  return (
+    <Link href={href} style={{ flex: 1, textDecoration: 'none' }}>
+      <div
+        style={{
+          background: '#fff',
+          padding: '28px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          cursor: 'pointer',
+          transition: 'background 0.2s, color 0.2s',
+          borderTop: '1px solid rgba(0,0,0,0.06)',
+        }}
+        className="hero-card"
+        onMouseEnter={e => {
+          const el = e.currentTarget
+          el.style.background = 'var(--primary)'
+          el.querySelectorAll('*').forEach((c: Element) => {
+            (c as HTMLElement).style.color = '#fff'
+          })
+        }}
+        onMouseLeave={e => {
+          const el = e.currentTarget
+          el.style.background = '#fff'
+          el.querySelectorAll('*').forEach((c: Element) => {
+            (c as HTMLElement).style.color = ''
+          })
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ color: 'var(--primary)', flexShrink: 0 }}>{icon}</div>
+          <span style={{
+            fontSize: 'clamp(14px, 1.5vw, 18px)',
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            color: 'var(--text)',
+          }}>
+            {label}
+          </span>
+        </div>
+        <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--primary)' }}>→</span>
+      </div>
+    </Link>
   )
 }

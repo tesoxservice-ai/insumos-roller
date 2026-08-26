@@ -1,243 +1,236 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useConfigurador } from '@/hooks/useConfigurador'
 import { usePresupuesto } from '@/hooks/usePresupuesto'
-import type { CatalogoCompleto, ReglaPrecio } from '@/types'
+import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
+import type { CatalogoCompleto, Color } from '@/types'
+
 import StepHeader from '@/components/configurador/StepHeader'
 import StepTipo from '@/components/configurador/StepTipo'
 import StepTela from '@/components/configurador/StepTela'
 import StepColor from '@/components/configurador/StepColor'
 import StepMedidas from '@/components/configurador/StepMedidas'
 import StepSistema from '@/components/configurador/StepSistema'
+import StepInstalacion from '@/components/configurador/StepInstalacion'
 import StepCierre from '@/components/configurador/StepCierre'
 import PriceBar from '@/components/configurador/PriceBar'
 import PresupuestoPanel from '@/components/presupuesto/PresupuestoPanel'
 import { generarPDF } from '@/lib/pdf'
 
-const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Cierre']
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Instalación', 'Cierre']
 
 export default function ConfiguradorPage() {
-  const [pasoActual, setPasoActual] = useState(0)
+  const {
+    state,
+    setTipo,
+    setTela,
+    setColor,
+    setMedidas,
+    setSistema,
+    setInstalacion,
+    calcularPrecioActual,
+    resetear,
+  } = useConfigurador()
+
+  const {
+    items,
+    agregarItem,
+    eliminarItem,
+    totalGeneral,
+    limpiarPresupuesto,
+  } = usePresupuesto()
+
+  const [paso, setPaso] = useState(0)
   const [catalogo, setCatalogo] = useState<CatalogoCompleto | null>(null)
-  const [cargando, setCargando] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const configurador = useConfigurador()
-  const presupuesto = usePresupuesto()
-
-  const cargarCatalogo = useCallback(async () => {
-    setCargando(true)
-    setError(null)
-    try {
-      const res = await fetch('/api/catalogo')
-      if (!res.ok) throw new Error('No se pudo cargar el catálogo')
-      const data: CatalogoCompleto = await res.json()
-      setCatalogo(data)
-    } catch {
-      setError('No pudimos cargar el catálogo. Verificá tu conexión.')
-    } finally {
-      setCargando(false)
-    }
+  useEffect(() => {
+    fetch('/api/catalogo')
+      .then(res => res.json())
+      .then((data: CatalogoCompleto) => setCatalogo(data))
+      .catch(() => setError('Error al cargar el catálogo'))
+      .finally(() => setLoading(false))
   }, [])
 
-  useEffect(() => {
-    cargarCatalogo()
-  }, [cargarCatalogo])
+  const precio = catalogo ? calcularPrecioActual(catalogo.precios) : null
 
-  const ir = (index: number) => setPasoActual(index)
-  const siguiente = () => setPasoActual((p) => Math.min(p + 1, PASOS.length - 1))
-  const anterior = () => setPasoActual((p) => Math.max(p - 1, 0))
+  const coloresFiltrados: Color[] = (catalogo?.colores ?? []).filter(
+    c => c.tela_id === state.tela?.id
+  ) ?? []
 
-  const reglaActual: ReglaPrecio | null =
-    catalogo && configurador.state.tela
-      ? (catalogo.precios.find((r) => r.tela_id === configurador.state.tela!.id) ?? null)
-      : null
-
-  const precio = catalogo ? configurador.calcularPrecioActual(catalogo.precios) : null
-
-  const mostrarPriceBar = pasoActual >= 3
-  const mostrarPanel = pasoActual >= 5 || presupuesto.items.length > 0
-
-  const handleFueraDeRango = () => {
-    const numero = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? ''
-    const mensaje = encodeURIComponent('Hola! Necesito asesoría para una cortina con medidas especiales.')
-    window.open(`https://wa.me/${numero}?text=${mensaje}`, '_blank')
+  function irA(nuevoPaso: number) {
+    if (nuevoPaso >= 0 && nuevoPaso < PASOS.length) {
+      setPaso(nuevoPaso)
+      window.scrollTo(0, 0)
+    }
   }
 
-  const handleAgregarAlPresupuesto = (ambiente: string) => {
-    if (precio === null) return
-    presupuesto.agregarItem({
-      ambiente,
-      configuracion: configurador.state,
-      precioEstimado: precio,
+  function handleFueraDeRango() {
+    const msg = generarMensajeWhatsApp(state, 0)
+    const url = generarUrlWhatsApp(
+      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '',
+      msg
+    )
+    window.open(url, '_blank')
+  }
+
+  function handleAgregarAlPresupuesto(ambiente: string) {
+    if (!precio) return
+    agregarItem({ ambiente, configuracion: state, precioEstimado: precio })
+    resetear()
+    setPaso(0)
+  }
+
+  async function handleDescargarPDF() {
+    await generarPDF(items)
+  }
+
+  async function handleEnviarEmail(email: string) {
+    await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email,
+        items,
+      }),
     })
   }
 
-  const handleNuevoProducto = () => {
-    configurador.resetear()
-    setPasoActual(0)
-  }
-
-  const handleEnviarEmail = async (email: string) => {
-    try {
-      await fetch('/api/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, items: presupuesto.items }),
-      })
-    } catch {
-      // Error silencioso — el componente maneja su propio estado de UI
-    }
-  }
-
-  const handleDescargarPDF = async () => {
-    await generarPDF(presupuesto.items)
-  }
-
-  if (cargando) {
+  if (loading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: 'var(--bg)' }}
-      >
-        <div className="flex flex-col items-center gap-4">
-          <div
-            className="w-10 h-10 rounded-full border-2 animate-spin"
-            style={{ borderColor: 'var(--gold)', borderTopColor: 'transparent' }}
-          />
-          <p style={{ color: 'var(--text-muted)' }}>Cargando catálogo...</p>
-        </div>
-      </div>
+      <main style={{
+        background: 'var(--bg)', minHeight: '100vh',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Cargando configurador…</p>
+      </main>
     )
   }
 
   if (error || !catalogo) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center px-4"
-        style={{ backgroundColor: 'var(--bg)' }}
-      >
-        <div className="flex flex-col items-center gap-4 text-center max-w-sm">
-          <p className="text-lg" style={{ color: 'var(--text)' }}>
-            {error ?? 'Error al cargar el catálogo'}
-          </p>
-          <button
-            onClick={cargarCatalogo}
-            className="px-6 py-2 font-semibold"
-            style={{
-              backgroundColor: 'var(--gold)',
-              color: 'var(--bg)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
-            Reintentar
-          </button>
-        </div>
-      </div>
+      <main style={{
+        background: 'var(--bg)', minHeight: '100vh',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <p style={{ color: '#ef4444', fontSize: 14 }}>{error ?? 'Error inesperado'}</p>
+      </main>
     )
   }
 
-  const telasFiltradas = configurador.state.tipo
-    ? catalogo.telas.filter((t) => t.tipo_id === configurador.state.tipo!.id)
-    : []
-
-  const coloresFiltrados = configurador.state.tela
-    ? catalogo.colores.filter((c) => c.tela_id === configurador.state.tela!.id)
-    : []
-
-  const nextLabel = pasoActual === PASOS.length - 1 ? 'Finalizar' : 'Siguiente →'
-
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg)' }}>
+    <main style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 100 }}>
+
       <StepHeader
         pasos={PASOS}
-        pasoActual={pasoActual}
-        onClickPaso={(i) => { if (i < pasoActual) ir(i) }}
+        pasoActual={paso}
+        onClickPaso={(i) => { if (i < paso) irA(i) }}
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        <main className="flex-1 overflow-y-auto pb-24 px-4 md:px-8 py-6">
-          {pasoActual === 0 && (
-            <StepTipo
-              tipos={catalogo.tipos}
-              seleccionado={configurador.state.tipo}
-              onSelect={(tipo) => { configurador.setTipo(tipo); setTimeout(siguiente, 200) }}
-            />
-          )}
-          {pasoActual === 1 && (
-            <StepTela
-              telas={catalogo.telas}
-              telasFiltradas={telasFiltradas}
-              seleccionada={configurador.state.tela}
-              onSelect={(tela) => { configurador.setTela(tela); setTimeout(siguiente, 200) }}
-            />
-          )}
-          {pasoActual === 2 && (
-            <StepColor
-              colores={catalogo.colores}
-              coloresFiltrados={coloresFiltrados}
-              seleccionado={configurador.state.color}
-              onSelect={(color) => { configurador.setColor(color); setTimeout(siguiente, 200) }}
-            />
-          )}
-          {pasoActual === 3 && (
-            <StepMedidas
-              ancho={configurador.state.ancho}
-              alto={configurador.state.alto}
-              reglas={catalogo.precios}
-              telaSeleccionada={configurador.state.tela}
-              onChange={configurador.setMedidas}
-              onFueraDeRango={handleFueraDeRango}
-            />
-          )}
-          {pasoActual === 4 && (
-            <StepSistema
-              sistema={configurador.state.sistema}
-              instalacion={configurador.state.instalacion}
-              onSistemaChange={configurador.setSistema}
-              onInstalacionChange={configurador.setInstalacion}
-              regla={reglaActual}
-            />
-          )}
-          {pasoActual === 5 && (
-            <StepCierre
-              state={configurador.state}
-              precioEstimado={precio}
-              reglas={catalogo.precios}
-              onAgregarAlPresupuesto={handleAgregarAlPresupuesto}
-              onNuevoProducto={handleNuevoProducto}
-            />
-          )}
-        </main>
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: '32px 16px 0' }}>
 
-        {mostrarPanel && (
-          <aside
-            className="hidden lg:block w-80 border-l overflow-y-auto"
-            style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface)' }}
-          >
+        {/* Panel de presupuesto si hay items */}
+        {(items.length > 0 || paso === PASOS.length - 1) && (
+          <div style={{ marginBottom: 24 }}>
             <PresupuestoPanel
-              items={presupuesto.items}
-              totalGeneral={presupuesto.totalGeneral}
-              onEliminar={presupuesto.eliminarItem}
-              onLimpiar={presupuesto.limpiarPresupuesto}
+              items={items}
+              totalGeneral={totalGeneral}
+              onEliminar={eliminarItem}
+              onLimpiar={limpiarPresupuesto}
               onDescargarPDF={handleDescargarPDF}
               onEnviarEmail={handleEnviarEmail}
             />
-          </aside>
+          </div>
         )}
+
+        {/* Contenido del paso */}
+        <div style={{
+          background: 'var(--surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+          padding: '28px 24px',
+        }}>
+          {paso === 0 && (
+            <StepTipo
+              tipos={catalogo.tipos}
+              seleccionado={state.tipo}
+              onSelect={tipo => { setTipo(tipo); irA(1) }}
+            />
+          )}
+
+          {paso === 1 && (
+            <StepTela
+              telas={catalogo.telas}
+              telasFiltradas={catalogo.telas.filter(t => t.tipo_id === state.tipo?.id)}
+              seleccionada={state.tela}
+              onSelect={tela => { setTela(tela); irA(2) }}
+            />
+          )}
+
+          {paso === 2 && (
+            <StepColor
+              colores={catalogo.colores}
+              coloresFiltrados={coloresFiltrados}
+              seleccionado={state.color}
+              onSelect={(color: Color) => setColor(color)}
+              tipoNombre={state.tipo?.nombre ?? ''}
+              telaNombre={state.tela?.nombre ?? ''}
+            />
+          )}
+
+          {paso === 3 && (
+            <StepMedidas
+              ancho={state.ancho}
+              alto={state.alto}
+              reglas={catalogo.precios}
+              telaSeleccionada={state.tela}
+              onChange={setMedidas}
+              onFueraDeRango={handleFueraDeRango}
+            />
+          )}
+
+          {paso === 4 && (
+            <StepSistema
+              sistema={state.sistema}
+              instalacion={state.instalacion}
+              onSistemaChange={(sis, extra) => setSistema(sis, extra)}
+              onInstalacionChange={(activa, extra) => setInstalacion(activa, extra)}
+              regla={catalogo.precios.find(p => p.tela_id === state.tela?.id) ?? null}
+            />
+          )}
+
+          {paso === 5 && (
+            <StepInstalacion
+              instalacion={state.instalacion}
+              onChange={(activa, extra) => setInstalacion(activa, extra)}
+            />
+          )}
+
+          {paso === 6 && (
+            <StepCierre
+              state={state}
+              precioEstimado={precio}
+              reglas={catalogo.precios}
+              onAgregarAlPresupuesto={handleAgregarAlPresupuesto}
+              onNuevoProducto={() => { resetear(); setPaso(0) }}
+            />
+          )}
+        </div>
       </div>
 
-      {mostrarPriceBar && (
+      {/* Price bar fija abajo */}
+      {paso > 0 && paso < PASOS.length - 1 && (
         <PriceBar
-          state={configurador.state}
+          state={state}
           precio={precio}
-          onNext={siguiente}
-          nextLabel={nextLabel}
-          onBack={anterior}
-          showBack={pasoActual > 0}
+          onNext={() => irA(paso + 1)}
+          nextLabel={paso === PASOS.length - 2 ? 'Ver resumen →' : 'Siguiente →'}
+          onBack={() => irA(paso - 1)}
+          showBack={paso > 0}
         />
       )}
-    </div>
+    </main>
   )
 }

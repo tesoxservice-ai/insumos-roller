@@ -19,59 +19,72 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: scrolled
-          ? 'rgba(15,14,12,0.85)'
-          : 'rgba(15,14,12,0.6)',
-        backdropFilter: scrolled ? 'blur(16px)' : 'none',
-        borderBottom: `1px solid ${scrolled ? 'var(--border)' : 'transparent'}`,
-      }}
-    >
-      <div className="max-w-6xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <span
-            className="text-xl font-bold tracking-tight"
-            style={{ color: 'var(--text)' }}
-          >
-            Max
+    <nav style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0,
+      zIndex: 50,
+      backgroundColor: scrolled ? 'rgba(255,255,255,0.97)' : 'rgba(255,255,255,0.90)',
+      backdropFilter: 'blur(12px)',
+      borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
+      boxShadow: scrolled ? '0 1px 12px rgba(20,0,140,0.06)' : 'none',
+      transition: 'all 0.3s',
+    }}>
+      <div style={{
+        width: '100%',
+        padding: '0 48px',
+        height: 72,
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
+        alignItems: 'center',
+      }}>
+
+        {/* Logo — izquierda */}
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1.1, justifySelf: 'start' }}>
+          <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text)' }}>
+            INSUM<span style={{ color: 'var(--primary)' }}>O</span>S
           </span>
-          <span
-            className="text-xl font-bold tracking-tight"
-            style={{ color: 'var(--gold)' }}
-          >
-            Roller
+          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: '0.22em', color: 'var(--primary)' }}>
+            R<span style={{ color: 'var(--text)' }}>O</span>LLER
           </span>
         </Link>
 
-        {/* Links centro — solo desktop */}
-        <div className="hidden md:flex items-center gap-6">
-          {LINKS.map((link) => (
+        {/* Links — centro */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 48 }}>
+          {LINKS.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm transition-colors hover:opacity-100"
-              style={{ color: 'var(--text-mid)' }}
+              style={{ fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text-mid)', textDecoration: 'none', transition: 'color 0.15s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-mid)')}
             >
               {link.label}
             </Link>
           ))}
         </div>
 
-        {/* CTA */}
-        <Link
-          href="/configurador"
-          className="text-sm font-semibold px-5 py-2 transition-opacity hover:opacity-85"
-          style={{
-            backgroundColor: 'var(--gold)',
-            color: '#0F0E0C',
-            borderRadius: '100px',
-          }}
-        >
-          Cotizá ahora
-        </Link>
+        {/* CTA — derecha */}
+        <div style={{ justifySelf: 'end' }}>
+          <Link
+            href="/configurador"
+            style={{
+              backgroundColor: 'var(--primary)',
+              color: '#fff',
+              borderRadius: '100px',
+              padding: '11px 28px',
+              fontSize: 14,
+              fontWeight: 700,
+              letterSpacing: '0.04em',
+              textDecoration: 'none',
+              display: 'inline-block',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+          >
+            Cotizá ahora
+          </Link>
+        </div>
+
       </div>
     </nav>
   )

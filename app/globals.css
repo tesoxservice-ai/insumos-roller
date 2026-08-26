@@ -3,20 +3,40 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0F0E0C;
-  --surface: #1A1814;
-  --surface2: #221F1A;
-  --border: #2E2A24;
-  --gold: #C9A84C;
-  --gold-soft: rgba(201, 168, 76, 0.10);
-  --gold-border: rgba(201, 168, 76, 0.25);
-  --text: #F2EDE4;
-  --text-mid: #B8AD9E;
-  --text-muted: #7A7269;
-  --green: #4A9B6F;
-  --green-soft: rgba(74, 155, 111, 0.10);
-  --radius: 14px;
-  --radius-sm: 8px;
+  /* FONDOS */
+  --bg: #FFFFFF;
+  --surface: #F7F7FB;
+  --surface2: #EDEDF5;
+
+  /* BORDES */
+  --border: #E2E2EE;
+  --border2: #C8C8DC;
+
+  /* COLOR PRIMARIO — azul/violeta del logo */
+  --primary: #14008C;
+  --primary-soft: rgba(20, 0, 140, 0.07);
+  --primary-border: rgba(20, 0, 140, 0.18);
+
+  /* TEXTOS */
+  --text: #0D0D0D;
+  --text-mid: #3D3D5C;
+  --text-muted: #8888A8;
+
+  /* ESTADOS */
+  --green: #0D7A4E;
+  --green-soft: rgba(13, 122, 78, 0.08);
+  --green-border: rgba(13, 122, 78, 0.25);
+  --red: #C0392B;
+  --red-soft: rgba(192, 57, 43, 0.08);
+
+  /* COMPATIBILIDAD — aliases para no romper componentes existentes */
+  --gold: #14008C;
+  --gold-soft: rgba(20, 0, 140, 0.07);
+  --gold-border: rgba(20, 0, 140, 0.18);
+
+  /* RADIO */
+  --radius: 12px;
+  --radius-sm: 6px;
 }
 
 * {
@@ -37,7 +57,7 @@ body {
 
 @layer utilities {
   .text-gold {
-    color: var(--gold);
+    color: var(--primary);
   }
 
   .bg-surface {
@@ -49,6 +69,6 @@ body {
   }
 
   .border-gold {
-    border-color: var(--gold-border);
+    border-color: var(--primary-border);
   }
 }

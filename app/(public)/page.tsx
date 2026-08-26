@@ -91,49 +91,63 @@ export default function HomePage() {
         {/* Overlay gradiente */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)',
+          background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
         }} />
 
         {/* Texto hero */}
         <div style={{
-          position: 'absolute', top: '50%', left: 0,
-          transform: 'translateY(-60%)',
-          padding: '0 48px',
-          maxWidth: 600,
+          position: 'absolute',
+          top: '50%',
+          left: 48,
+          transform: 'translateY(-50%)',
         }}>
-          <p style={{
-            color: 'rgba(255,255,255,0.75)',
-            fontSize: 13, fontWeight: 600,
-            letterSpacing: '0.18em',
-            textTransform: 'uppercase',
-            marginBottom: 16,
-          }}>
-            CORTINAS QUE TRANSFORMAN
-          </p>
           <h1 style={{
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: 'clamp(52px, 7vw, 96px)',
-            fontWeight: 900,
-            lineHeight: 0.95,
-            letterSpacing: '-0.03em',
-            color: '#fff',
             margin: 0,
+            padding: 0,
+            lineHeight: 0.9,
           }}>
-            TUS<br />
-            <span style={{ color: 'var(--primary)' }}>ESPACIOS</span>
+            <span style={{
+              display: 'block',
+              fontSize: 'clamp(64px, 9vw, 120px)',
+              fontWeight: 900,
+              color: '#FFFFFF',
+              letterSpacing: '-0.03em',
+            }}>
+              CORTINAS
+            </span>
+            <span style={{
+              display: 'block',
+              fontSize: 'clamp(18px, 2.5vw, 32px)',
+              fontWeight: 600,
+              color: 'rgba(255,255,255,0.85)',
+              letterSpacing: '0.08em',
+              marginTop: 8,
+              marginBottom: 4,
+            }}>
+              QUE TRANSFORMAN
+            </span>
+            <span style={{
+              display: 'block',
+              fontSize: 'clamp(18px, 2.5vw, 32px)',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+            }}>
+              <span style={{ color: 'rgba(255,255,255,0.85)' }}>TUS </span>
+              <span style={{ color: '#14008C' }}>ESPACIOS</span>
+            </span>
           </h1>
         </div>
 
         {/* Cards de acción — parte inferior */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
-          display: 'flex',
-          gap: 0,
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
         }}>
           <HeroCard
             href="/configurador"
             icon={
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
               </svg>
             }
@@ -142,11 +156,12 @@ export default function HomePage() {
           <HeroCard
             href="/stock"
             icon={
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
               </svg>
             }
             label="LISTAS PARA LLEVAR"
+            borderLeft
           />
         </div>
       </section>
@@ -173,12 +188,10 @@ export default function HomePage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 16,
-          }}
-            className="grid-ambientes"
-          >
+          }}>
             {AMBIENTES.map(a => (
               <Link key={a.label} href="/configurador" style={{ textDecoration: 'none' }}>
-                <div style={{ cursor: 'pointer' }}>
+                <div>
                   <div style={{
                     position: 'relative', aspectRatio: '4/3',
                     overflow: 'hidden', borderRadius: 'var(--radius)',
@@ -188,24 +201,17 @@ export default function HomePage() {
                       src={a.img}
                       alt={a.label}
                       fill
-                      style={{
-                        objectFit: 'cover',
-                        transition: 'transform 0.4s ease',
-                      }}
+                      style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
                       className="ambiente-img"
                     />
                   </div>
                   <div style={{
                     display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 4px',
+                    justifyContent: 'space-between', padding: '0 4px',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                       <span style={{ fontSize: 16 }}>{a.icon}</span>
-                      <span style={{
-                        fontSize: 13, fontWeight: 700,
-                        letterSpacing: '0.1em', color: 'var(--text)',
-                      }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text)' }}>
                         {a.label}
                       </span>
                     </div>
@@ -225,9 +231,7 @@ export default function HomePage() {
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
             gap: 20,
-          }}
-            className="grid-accesos"
-          >
+          }}>
             {ACCESOS.map(a => (
               <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
                 <div style={{
@@ -244,16 +248,10 @@ export default function HomePage() {
                   className="acceso-card"
                 >
                   <div style={{ color: 'var(--primary)' }}>{a.icon}</div>
-                  <div style={{
-                    fontSize: 13, fontWeight: 800,
-                    letterSpacing: '0.08em', color: 'var(--text)',
-                  }}>
+                  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.08em', color: 'var(--text)' }}>
                     {a.titulo}
                   </div>
-                  <p style={{
-                    fontSize: 13, color: 'var(--text-muted)',
-                    lineHeight: 1.55, margin: 0, flex: 1,
-                  }}>
+                  <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55, margin: 0, flex: 1 }}>
                     {a.desc}
                   </p>
                   <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 18 }}>→</span>
@@ -265,48 +263,46 @@ export default function HomePage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ background: '#0D0D0D', color: '#fff' }}>
+      <footer style={{ background: '#0A0A14', color: '#fff' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 32px 40px' }}>
-
-          {/* Logo + links */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: '200px repeat(4, 1fr)',
             gap: 32,
             marginBottom: 48,
             paddingBottom: 48,
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
           }}
             className="footer-grid"
           >
-            {/* Logo */}
             <div>
-              <Image
-                src="/images/logo.png"
-                alt="Insumos Roller"
-                width={140}
-                height={56}
-                style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)', marginBottom: 16 }}
-              />
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+              <div style={{ marginBottom: 16 }}>
+                <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: '#fff' }}>
+                  INSUM<span style={{ color: '#4444CC' }}>O</span>S
+                </span>
+                <br />
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.22em', color: '#4444CC' }}>
+                  R<span style={{ color: '#fff' }}>O</span>LLER
+                </span>
+              </div>
+              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, margin: 0 }}>
                 Fabricación a medida.<br />Envíos a todo el país.
               </p>
             </div>
 
-            {/* Links */}
             {Object.entries(FOOTER_LINKS).map(([titulo, links]) => (
               <div key={titulo}>
                 <p style={{
                   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.4)', marginBottom: 16,
-                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.35)', marginBottom: 16,
+                  textTransform: 'uppercase', margin: '0 0 16px 0',
                 }}>
                   {titulo}
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {links.map(l => (
                     <Link key={l.label} href={l.href} style={{
-                      fontSize: 13, color: 'rgba(255,255,255,0.7)',
+                      fontSize: 13, color: 'rgba(255,255,255,0.6)',
                       textDecoration: 'none', transition: 'color 0.15s',
                     }}>
                       {l.label}
@@ -317,22 +313,17 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Bottom */}
           <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
+            display: 'flex', justifyContent: 'space-between',
+            alignItems: 'center', flexWrap: 'wrap', gap: 16,
           }}>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
               © 2025 Insumos Roller. Todos los derechos reservados.
             </p>
             <div style={{ display: 'flex', gap: 20 }}>
               {['Términos y condiciones', 'Política de privacidad'].map(t => (
                 <Link key={t} href="/#" style={{
-                  fontSize: 12, color: 'rgba(255,255,255,0.35)',
-                  textDecoration: 'none',
+                  fontSize: 12, color: 'rgba(255,255,255,0.25)', textDecoration: 'none',
                 }}>
                   {t}
                 </Link>
@@ -342,15 +333,11 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Estilos responsivos */}
       <style>{`
         @media (max-width: 768px) {
           .grid-ambientes { grid-template-columns: repeat(2, 1fr) !important; }
           .grid-accesos { grid-template-columns: repeat(2, 1fr) !important; }
           .footer-grid { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          .grid-accesos { grid-template-columns: 1fr !important; }
         }
         .ambiente-img:hover { transform: scale(1.05); }
         .acceso-card:hover { border-color: var(--primary) !important; box-shadow: 0 4px 20px rgba(20,0,140,0.08); }
@@ -359,49 +346,57 @@ export default function HomePage() {
   )
 }
 
-function HeroCard({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
+function HeroCard({ href, icon, label, borderLeft }: {
+  href: string
+  icon: React.ReactNode
+  label: string
+  borderLeft?: boolean
+}) {
   return (
-    <Link href={href} style={{ flex: 1, textDecoration: 'none' }}>
+    <Link href={href} style={{ textDecoration: 'none' }}>
       <div
         style={{
           background: '#fff',
-          padding: '28px 32px',
+          padding: '24px 36px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 16,
           cursor: 'pointer',
-          transition: 'background 0.2s, color 0.2s',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
+          transition: 'background 0.2s',
+          borderLeft: borderLeft ? '1px solid rgba(0,0,0,0.08)' : 'none',
         }}
         className="hero-card"
         onMouseEnter={e => {
-          const el = e.currentTarget
-          el.style.background = 'var(--primary)'
-          el.querySelectorAll('*').forEach((c: Element) => {
-            (c as HTMLElement).style.color = '#fff'
+          e.currentTarget.style.background = '#14008C'
+          e.currentTarget.querySelectorAll('[data-text]').forEach((el: Element) => {
+            (el as HTMLElement).style.color = '#fff'
           })
+          const arrow = e.currentTarget.querySelector('[data-arrow]') as HTMLElement
+          if (arrow) arrow.style.color = '#fff'
         }}
         onMouseLeave={e => {
-          const el = e.currentTarget
-          el.style.background = '#fff'
-          el.querySelectorAll('*').forEach((c: Element) => {
-            (c as HTMLElement).style.color = ''
+          e.currentTarget.style.background = '#fff'
+          e.currentTarget.querySelectorAll('[data-text]').forEach((el: Element) => {
+            (el as HTMLElement).style.color = ''
           })
+          const arrow = e.currentTarget.querySelector('[data-arrow]') as HTMLElement
+          if (arrow) arrow.style.color = '#14008C'
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ color: 'var(--primary)', flexShrink: 0 }}>{icon}</div>
-          <span style={{
-            fontSize: 'clamp(14px, 1.5vw, 18px)',
+          <div data-text="" style={{ color: '#14008C', flexShrink: 0, transition: 'color 0.2s' }}>{icon}</div>
+          <span data-text="" style={{
+            fontSize: 'clamp(13px, 1.4vw, 17px)',
             fontWeight: 800,
             letterSpacing: '0.08em',
-            color: 'var(--text)',
+            color: '#0D0D0D',
+            transition: 'color 0.2s',
           }}>
             {label}
           </span>
         </div>
-        <span style={{ fontSize: 24, fontWeight: 700, color: 'var(--primary)' }}>→</span>
+        <span data-arrow="" style={{ fontSize: 22, fontWeight: 700, color: '#14008C', transition: 'color 0.2s' }}>→</span>
       </div>
     </Link>
   )

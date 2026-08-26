@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0F0E0C;
+  --surface: #1A1814;
+  --surface2: #221F1A;
+  --border: #2E2A24;
+  --gold: #C9A84C;
+  --gold-soft: rgba(201, 168, 76, 0.10);
+  --gold-border: rgba(201, 168, 76, 0.25);
+  --text: #F2EDE4;
+  --text-mid: #B8AD9E;
+  --text-muted: #7A7269;
+  --green: #4A9B6F;
+  --green-soft: rgba(74, 155, 111, 0.10);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .bg-surface {
+    background-color: var(--surface);
+  }
+
+  .bg-surface2 {
+    background-color: var(--surface2);
+  }
+
+  .border-gold {
+    border-color: var(--gold-border);
+  }
+}

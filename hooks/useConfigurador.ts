@@ -1,0 +1,99 @@
+'use client'
+
+import { useState, useCallback } from 'react'
+import type { ConfiguradorState, TipoCortina, Tela, Color, ReglaPrecio } from '@/types'
+import { calcularPrecio } from '@/lib/precio'
+
+const estadoInicial: ConfiguradorState = {
+  tipo: null,
+  tela: null,
+  color: null,
+  colorHex: '',
+  ancho: 0,
+  alto: 0,
+  sistema: '',
+  sistemaExtra: 0,
+  instalacion: false,
+  instExtra: 0,
+}
+
+interface UseConfiguradorReturn {
+  state: ConfiguradorState
+  setTipo: (tipo: TipoCortina) => void
+  setTela: (tela: Tela) => void
+  setColor: (color: Color) => void
+  setMedidas: (ancho: number, alto: number) => void
+  setSistema: (sistema: 'manual' | 'motorizado', extra?: number) => void
+  setInstalacion: (activa: boolean, extra?: number) => void
+  calcularPrecioActual: (reglas: ReglaPrecio[]) => number | null
+  resetear: () => void
+}
+
+export function useConfigurador(): UseConfiguradorReturn {
+  const [state, setState] = useState<ConfiguradorState>(estadoInicial)
+
+  const setTipo = useCallback((tipo: TipoCortina) => {
+    setState((prev) => ({
+      ...prev,
+      tipo,
+      // Al cambiar tipo, se resetean tela, color y precio
+      tela: null,
+      color: null,
+      colorHex: '',
+    }))
+  }, [])
+
+  const setTela = useCallback((tela: Tela) => {
+    setState((prev) => ({
+      ...prev,
+      tela,
+      // Al cambiar tela, se resetea el color
+      color: null,
+      colorHex: '',
+    }))
+  }, [])
+
+  const setColor = useCallback((color: Color) => {
+    setState((prev) => ({
+      ...prev,
+      color,
+      colorHex: color.hex,
+    }))
+  }, [])
+
+  const setMedidas = useCallback((ancho: number, alto: number) => {
+    setState((prev) => ({ ...prev, ancho, alto }))
+  }, [])
+
+  const setSistema = useCallback(
+    (sistema: 'manual' | 'motorizado', extra = 0) => {
+      setState((prev) => ({ ...prev, sistema, sistemaExtra: extra }))
+    },
+    []
+  )
+
+  const setInstalacion = useCallback((instalacion: boolean, extra = 0) => {
+    setState((prev) => ({ ...prev, instalacion, instExtra: instalacion ? extra : 0 }))
+  }, [])
+
+  const calcularPrecioActual = useCallback(
+    (reglas: ReglaPrecio[]) => calcularPrecio(state, reglas),
+    [state]
+  )
+
+  const resetear = useCallback(() => {
+    setState(estadoInicial)
+  }, [])
+
+  return {
+    state,
+    setTipo,
+    setTela,
+    setColor,
+    setMedidas,
+    setSistema,
+    setInstalacion,
+    calcularPrecioActual,
+    resetear,
+  }
+}

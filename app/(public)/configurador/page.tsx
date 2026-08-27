@@ -12,13 +12,12 @@ import StepTela from '@/components/configurador/StepTela'
 import StepColor from '@/components/configurador/StepColor'
 import StepMedidas from '@/components/configurador/StepMedidas'
 import StepSistema from '@/components/configurador/StepSistema'
-import StepInstalacion from '@/components/configurador/StepInstalacion'
 import StepCierre from '@/components/configurador/StepCierre'
 import PriceBar from '@/components/configurador/PriceBar'
 import PresupuestoPanel from '@/components/presupuesto/PresupuestoPanel'
 import { generarPDF } from '@/lib/pdf'
 
-const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Instalación', 'Cierre']
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
 export default function ConfiguradorPage() {
   const {
@@ -58,7 +57,7 @@ export default function ConfiguradorPage() {
 
   const coloresFiltrados: Color[] = (catalogo?.colores ?? []).filter(
     c => c.tela_id === state.tela?.id
-  ) ?? []
+  )
 
   function irA(nuevoPaso: number) {
     if (nuevoPaso >= 0 && nuevoPaso < PASOS.length) {
@@ -91,20 +90,17 @@ export default function ConfiguradorPage() {
     await fetch('/api/email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email,
-        items,
-      }),
+      body: JSON.stringify({ email, items }),
     })
   }
 
   if (loading) {
     return (
       <main style={{
-        background: 'var(--bg)', minHeight: '100vh',
+        background: '#fff', minHeight: '100vh',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Cargando configurador…</p>
+        <p style={{ color: '#BBB', fontSize: 14 }}>Cargando configurador…</p>
       </main>
     )
   }
@@ -112,7 +108,7 @@ export default function ConfiguradorPage() {
   if (error || !catalogo) {
     return (
       <main style={{
-        background: 'var(--bg)', minHeight: '100vh',
+        background: '#fff', minHeight: '100vh',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}>
         <p style={{ color: '#ef4444', fontSize: 14 }}>{error ?? 'Error inesperado'}</p>
@@ -121,7 +117,7 @@ export default function ConfiguradorPage() {
   }
 
   return (
-    <main style={{ background: 'var(--bg)', minHeight: '100vh', paddingBottom: 100 }}>
+    <main style={{ background: '#FAFAFA', minHeight: '100vh', paddingBottom: 100 }}>
 
       <StepHeader
         pasos={PASOS}
@@ -129,10 +125,10 @@ export default function ConfiguradorPage() {
         onClickPaso={(i) => { if (i < paso) irA(i) }}
       />
 
-      <div style={{ maxWidth: 860, margin: '0 auto', padding: '32px 16px 0' }}>
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 24px 0' }}>
 
         {/* Panel de presupuesto si hay items */}
-        {(items.length > 0 || paso === PASOS.length - 1) && (
+        {items.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <PresupuestoPanel
               items={items}
@@ -147,10 +143,10 @@ export default function ConfiguradorPage() {
 
         {/* Contenido del paso */}
         <div style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius)',
-          padding: '28px 24px',
+          background: '#fff',
+          border: '1px solid #EBEBEB',
+          borderRadius: 8,
+          padding: '36px 32px',
         }}>
           {paso === 0 && (
             <StepTipo
@@ -202,13 +198,6 @@ export default function ConfiguradorPage() {
           )}
 
           {paso === 5 && (
-            <StepInstalacion
-              instalacion={state.instalacion}
-              onChange={(activa, extra) => setInstalacion(activa, extra)}
-            />
-          )}
-
-          {paso === 6 && (
             <StepCierre
               state={state}
               precioEstimado={precio}
@@ -220,8 +209,8 @@ export default function ConfiguradorPage() {
         </div>
       </div>
 
-      {/* Price bar fija abajo */}
-      {paso > 0 && paso < PASOS.length - 1 && (
+      {/* Price bar fija abajo — no en el último paso */}
+      {paso < PASOS.length - 1 && (
         <PriceBar
           state={state}
           precio={precio}

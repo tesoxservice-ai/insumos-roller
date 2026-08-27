@@ -9,172 +9,251 @@ interface StepTipoProps {
   onSelect: (tipo: TipoCortina) => void
 }
 
-const SVG_POR_TIPO: Record<string, React.ReactNode> = {
+const DESCRIPCIONES: Record<string, string> = {
+  'Roller': 'Minimalistas, prácticas y versátiles. Ideales para cualquier ambiente.',
+  'Verticales': 'Elegantes y funcionales. Ideales para grandes ventanales.',
+  'Tradicionales': 'Clásicas y decorativas. Aportan calidez y estilo.',
+  'Horizontales': 'Control de luz y privacidad. Calidad y durabilidad.',
+  'Dúo': 'Diseño innovador que combina transparencia y privacidad.',
+}
+
+const PLACEHOLDERS: Record<string, React.ReactNode> = {
   Roller: (
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <rect x="10" y="8" width="60" height="6" rx="3" fill="var(--gold)" opacity="0.8"/>
-      <rect x="18" y="14" width="44" height="52" rx="2" fill="var(--surface2)" stroke="var(--border)" strokeWidth="1"/>
-      <rect x="18" y="14" width="44" height="8" fill="var(--gold)" opacity="0.3"/>
-      <line x1="18" y1="26" x2="62" y2="26" stroke="var(--border)" strokeWidth="0.8"/>
-      <line x1="18" y1="34" x2="62" y2="34" stroke="var(--border)" strokeWidth="0.8"/>
-      <line x1="18" y1="42" x2="62" y2="42" stroke="var(--border)" strokeWidth="0.8"/>
-      <line x1="18" y1="50" x2="62" y2="50" stroke="var(--border)" strokeWidth="0.8"/>
-      <rect x="37" y="66" width="6" height="8" rx="2" fill="var(--gold)" opacity="0.6"/>
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="20" y="18" width="100" height="12" rx="6" fill="#C8C0B0"/>
+      <ellipse cx="70" cy="18" rx="12" ry="8" fill="#B8B0A0"/>
+      <rect x="22" y="28" width="96" height="110" rx="2" fill="#E8E0D0"/>
+      {[45, 62, 79, 96, 113].map(y => (
+        <line key={y} x1="22" y1={y} x2="118" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
+      ))}
+      <rect x="22" y="136" width="96" height="8" rx="2" fill="#C8C0B0"/>
+      <line x1="108" y1="30" x2="108" y2="136" stroke="#C8C0B0" strokeWidth="2"/>
+      <circle cx="108" cy="144" r="4" fill="#C8C0B0"/>
     </svg>
   ),
   Verticales: (
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <rect x="8" y="8" width="64" height="4" rx="2" fill="var(--gold)" opacity="0.8"/>
-      {[16, 26, 36, 46, 56].map((x, i) => (
-        <rect
-          key={i}
-          x={x} y="12" width="8" height="58" rx="1"
-          fill="var(--surface2)"
-          stroke="var(--border)"
-          strokeWidth="1"
-          opacity={0.6 + i * 0.08}
-        />
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="15" y="18" width="110" height="8" rx="3" fill="#C8C0B0"/>
+      {[20, 36, 52, 68, 84, 100, 116].map((x, i) => (
+        <rect key={i} x={x} y="26" width="12" height="118" rx="2" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
       ))}
     </svg>
   ),
   Tradicionales: (
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <rect x="8" y="8" width="64" height="4" rx="2" fill="var(--gold)" opacity="0.8"/>
-      <path d="M12 12 Q20 30 12 48 Q20 66 12 72" stroke="var(--text-mid)" strokeWidth="2" fill="none"/>
-      <path d="M68 12 Q60 30 68 48 Q60 66 68 72" stroke="var(--text-mid)" strokeWidth="2" fill="none"/>
-      <path d="M12 12 C20 18 60 18 68 12" stroke="var(--text-mid)" strokeWidth="1.5" fill="var(--surface2)" opacity="0.6"/>
-      <path d="M12 28 C25 32 55 32 68 28" stroke="var(--border)" strokeWidth="1" fill="none"/>
-      <path d="M12 44 C25 48 55 48 68 44" stroke="var(--border)" strokeWidth="1" fill="none"/>
-      <path d="M12 60 C25 64 55 64 68 60" stroke="var(--border)" strokeWidth="1" fill="none"/>
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="15" y="18" width="110" height="6" rx="3" fill="#C8C0B0"/>
+      {[28, 44, 60, 76, 92, 108].map((y, i) => (
+        <rect key={i} x="20" y={y} width="100" height="12" rx="1" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
+      ))}
+      <rect x="20" y="120" width="100" height="8" rx="2" fill="#C8C0B0"/>
+      <line x1="118" y1="24" x2="118" y2="122" stroke="#C8C0B0" strokeWidth="1.5"/>
+      <circle cx="118" cy="128" r="3" fill="#C8C0B0"/>
     </svg>
   ),
   Horizontales: (
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <rect x="10" y="8" width="60" height="5" rx="2" fill="var(--gold)" opacity="0.8"/>
-      {[18, 27, 36, 45, 54, 63].map((y, i) => (
-        <rect key={i} x="14" y={y} width="52" height="6" rx="1"
-          fill="var(--surface2)" stroke="var(--border)" strokeWidth="0.8"
-          opacity={0.5 + i * 0.08}
-        />
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="15" y="18" width="110" height="8" rx="3" fill="#C8C0B0"/>
+      {[32, 46, 60, 74, 88, 102, 116, 130].map((y, i) => (
+        <rect key={i} x="20" y={y} width="100" height="8" rx="1" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
       ))}
-      <line x1="40" y1="13" x2="40" y2="72" stroke="var(--border)" strokeWidth="0.6" strokeDasharray="2 2"/>
     </svg>
   ),
   Dúo: (
-    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-      <rect x="10" y="8" width="60" height="5" rx="2" fill="var(--gold)" opacity="0.8"/>
-      {Array.from({ length: 9 }).map((_, i) => (
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="15" y="18" width="110" height="8" rx="3" fill="#C8C0B0"/>
+      {Array.from({ length: 10 }).map((_, i) => (
         <rect
           key={i}
-          x="14" y={14 + i * 7} width="52" height="4" rx="1"
-          fill={i % 2 === 0 ? 'var(--surface2)' : 'var(--gold)'}
-          opacity={i % 2 === 0 ? 0.7 : 0.2}
-          stroke="var(--border)" strokeWidth="0.5"
+          x="20" y={30 + i * 13} width="100" height="8" rx="1"
+          fill={i % 2 === 0 ? '#E8E0D0' : 'rgba(200,192,176,0.25)'}
+          stroke="#D0C8B8" strokeWidth="0.5"
         />
       ))}
     </svg>
   ),
 }
 
-function getSvg(nombre: string) {
-  for (const key of Object.keys(SVG_POR_TIPO)) {
-    if (nombre.toLowerCase().includes(key.toLowerCase())) return SVG_POR_TIPO[key]
+function getPlaceholder(nombre: string) {
+  for (const key of Object.keys(PLACEHOLDERS)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return PLACEHOLDERS[key]
   }
-  return SVG_POR_TIPO['Roller']
+  return PLACEHOLDERS['Roller']
+}
+
+function getDescripcion(nombre: string) {
+  for (const key of Object.keys(DESCRIPCIONES)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return DESCRIPCIONES[key]
+  }
+  return ''
 }
 
 export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
   const [hoverId, setHoverId] = useState<string | null>(null)
-  const [expandidoMobile, setExpandidoMobile] = useState<string | null>(null)
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold mb-1" style={{ color: 'var(--text)' }}>
-        Elegí el tipo de cortina
-      </h2>
-      <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-        Cada tipo tiene características únicas para distintos ambientes y necesidades.
-      </p>
+    <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-        {tipos.map((tipo) => {
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+        <p style={{
+          fontSize: 11, fontWeight: 700, color: '#14008C',
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+          marginBottom: 12,
+        }}>
+          PASO 1 DE 6
+        </p>
+        <h2 style={{
+          fontSize: 'clamp(24px, 3vw, 36px)',
+          fontWeight: 700,
+          color: '#0A0A14',
+          letterSpacing: '-0.02em',
+          margin: '0 0 12px 0',
+          fontStyle: 'italic',
+        }}>
+          Elegí el tipo de cortina
+        </h2>
+        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
+        <p style={{ fontSize: 14, color: '#999', margin: 0, maxWidth: 400, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+          Cada tipo tiene características únicas para distintos ambientes y necesidades.
+        </p>
+      </div>
+
+      {/* Grilla */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${Math.min(tipos.length, 5)}, 1fr)`,
+        gap: 16,
+        marginBottom: 32,
+      }}
+        className="tipo-grid"
+      >
+        {tipos.map(tipo => {
           const activo = seleccionado?.id === tipo.id
-          const conTooltip = hoverId === tipo.id
-          const expandido = expandidoMobile === tipo.id
+          const hover = hoverId === tipo.id
+          const desc = getDescripcion(tipo.nombre)
 
           return (
-            <div key={tipo.id} className="relative flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  onSelect(tipo)
-                  setExpandidoMobile(expandido ? null : tipo.id)
-                }}
-                onMouseEnter={() => setHoverId(tipo.id)}
-                onMouseLeave={() => setHoverId(null)}
-                className="flex flex-col items-center rounded-xl border transition-all duration-150 overflow-hidden"
-                style={{
-                  backgroundColor: activo ? 'var(--gold-soft)' : 'var(--surface)',
-                  borderColor: activo ? 'var(--gold)' : conTooltip ? 'var(--gold-border)' : 'var(--border)',
-                  borderWidth: activo ? '2px' : '1px',
-                }}
-              >
-                {/* Área visual */}
-                <div
-                  className="w-full flex items-center justify-center p-2"
-                  style={{ height: '120px', backgroundColor: 'var(--surface2)' }}
-                >
-                  <div className="w-16 h-16">
-                    {getSvg(tipo.nombre)}
-                  </div>
-                </div>
-
-                {/* Nombre */}
-                <div className="py-2 px-1 text-center">
-                  <span
-                    className="text-sm font-medium"
-                    style={{ color: activo ? 'var(--gold)' : 'var(--text)' }}
-                  >
-                    {tipo.nombre}
-                  </span>
-                </div>
-
-                {/* Tooltip desktop */}
-                {conTooltip && (
-                  <div
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 w-48 p-3 rounded-lg text-left shadow-lg pointer-events-none"
-                    style={{ backgroundColor: '#0a0908', border: '1px solid var(--border)' }}
-                  >
-                    <p className="text-xs font-semibold mb-1" style={{ color: 'var(--gold)' }}>
-                      {tipo.tooltip}
-                    </p>
-                    <p className="text-xs leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-                      {tipo.descripcion}
-                    </p>
+            <div
+              key={tipo.id}
+              onClick={() => onSelect(tipo)}
+              onMouseEnter={() => setHoverId(tipo.id)}
+              onMouseLeave={() => setHoverId(null)}
+              style={{
+                cursor: 'pointer',
+                border: `1.5px solid ${activo ? '#14008C' : hover ? '#C0C0D8' : '#EBEBEB'}`,
+                borderRadius: 6,
+                overflow: 'hidden',
+                transition: 'all 0.18s',
+                background: activo ? '#F7F7FB' : '#fff',
+                boxShadow: hover && !activo ? '0 4px 16px rgba(0,0,0,0.08)' : 'none',
+              }}
+            >
+              {/* Imagen placeholder */}
+              <div style={{
+                background: '#F5F0E8',
+                aspectRatio: '3/4',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '24px 20px',
+                position: 'relative',
+                overflow: 'hidden',
+              }}>
+                {getPlaceholder(tipo.nombre)}
+                {activo && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 10, right: 10,
+                    width: 22, height: 22,
+                    background: '#14008C',
+                    borderRadius: '50%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', fontSize: 12, fontWeight: 700,
+                  }}>
+                    ✓
                   </div>
                 )}
-              </button>
+              </div>
 
-              {/* Tooltip mobile expandible */}
-              {expandido && (
-                <div
-                  className="rounded-lg p-3 text-sm"
-                  style={{
-                    backgroundColor: 'var(--surface2)',
-                    border: '1px solid var(--border)',
-                  }}
-                >
-                  <p className="font-semibold mb-1" style={{ color: 'var(--gold)' }}>
-                    {tipo.tooltip}
-                  </p>
-                  <p className="leading-relaxed" style={{ color: 'var(--text-mid)' }}>
-                    {tipo.descripcion}
-                  </p>
+              {/* Info */}
+              <div style={{ padding: '14px 14px 16px' }}>
+                <div style={{
+                  fontSize: 12, fontWeight: 800,
+                  color: activo ? '#14008C' : '#0A0A14',
+                  letterSpacing: '0.06em',
+                  marginBottom: 5,
+                }}>
+                  {tipo.nombre.toUpperCase()}
                 </div>
-              )}
+                <p style={{
+                  fontSize: 11, color: '#999',
+                  lineHeight: 1.5, margin: '0 0 10px 0',
+                }}>
+                  {desc}
+                </p>
+                <span style={{
+                  fontSize: 16,
+                  color: activo ? '#14008C' : hover ? '#14008C' : '#CCC',
+                  transition: 'color 0.15s',
+                }}>
+                  →
+                </span>
+              </div>
             </div>
           )
         })}
       </div>
+
+      {/* Banner ayuda */}
+      <div style={{
+        background: '#F7F7FB',
+        border: '1px solid #E8E8F0',
+        borderRadius: 6,
+        padding: '16px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 16,
+        flexWrap: 'wrap',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 36, height: 36,
+            background: '#EEEEF8',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 16, flexShrink: 0,
+          }}>
+            ?
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#0A0A14', marginBottom: 2 }}>
+              ¿No sabés cuál elegir?
+            </div>
+            <div style={{ fontSize: 12, color: '#999' }}>
+              Te ayudamos a encontrar la mejor opción para vos.
+            </div>
+          </div>
+        </div>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          color: '#14008C', fontSize: 13, fontWeight: 700,
+          letterSpacing: '0.04em', cursor: 'pointer',
+          borderBottom: '1.5px solid #14008C',
+          paddingBottom: 1,
+        }}>
+          VER GUÍA DE TIPOS →
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .tipo-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 400px) {
+          .tipo-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
     </div>
   )
 }

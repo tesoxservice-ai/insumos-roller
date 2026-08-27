@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import type { ReglaPrecio } from '@/types'
 
 interface StepSistemaProps {
@@ -10,49 +11,19 @@ interface StepSistemaProps {
   regla: ReglaPrecio | null
 }
 
-interface OpcionCardProps {
-  seleccionada: boolean
-  onClick: () => void
-  icono: React.ReactNode
-  titulo: string
-  descripcion: string
-  extra: string | null
-}
-
-function OpcionCard({ seleccionada, onClick, icono, titulo, descripcion, extra }: OpcionCardProps) {
+function RadioCircle({ activo }: { activo: boolean }) {
   return (
-    <button
-      onClick={onClick}
-      className="flex items-start gap-4 p-4 rounded-xl border text-left w-full transition-all"
-      style={{
-        backgroundColor: seleccionada ? 'var(--gold-soft)' : 'var(--surface)',
-        borderColor: seleccionada ? 'var(--gold)' : 'var(--border)',
-        borderWidth: seleccionada ? '2px' : '1px',
-      }}
-    >
-      <span className="text-2xl flex-shrink-0 mt-0.5">{icono}</span>
-      <div className="flex-1">
-        <p className="font-semibold text-sm" style={{ color: seleccionada ? 'var(--gold)' : 'var(--text)' }}>
-          {titulo}
-        </p>
-        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          {descripcion}
-        </p>
-        {extra && (
-          <p className="text-xs font-semibold mt-1" style={{ color: 'var(--gold)' }}>
-            {extra}
-          </p>
-        )}
-      </div>
-      {/* Indicador selección */}
-      <span
-        className="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-1"
-        style={{
-          borderColor: seleccionada ? 'var(--gold)' : 'var(--border)',
-          backgroundColor: seleccionada ? 'var(--gold)' : 'transparent',
-        }}
-      />
-    </button>
+    <div style={{
+      width: 22, height: 22,
+      borderRadius: '50%',
+      border: `2px solid ${activo ? '#14008C' : '#CCC'}`,
+      background: activo ? '#14008C' : '#fff',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      flexShrink: 0,
+      transition: 'all 0.15s',
+    }}>
+      {activo && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
+    </div>
   )
 }
 
@@ -63,70 +34,240 @@ export default function StepSistema({
   onInstalacionChange,
   regla,
 }: StepSistemaProps) {
-  const motorizadoExtra = regla?.motorizada_extra ?? 0
-  const instalacionExtra = regla?.instalacion_extra ?? 0
+
+  const motorExtra = regla?.motorizada_extra ?? 35000
+  const instExtra = regla?.instalacion_extra ?? 20000
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h2 className="text-xl font-semibold mb-1" style={{ color: 'var(--text)' }}>
-        Sistema e instalación
-      </h2>
-      <p className="text-sm mb-8" style={{ color: 'var(--text-muted)' }}>
-        Elegí cómo vas a manejar tu cortina y si necesitás que la instalemos.
-      </p>
+    <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      {/* Sistema de accionamiento */}
-      <section className="mb-6">
-        <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-          Sistema de accionamiento
-        </h3>
-        <div className="flex flex-col gap-3">
-          <OpcionCard
-            seleccionada={sistema === 'manual'}
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <p style={{
+          fontSize: 11, fontWeight: 700, color: '#14008C',
+          letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 12,
+        }}>
+          PASO 4 DE 6
+        </p>
+        <h2 style={{
+          fontSize: 'clamp(24px, 3vw, 36px)',
+          fontWeight: 700, color: '#0A0A14',
+          letterSpacing: '-0.02em', margin: '0 0 12px 0',
+          fontStyle: 'italic',
+        }}>
+          Elegí el sistema e instalación
+        </h2>
+        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
+        <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
+          Elegí cómo vas a manejar tu cortina y si necesitás que la instalemos.
+        </p>
+      </div>
+
+      {/* SISTEMA */}
+      <div style={{ marginBottom: 32 }}>
+        <p style={{
+          fontSize: 11, fontWeight: 800, color: '#14008C',
+          letterSpacing: '0.16em', marginBottom: 14,
+        }}>
+          SISTEMA DE ACCIONAMIENTO
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
+          className="sistema-grid"
+        >
+          {/* Cadena */}
+          <div
             onClick={() => onSistemaChange('manual', 0)}
-            icono="🔗"
-            titulo="Cadena manual"
-            descripcion="Sistema clásico con cadena plástica o metálica. Simple, silencioso y sin necesidad de electricidad."
-            extra={null}
-          />
-          <OpcionCard
-            seleccionada={sistema === 'motorizado'}
-            onClick={() => onSistemaChange('motorizado', motorizadoExtra)}
-            icono="⚡"
-            titulo="Motorizado"
-            descripcion="Motor silencioso controlable por control remoto o app. Ideal para cortinas de difícil acceso o grandes dimensiones."
-            extra={motorizadoExtra > 0 ? `+ $${motorizadoExtra.toLocaleString('es-AR')}` : null}
-          />
+            style={{
+              border: `1.5px solid ${sistema === 'manual' || sistema === 'Cadena' ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 8,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              display: 'flex',
+              transition: 'all 0.18s',
+              background: '#fff',
+              boxShadow: sistema === 'manual' || sistema === 'Cadena' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+            }}
+          >
+            {/* Imagen placeholder */}
+            <div style={{
+              width: 140, flexShrink: 0,
+              background: '#F5F0E8',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16,
+            }}>
+              <svg viewBox="0 0 80 100" width="80" height="100" fill="none">
+                <rect x="10" y="8" width="60" height="8" rx="4" fill="#C8C0B0"/>
+                <rect x="14" y="16" width="52" height="68" rx="2" fill="#E8E0D0"/>
+                {[28, 40, 52, 64, 76].map(y => (
+                  <line key={y} x1="14" y1={y} x2="66" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
+                ))}
+                <rect x="14" y="82" width="52" height="6" rx="2" fill="#C8C0B0"/>
+                <line x1="56" y1="16" x2="56" y2="82" stroke="#C8C0B0" strokeWidth="1.5"/>
+                <circle cx="56" cy="88" r="3" fill="#C8C0B0"/>
+                {[92, 96, 100].map(y => (
+                  <circle key={y} cx="56" cy={y} r="1.5" fill="#C8C0B0"/>
+                ))}
+              </svg>
+            </div>
+            {/* Info */}
+            <div style={{ padding: '20px 16px 20px 16px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 18, marginBottom: 8 }}>🔗</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+                Cadena manual
+              </div>
+              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: 0 }}>
+                Sistema clásico con cadena plástica o metálica. Simple, silencioso y sin necesidad de electricidad.
+              </p>
+              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+                <RadioCircle activo={sistema === 'manual' || sistema === 'Cadena'} />
+              </div>
+            </div>
+          </div>
+
+          {/* Motorizado */}
+          <div
+            onClick={() => onSistemaChange('motorizado', motorExtra)}
+            style={{
+              border: `1.5px solid ${sistema === 'motorizado' || sistema === 'Motorizada' ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 8,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              display: 'flex',
+              transition: 'all 0.18s',
+              background: '#fff',
+              boxShadow: sistema === 'motorizado' || sistema === 'Motorizada' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+            }}
+          >
+            {/* Imagen placeholder */}
+            <div style={{
+              width: 140, flexShrink: 0,
+              background: '#F5F0E8',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16,
+            }}>
+              <svg viewBox="0 0 80 100" width="80" height="100" fill="none">
+                <rect x="10" y="8" width="60" height="10" rx="5" fill="#B0A898"/>
+                <rect x="28" y="6" width="24" height="6" rx="3" fill="#8A8278"/>
+                <rect x="14" y="18" width="52" height="68" rx="2" fill="#E8E0D0"/>
+                {[30, 42, 54, 66, 78].map(y => (
+                  <line key={y} x1="14" y1={y} x2="66" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
+                ))}
+                <rect x="14" y="84" width="52" height="6" rx="2" fill="#C8C0B0"/>
+              </svg>
+            </div>
+            {/* Info */}
+            <div style={{ padding: '20px 16px 20px 16px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 18, marginBottom: 8 }}>⚡</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+                Motorizado
+              </div>
+              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: '0 0 8px 0' }}>
+                Motor silencioso controlable por control remoto o app. Ideal para cortinas de difícil acceso o grandes dimensiones.
+              </p>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C' }}>
+                + ${motorExtra.toLocaleString('es-AR')}
+              </div>
+              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+                <RadioCircle activo={sistema === 'motorizado' || sistema === 'Motorizada'} />
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
 
-      {/* Divider */}
-      <div className="my-6" style={{ borderTop: '1px solid var(--border)' }} />
-
-      {/* Instalación */}
-      <section>
-        <h3 className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
-          Instalación
-        </h3>
-        <div className="flex flex-col gap-3">
-          <OpcionCard
-            seleccionada={!instalacion}
+      {/* INSTALACIÓN */}
+      <div>
+        <p style={{
+          fontSize: 11, fontWeight: 800, color: '#14008C',
+          letterSpacing: '0.16em', marginBottom: 14,
+        }}>
+          INSTALACIÓN
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
+          className="inst-grid"
+        >
+          {/* La instalo yo */}
+          <div
             onClick={() => onInstalacionChange(false, 0)}
-            icono="🔨"
-            titulo="La instalo yo"
-            descripcion="Te enviamos la cortina con instrucciones claras. La mayoría de las personas la instala en menos de 30 minutos."
-            extra={null}
-          />
-          <OpcionCard
-            seleccionada={instalacion}
-            onClick={() => onInstalacionChange(true, instalacionExtra)}
-            icono="👷"
-            titulo="Quiero instalación profesional"
-            descripcion="Nuestro equipo instala la cortina en tu domicilio. Incluye medición final, colocación y prueba del sistema."
-            extra={instalacionExtra > 0 ? `+ $${instalacionExtra.toLocaleString('es-AR')}` : null}
-          />
+            style={{
+              border: `1.5px solid ${!instalacion ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 8,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              display: 'flex',
+              transition: 'all 0.18s',
+              background: '#fff',
+              boxShadow: !instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+            }}
+          >
+            <div style={{
+              width: 140, flexShrink: 0,
+              background: '#F5F0E8',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16, fontSize: 40,
+            }}>
+              📦
+            </div>
+            <div style={{ padding: '20px 16px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 18, marginBottom: 8 }}>🔩</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+                La instalo yo
+              </div>
+              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: 0 }}>
+                Te enviamos la cortina con instrucciones claras. La mayoría de las personas la instala en menos de 30 minutos.
+              </p>
+              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+                <RadioCircle activo={!instalacion} />
+              </div>
+            </div>
+          </div>
+
+          {/* Instalación profesional */}
+          <div
+            onClick={() => onInstalacionChange(true, instExtra)}
+            style={{
+              border: `1.5px solid ${instalacion ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 8,
+              overflow: 'hidden',
+              cursor: 'pointer',
+              display: 'flex',
+              transition: 'all 0.18s',
+              background: '#fff',
+              boxShadow: instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+            }}
+          >
+            <div style={{
+              width: 140, flexShrink: 0,
+              background: '#F5F0E8',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 16, fontSize: 40,
+            }}>
+              👷
+            </div>
+            <div style={{ padding: '20px 16px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 18, marginBottom: 8 }}>🏠</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: instalacion ? '#14008C' : '#0A0A14', marginBottom: 6 }}>
+                Quiero instalación profesional
+              </div>
+              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: '0 0 8px 0' }}>
+                Nuestro equipo instala la cortina en tu domicilio. Incluye medición final, colocación y prueba del sistema.
+              </p>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C' }}>
+                + ${instExtra.toLocaleString('es-AR')}
+              </div>
+              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+                <RadioCircle activo={instalacion} />
+              </div>
+            </div>
+          </div>
         </div>
-      </section>
+      </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .sistema-grid, .inst-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   )
 }

@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import type { Tela } from '@/types'
 
 interface StepTelaProps {
@@ -10,186 +9,257 @@ interface StepTelaProps {
   onSelect: (tela: Tela) => void
 }
 
-const EMOJI_POR_TELA: Record<string, string> = {
-  blackout: '🌙',
-  sunscreen: '☀️',
-  doble: '✨',
+const EMOJIS: Record<string, string> = {
+  Blackout: '🌙',
+  Sunscreen: '☀️',
+  Doble: '✨',
 }
 
-function getEmoji(nombre: string): string {
-  const key = Object.keys(EMOJI_POR_TELA).find((k) =>
-    nombre.toLowerCase().includes(k)
-  )
-  return key ? EMOJI_POR_TELA[key] : '🪟'
+const COLORES_FONDO: Record<string, string> = {
+  Blackout: '#2A2520',
+  Sunscreen: '#F0EAE0',
+  Doble: '#E8E4DC',
 }
 
-type NivelLuz = 'sunscreen3' | 'sunscreen5' | 'blackout'
-
-const NIVELES: { id: NivelLuz; label: string; valor: number; desc: string }[] = [
-  { id: 'sunscreen3', label: 'Sunscreen 3%', valor: 15, desc: 'Máxima transparencia' },
-  { id: 'sunscreen5', label: 'Sunscreen 5%', valor: 45, desc: 'Filtrado equilibrado' },
-  { id: 'blackout', label: 'Blackout', valor: 85, desc: 'Oscuridad total' },
-]
-
-function nivelDesdeValor(valor: number): NivelLuz | null {
-  if (valor <= 20) return 'sunscreen3'
-  if (valor <= 60) return 'sunscreen5'
-  if (valor >= 75) return 'blackout'
-  return null
+function getEmoji(nombre: string) {
+  for (const key of Object.keys(EMOJIS)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return EMOJIS[key]
+  }
+  return '✨'
 }
 
-function labelEstado(valor: number): string {
-  if (valor <= 20) return 'SUNSCREEN 3% — Máxima transparencia'
-  if (valor <= 60) return 'SUNSCREEN 5% — Filtrado equilibrado'
-  return 'BLACKOUT — Oscuridad total'
+function getFondo(nombre: string) {
+  for (const key of Object.keys(COLORES_FONDO)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return COLORES_FONDO[key]
+  }
+  return '#F0EAE0'
 }
 
-export default function StepTela({ telasFiltradas, seleccionada, onSelect }: StepTelaProps) {
-  const [hoverId, setHoverId] = useState<string | null>(null)
-  const [luzValor, setLuzValor] = useState(85)
-
-  const nivelActivo = nivelDesdeValor(luzValor)
+export default function StepTela({
+  telas,
+  telasFiltradas,
+  seleccionada,
+  onSelect,
+}: StepTelaProps) {
+  const lista = telasFiltradas.length > 0 ? telasFiltradas : telas
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold mb-1" style={{ color: 'var(--text)' }}>
-        Elegí la tela
-      </h2>
-      <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-        Cada tela tiene propiedades únicas de luz, privacidad y temperatura.
-      </p>
+    <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      {/* Grilla de telas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
-        {telasFiltradas.map((tela) => {
-          const activa = seleccionada?.id === tela.id
-          const hovered = hoverId === tela.id
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 36 }}>
+        <p style={{
+          fontSize: 11, fontWeight: 700, color: '#14008C',
+          letterSpacing: '0.16em', textTransform: 'uppercase',
+          marginBottom: 12,
+        }}>
+          PASO 2 DE 6
+        </p>
+        <h2 style={{
+          fontSize: 'clamp(24px, 3vw, 36px)',
+          fontWeight: 700,
+          color: '#0A0A14',
+          letterSpacing: '-0.02em',
+          margin: '0 0 12px 0',
+          fontStyle: 'italic',
+        }}>
+          Elegí el tipo de tela
+        </h2>
+        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
+        <p style={{
+          fontSize: 14, color: '#999', margin: 0,
+          maxWidth: 440, marginLeft: 'auto', marginRight: 'auto',
+          lineHeight: 1.6,
+        }}>
+          Cada tela tiene propiedades únicas de luz, privacidad y temperatura.
+        </p>
+      </div>
+
+      {/* Cards */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${Math.min(lista.length, 3)}, 1fr)`,
+        gap: 16,
+        marginBottom: 24,
+      }}
+        className="tela-grid"
+      >
+        {lista.map(tela => {
+          const activo = seleccionada?.id === tela.id
+          const fondo = getFondo(tela.nombre)
+          const esOscuro = tela.nombre.toLowerCase().includes('blackout')
 
           return (
-            <button
+            <div
               key={tela.id}
               onClick={() => onSelect(tela)}
-              onMouseEnter={() => setHoverId(tela.id)}
-              onMouseLeave={() => setHoverId(null)}
-              className="rounded-xl border text-left transition-all duration-150 overflow-hidden"
               style={{
-                backgroundColor: activa ? 'var(--gold-soft)' : 'var(--surface)',
-                borderColor: activa ? 'var(--gold)' : hovered ? 'var(--gold-border)' : 'var(--border)',
-                borderWidth: activa ? '2px' : '1px',
+                border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
+                borderRadius: 6,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'all 0.18s',
+                background: '#fff',
+                boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.08)' : 'none',
               }}
             >
-              {/* Header */}
-              <div className="p-4 pb-2 flex items-start gap-3">
-                <span className="text-3xl">{getEmoji(tela.nombre)}</span>
-                <div>
-                  <p className="font-semibold" style={{ color: activa ? 'var(--gold)' : 'var(--text)' }}>
-                    {tela.nombre}
-                  </p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                    {tela.descripcion}
-                  </p>
+              {/* Imagen placeholder de textura */}
+              <div style={{
+                background: fondo,
+                height: 160,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+              }}>
+                {/* Textura simulada con SVG */}
+                <svg
+                  viewBox="0 0 200 160"
+                  width="100%"
+                  height="100%"
+                  style={{ position: 'absolute', inset: 0 }}
+                  preserveAspectRatio="xMidYMid slice"
+                >
+                  {Array.from({ length: 20 }).map((_, i) => (
+                    <line
+                      key={`h${i}`}
+                      x1="0" y1={i * 8} x2="200" y2={i * 8}
+                      stroke={esOscuro ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}
+                      strokeWidth="1"
+                    />
+                  ))}
+                  {Array.from({ length: 25 }).map((_, i) => (
+                    <line
+                      key={`v${i}`}
+                      x1={i * 8} y1="0" x2={i * 8} y2="160"
+                      stroke={esOscuro ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}
+                      strokeWidth="1"
+                    />
+                  ))}
+                  {/* Pliegues diagonales sutiles */}
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <line
+                      key={`d${i}`}
+                      x1={i * 40 - 20} y1="0"
+                      x2={i * 40 + 20} y2="160"
+                      stroke={esOscuro ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
+                      strokeWidth="3"
+                    />
+                  ))}
+                </svg>
+
+                {/* Emoji centrado */}
+                <span style={{
+                  fontSize: 36,
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+                }}>
+                  {getEmoji(tela.nombre)}
+                </span>
+
+                {/* Radio button */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: 12, right: 12,
+                  width: 22, height: 22,
+                  borderRadius: '50%',
+                  border: `2px solid ${activo ? '#14008C' : esOscuro ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)'}`,
+                  background: activo ? '#14008C' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {activo && (
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />
+                  )}
                 </div>
               </div>
 
-              {/* Checks — siempre visibles en mobile, en hover en desktop */}
-              <div
-                className="px-4 pb-4 pt-2 flex flex-col gap-1.5 transition-all"
-                style={{ display: hovered || activa ? 'flex' : 'none' }}
-              >
-                {tela.checks.map((check, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: 'var(--green)' }}>✓</span>
-                    <span className="text-xs" style={{ color: 'var(--text-mid)' }}>{check}</span>
-                  </div>
-                ))}
-              </div>
+              {/* Info */}
+              <div style={{ padding: '16px 18px 18px' }}>
+                <div style={{
+                  fontSize: 13, fontWeight: 800,
+                  color: activo ? '#14008C' : '#0A0A14',
+                  letterSpacing: '0.06em',
+                  marginBottom: 6,
+                }}>
+                  {tela.nombre.toUpperCase()}
+                </div>
+                <p style={{
+                  fontSize: 12, color: '#888',
+                  lineHeight: 1.55, margin: '0 0 12px 0',
+                }}>
+                  {tela.descripcion}
+                </p>
 
-              {/* Checks mobile (siempre visibles) */}
-              <div
-                className="px-4 pb-4 pt-2 flex-col gap-1.5 md:hidden"
-                style={{ display: 'flex' }}
-              >
-                {tela.checks.map((check, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: 'var(--green)' }}>✓</span>
-                    <span className="text-xs" style={{ color: 'var(--text-mid)' }}>{check}</span>
-                  </div>
-                ))}
+                {/* Checks */}
+                {tela.checks && tela.checks.length > 0 && (
+                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
+                    {tela.checks.map((check, i) => (
+                      <li key={i} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 7,
+                        fontSize: 12, color: '#555',
+                      }}>
+                        <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 0 }}>✓</span>
+                        {check}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-            </button>
+            </div>
           )
         })}
       </div>
 
-      {/* Simulador de luz */}
-      <div
-        className="rounded-xl p-6 border"
-        style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
-      >
-        <h3 className="text-sm font-semibold mb-4" style={{ color: 'var(--gold)' }}>
-          ✦ ¿Cuánta luz querés que entre?
-        </h3>
-
-        {/* SVG habitación */}
-        <div className="relative w-full rounded-lg overflow-hidden mb-4" style={{ height: '180px', backgroundColor: '#1c2a1c' }}>
-          <svg viewBox="0 0 400 180" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-            {/* Piso */}
-            <rect x="0" y="140" width="400" height="40" fill="#2a1f0e" opacity="0.9"/>
-            {/* Pared izquierda */}
-            <rect x="0" y="0" width="80" height="140" fill="#1a1410" opacity="0.9"/>
-            {/* Pared derecha */}
-            <rect x="320" y="0" width="80" height="140" fill="#1a1410" opacity="0.9"/>
-            {/* Techo */}
-            <rect x="0" y="0" width="400" height="30" fill="#1a1410" opacity="0.9"/>
-            {/* Marco ventana */}
-            <rect x="85" y="20" width="230" height="120" rx="2" fill="#0a0a08" stroke="#2E2A24" strokeWidth="3"/>
-            {/* Luz exterior que entra */}
-            <rect x="88" y="23" width="224" height="114" fill="#e8d5a0" opacity={0.08 + (1 - luzValor / 100) * 0.55}/>
-            {/* Overlay de cortina */}
-            <rect x="88" y="23" width="224" height="114" fill="#0F0E0C" opacity={luzValor / 100 * 0.92}/>
-            {/* Barra cortina */}
-            <rect x="82" y="18" width="236" height="7" rx="2" fill="#C9A84C" opacity="0.7"/>
-            {/* Lámpara */}
-            <ellipse cx="200" cy="32" rx="20" ry="6" fill="#C9A84C" opacity="0.3"/>
-            <rect x="198" y="30" width="4" height="16" fill="#C9A84C" opacity="0.4"/>
-            <ellipse cx="200" cy="52" rx="14" ry="8" fill="#C9A84C" opacity={0.15 + luzValor / 100 * 0.2}/>
-          </svg>
+      {/* Placeholder simulador de luz */}
+      <div style={{
+        background: '#F7F7FB',
+        border: '1px dashed #C8C8DC',
+        borderRadius: 6,
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        marginBottom: 0,
+      }}>
+        <div style={{
+          width: 40, height: 40,
+          background: '#EEEEF8',
+          borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: 18, flexShrink: 0,
+        }}>
+          💡
         </div>
-
-        {/* Label estado */}
-        <p className="text-xs font-semibold text-center mb-3" style={{ color: 'var(--gold)' }}>
-          {labelEstado(luzValor)}
-        </p>
-
-        {/* Slider */}
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={luzValor}
-          onChange={(e) => setLuzValor(Number(e.target.value))}
-          className="w-full mb-4 accent-yellow-500"
-          style={{ accentColor: 'var(--gold)' }}
-        />
-
-        {/* Botones de nivel */}
-        <div className="flex gap-2 justify-center flex-wrap">
-          {NIVELES.map((nivel) => (
-            <button
-              key={nivel.id}
-              onClick={() => setLuzValor(nivel.valor)}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all border"
-              style={{
-                backgroundColor: nivelActivo === nivel.id ? 'var(--gold-soft)' : 'var(--surface2)',
-                borderColor: nivelActivo === nivel.id ? 'var(--gold)' : 'var(--border)',
-                color: nivelActivo === nivel.id ? 'var(--gold)' : 'var(--text-mid)',
-              }}
-            >
-              {nivel.label}
-            </button>
-          ))}
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0A14', marginBottom: 2 }}>
+            Simulador de luz
+          </div>
+          <div style={{ fontSize: 12, color: '#999' }}>
+            Próximamente podrás ver cuánta luz entra con cada tipo de tela.
+          </div>
+        </div>
+        <div style={{
+          marginLeft: 'auto',
+          fontSize: 10, fontWeight: 700,
+          color: '#14008C',
+          background: 'rgba(20,0,140,0.07)',
+          border: '1px solid rgba(20,0,140,0.18)',
+          borderRadius: 100,
+          padding: '3px 10px',
+          letterSpacing: '0.08em',
+          flexShrink: 0,
+        }}>
+          PRÓXIMAMENTE
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          .tela-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   )
 }

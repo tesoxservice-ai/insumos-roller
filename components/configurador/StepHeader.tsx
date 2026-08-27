@@ -8,67 +8,119 @@ interface StepHeaderProps {
 
 export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeaderProps) {
   return (
-    <header
-      className="w-full overflow-x-auto border-b flex-shrink-0"
-      style={{
-        backgroundColor: 'var(--surface)',
-        borderColor: 'var(--border)',
-        height: '52px',
-      }}
-    >
-      <div className="flex items-center h-full px-4 gap-1 min-w-max">
+    <header style={{
+      width: '100%',
+      background: '#fff',
+      borderBottom: '1px solid #EBEBEB',
+      position: 'sticky',
+      top: 72, // debajo del nav
+      zIndex: 30,
+    }}>
+      <div style={{
+        maxWidth: 960,
+        margin: '0 auto',
+        padding: '0 24px',
+        height: 64,
+        display: 'flex',
+        alignItems: 'center',
+        overflowX: 'auto',
+      }}>
         {pasos.map((paso, i) => {
           const completado = i < pasoActual
           const activo = i === pasoActual
           const clickable = i < pasoActual
+          const esUltimo = i === pasos.length - 1
 
           return (
-            <button
+            <div
               key={paso}
-              onClick={() => clickable && onClickPaso(i)}
-              disabled={!clickable}
-              className="flex items-center gap-2 px-3 py-1 rounded-lg transition-all"
               style={{
-                cursor: clickable ? 'pointer' : 'default',
-                opacity: !activo && !completado ? 0.45 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                flex: esUltimo ? '0 0 auto' : '1 1 0',
+                minWidth: 0,
               }}
             >
-              {/* Número / check */}
-              <span
-                className="w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              {/* Paso */}
+              <button
+                onClick={() => clickable && onClickPaso(i)}
+                disabled={!clickable}
                 style={{
-                  backgroundColor: completado
-                    ? 'var(--green)'
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'none',
+                  border: 'none',
+                  cursor: clickable ? 'pointer' : 'default',
+                  padding: '4px 0',
+                  flexShrink: 0,
+                }}
+              >
+                {/* Círculo */}
+                <div style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  background: completado
+                    ? '#0A0A14'
                     : activo
-                    ? 'var(--gold)'
-                    : 'var(--surface2)',
-                  color: completado || activo ? 'var(--bg)' : 'var(--text-muted)',
-                }}
-              >
-                {completado ? '✓' : i + 1}
-              </span>
+                    ? '#14008C'
+                    : 'transparent',
+                  border: completado || activo
+                    ? 'none'
+                    : '1.5px solid #CCCCCC',
+                  transition: 'all 0.2s',
+                }}>
+                  {completado ? (
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  ) : (
+                    <span style={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: activo ? '#fff' : '#AAA',
+                      lineHeight: 1,
+                    }}>
+                      {i + 1}
+                    </span>
+                  )}
+                </div>
 
-              {/* Nombre */}
-              <span
-                className="text-sm font-medium whitespace-nowrap"
-                style={{
+                {/* Nombre */}
+                <span style={{
+                  fontSize: 12,
+                  fontWeight: activo || completado ? 700 : 500,
                   color: activo
-                    ? 'var(--gold)'
+                    ? '#14008C'
                     : completado
-                    ? 'var(--text)'
-                    : 'var(--text-muted)',
-                }}
-              >
-                {paso}
-              </span>
-
-              {/* Separador */}
-              {i < pasos.length - 1 && (
-                <span className="ml-1 text-xs" style={{ color: 'var(--border)' }}>
-                  /
+                    ? '#0A0A14'
+                    : '#BBBBBB',
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  whiteSpace: 'nowrap',
+                  transition: 'color 0.2s',
+                }}>
+                  {paso}
                 </span>
+              </button>
+
+              {/* Línea conectora */}
+              {!esUltimo && (
+                <div style={{
+                  flex: 1,
+                  height: 1.5,
+                  margin: '0 12px',
+                  background: completado ? '#0A0A14' : '#E0E0E0',
+                  transition: 'background 0.2s',
+                  minWidth: 16,
+                }} />
               )}
-            </button>
+            </div>
           )
         })}
       </div>

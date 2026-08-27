@@ -1,4 +1,4 @@
-// Tipos centrales del sistema MaxRoller
+// Tipos centrales del sistema Insumos Roller
 
 export interface TipoCortina {
   id: string
@@ -66,7 +66,7 @@ export interface Cotizacion {
   con_instalacion: boolean
   precio_estimado: number
   email_cliente: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- items puede contener cualquier estructura de ambiente
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items: any[]
   estado: 'pendiente' | 'enviada' | 'aceptada' | 'rechazada'
   created_at: string
@@ -83,6 +83,7 @@ export interface ConfiguradorState {
   sistemaExtra: number
   instalacion: boolean
   instExtra: number
+  caida: 'detras' | 'delante'
 }
 
 export interface ItemPresupuesto {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { TipoCortina } from '@/types'
 
 interface StepTipoProps {
@@ -15,6 +16,24 @@ const DESCRIPCIONES: Record<string, string> = {
   'Tradicionales': 'Clásicas y decorativas. Aportan calidez y estilo.',
   'Horizontales': 'Control de luz y privacidad. Calidad y durabilidad.',
   'Dúo': 'Diseño innovador que combina transparencia y privacidad.',
+  'Textiles': 'Elegantes y decorativas. Filtran la luz con suavidad.',
+  'Bandas': 'Elegantes y funcionales. Ideales para grandes ventanales.',
+}
+
+// Mapeo nombre → archivo en /public/images/
+const IMAGEN_MAP: Record<string, string> = {
+  'roller':    '/images/ROLLER.png',
+  'vertical':  '/images/VERTICALES.png',
+  'banda':     '/images/VERTICALES.png',
+  'textil':    '/images/TEXTILES.png',
+}
+
+function getImagenSrc(nombre: string): string | null {
+  const lower = nombre.toLowerCase()
+  for (const [key, src] of Object.entries(IMAGEN_MAP)) {
+    if (lower.includes(key)) return src
+  }
+  return null
 }
 
 const PLACEHOLDERS: Record<string, React.ReactNode> = {
@@ -87,6 +106,27 @@ function getDescripcion(nombre: string) {
   return ''
 }
 
+// Componente interno que maneja imagen real + fallback SVG
+function TipoImagen({ nombre }: { nombre: string }) {
+  const src = getImagenSrc(nombre)
+  const [imgError, setImgError] = useState(false)
+
+  if (!src || imgError) {
+    return <>{getPlaceholder(nombre)}</>
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={nombre}
+      fill
+      sizes="(max-width: 640px) 33vw, 20vw"
+      style={{ objectFit: 'cover', objectPosition: 'center' }}
+      onError={() => setImgError(true)}
+    />
+  )
+}
+
 export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
   const [hoverId, setHoverId] = useState<string | null>(null)
 
@@ -131,6 +171,7 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
           const activo = seleccionado?.id === tipo.id
           const hover = hoverId === tipo.id
           const desc = getDescripcion(tipo.nombre)
+          const tieneImagen = !!getImagenSrc(tipo.nombre)
 
           return (
             <div
@@ -148,18 +189,20 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
                 boxShadow: hover && !activo ? '0 4px 16px rgba(0,0,0,0.08)' : 'none',
               }}
             >
-              {/* Imagen placeholder */}
+              {/* Zona de imagen */}
               <div style={{
                 background: '#F5F0E8',
                 aspectRatio: '3/4',
+                position: 'relative',
+                overflow: 'hidden',
+                // Padding solo si es SVG (sin imagen real)
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '24px 20px',
-                position: 'relative',
-                overflow: 'hidden',
+                padding: tieneImagen ? 0 : '24px 20px',
               }}>
-                {getPlaceholder(tipo.nombre)}
+                <TipoImagen nombre={tipo.nombre} />
+
                 {activo && (
                   <div style={{
                     position: 'absolute',
@@ -169,9 +212,19 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
                     borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     color: '#fff', fontSize: 12, fontWeight: 700,
+                    zIndex: 2,
                   }}>
                     ✓
                   </div>
+                )}
+
+                {/* Overlay sutil al hover para imagen real */}
+                {tieneImagen && hover && !activo && (
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'rgba(20,0,140,0.06)',
+                    zIndex: 1,
+                  }} />
                 )}
               </div>
 

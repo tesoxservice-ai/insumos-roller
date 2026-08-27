@@ -19,7 +19,6 @@ export default function PriceBar({
   onBack,
   showBack,
 }: PriceBarProps) {
-  // Descripción resumida de la configuración actual
   const partes: string[] = []
   if (state.tipo) partes.push(state.tipo.nombre)
   if (state.tela) partes.push(state.tela.nombre)
@@ -28,58 +27,101 @@ export default function PriceBar({
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:px-8 border-t"
       style={{
-        backgroundColor: 'rgba(26,24,20,0.92)',
+        position: 'fixed',
+        bottom: 0, left: 0, right: 0,
+        zIndex: 40,
+        background: 'rgba(255,255,255,0.97)',
         backdropFilter: 'blur(12px)',
-        borderColor: 'var(--border)',
-        height: '68px',
+        borderTop: '1px solid #EBEBEB',
+        boxShadow: '0 -4px 24px rgba(0,0,0,0.06)',
+        height: 72,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 32px',
       }}
     >
-      {/* Izquierda: descripción y precio */}
-      <div className="flex flex-col justify-center min-w-0">
+      {/* Izquierda — descripción y precio */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
         {descripcion && (
-          <p
-            className="text-xs truncate"
-            style={{ color: 'var(--text-muted)', maxWidth: '220px' }}
-          >
+          <p style={{
+            fontSize: 11,
+            color: '#BBB',
+            margin: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            maxWidth: 280,
+            letterSpacing: '0.03em',
+          }}>
             {descripcion}
           </p>
         )}
         {precio !== null ? (
-          <p className="text-xl font-bold leading-tight" style={{ color: 'var(--gold)' }}>
+          <p style={{
+            fontSize: 20,
+            fontWeight: 900,
+            color: '#0A0A14',
+            margin: 0,
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+          }}>
             ${precio.toLocaleString('es-AR')}
+            <span style={{ fontSize: 11, fontWeight: 400, color: '#BBB', marginLeft: 6 }}>
+              estimado
+            </span>
           </p>
         ) : (
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: 12, color: '#BBB', margin: 0 }}>
             Completá los pasos para ver el precio
           </p>
         )}
       </div>
 
-      {/* Derecha: botones */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      {/* Derecha — botones */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         {showBack && (
           <button
             onClick={onBack}
-            className="px-4 py-2 rounded-xl text-sm border transition-opacity hover:opacity-70"
             style={{
-              borderColor: 'var(--border)',
-              color: 'var(--text-mid)',
-              backgroundColor: 'transparent',
+              padding: '10px 20px',
+              background: 'transparent',
+              border: '1.5px solid #E0E0E0',
+              borderRadius: 4,
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#888',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              transition: 'border-color 0.15s',
             }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = '#14008C'}
+            onMouseLeave={e => e.currentTarget.style.borderColor = '#E0E0E0'}
           >
             ← Atrás
           </button>
         )}
         <button
           onClick={onNext}
-          className="px-5 py-2 rounded-xl text-sm font-semibold transition-opacity hover:opacity-85"
           style={{
-            backgroundColor: 'var(--gold)',
-            color: 'var(--bg)',
-            borderRadius: 'var(--radius-sm)',
+            padding: '11px 28px',
+            background: '#14008C',
+            border: 'none',
+            borderRadius: 4,
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#fff',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+            letterSpacing: '0.04em',
+            transition: 'opacity 0.15s',
           }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
         >
           {nextLabel}
         </button>

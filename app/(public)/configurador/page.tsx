@@ -28,6 +28,7 @@ export default function ConfiguradorPage() {
     setMedidas,
     setSistema,
     setInstalacion,
+    setCaida,
     calcularPrecioActual,
     resetear,
   } = useConfigurador()
@@ -127,7 +128,6 @@ export default function ConfiguradorPage() {
 
       <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 24px 0' }}>
 
-        {/* Panel de presupuesto si hay items */}
         {items.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <PresupuestoPanel
@@ -141,7 +141,6 @@ export default function ConfiguradorPage() {
           </div>
         )}
 
-        {/* Contenido del paso */}
         <div style={{
           background: '#fff',
           border: '1px solid #EBEBEB',
@@ -173,6 +172,8 @@ export default function ConfiguradorPage() {
               onSelect={(color: Color) => setColor(color)}
               tipoNombre={state.tipo?.nombre ?? ''}
               telaNombre={state.tela?.nombre ?? ''}
+              caida={state.caida}
+              onCaidaChange={setCaida}
             />
           )}
 
@@ -209,7 +210,6 @@ export default function ConfiguradorPage() {
         </div>
       </div>
 
-      {/* Price bar fija abajo — no en el último paso */}
       {paso < PASOS.length - 1 && (
         <PriceBar
           state={state}

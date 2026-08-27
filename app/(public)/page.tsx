@@ -80,7 +80,7 @@ export default function HomePage() {
     <main style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+      <section style={{ position: 'relative', height: '85vh', minHeight: 520, overflow: 'hidden' }}>
         <Image
           src="/images/LIVING.png"
           alt="Living con cortinas Insumos Roller"
@@ -88,49 +88,45 @@ export default function HomePage() {
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           priority
         />
-        {/* Overlay gradiente */}
+        {/* Overlay */}
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
+          background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)',
         }} />
 
-        {/* Texto hero */}
+        {/* Texto hero — más chico y más arriba */}
         <div style={{
           position: 'absolute',
-          top: '50%',
-          left: 48,
+          top: '40%',
+          left: 56,
           transform: 'translateY(-50%)',
         }}>
-          <h1 style={{
-            margin: 0,
-            padding: 0,
-            lineHeight: 0.9,
-          }}>
+          <h1 style={{ margin: 0, padding: 0, lineHeight: 0.9 }}>
             <span style={{
               display: 'block',
-              fontSize: 'clamp(64px, 9vw, 120px)',
+              fontSize: 'clamp(48px, 6.5vw, 88px)',
               fontWeight: 900,
               color: '#FFFFFF',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.02em',
             }}>
               CORTINAS
             </span>
             <span style={{
               display: 'block',
-              fontSize: 'clamp(18px, 2.5vw, 32px)',
+              fontSize: 'clamp(14px, 1.8vw, 22px)',
               fontWeight: 600,
               color: 'rgba(255,255,255,0.85)',
-              letterSpacing: '0.08em',
-              marginTop: 8,
-              marginBottom: 4,
+              letterSpacing: '0.12em',
+              marginTop: 10,
+              marginBottom: 2,
             }}>
               QUE TRANSFORMAN
             </span>
             <span style={{
               display: 'block',
-              fontSize: 'clamp(18px, 2.5vw, 32px)',
+              fontSize: 'clamp(14px, 1.8vw, 22px)',
               fontWeight: 700,
-              letterSpacing: '0.08em',
+              letterSpacing: '0.12em',
             }}>
               <span style={{ color: 'rgba(255,255,255,0.85)' }}>TUS </span>
               <span style={{ color: '#14008C' }}>ESPACIOS</span>
@@ -138,16 +134,24 @@ export default function HomePage() {
           </h1>
         </div>
 
-        {/* Cards de acción — parte inferior */}
+        {/* Cards de acción — superpuestas sobre la imagen, parte inferior */}
         <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
+          position: 'absolute',
+          bottom: 0, left: 0, right: 0,
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
+          maxWidth: 760,
+          margin: '0 auto',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '0 32px',
+          gap: 16,
+          paddingBottom: 40,
         }}>
           <HeroCard
             href="/configurador"
             icon={
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>
               </svg>
             }
@@ -156,12 +160,11 @@ export default function HomePage() {
           <HeroCard
             href="/stock"
             icon={
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
               </svg>
             }
             label="LISTAS PARA LLEVAR"
-            borderLeft
           />
         </div>
       </section>
@@ -263,7 +266,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ background: '#0A0A14', color: '#fff' }}>
+      <footer style={{ background: '#fff', color: '#0A0A14' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 32px 40px' }}>
           <div style={{
             display: 'grid',
@@ -271,7 +274,7 @@ export default function HomePage() {
             gap: 32,
             marginBottom: 48,
             paddingBottom: 48,
-            borderBottom: '1px solid rgba(255,255,255,0.08)',
+            borderBottom: '1px solid rgba(253, 0, 0, 0.08)',
           }}
             className="footer-grid"
           >
@@ -294,7 +297,7 @@ export default function HomePage() {
               <div key={titulo}>
                 <p style={{
                   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.35)', marginBottom: 16,
+                  color: 'rgba(255,255,255,0.35)',
                   textTransform: 'uppercase', margin: '0 0 16px 0',
                 }}>
                   {titulo}
@@ -334,60 +337,45 @@ export default function HomePage() {
       </footer>
 
       <style>{`
-        @media (max-width: 768px) {
-          .grid-ambientes { grid-template-columns: repeat(2, 1fr) !important; }
-          .grid-accesos { grid-template-columns: repeat(2, 1fr) !important; }
-          .footer-grid { grid-template-columns: 1fr 1fr !important; }
-        }
         .ambiente-img:hover { transform: scale(1.05); }
         .acceso-card:hover { border-color: var(--primary) !important; box-shadow: 0 4px 20px rgba(20,0,140,0.08); }
+        .hero-card:hover { background: #14008C !important; }
+        .hero-card:hover [data-text] { color: #fff !important; }
+        .hero-card:hover [data-arrow] { color: #fff !important; }
+        @media (max-width: 768px) {
+          .footer-grid { grid-template-columns: 1fr 1fr !important; }
+        }
       `}</style>
     </main>
   )
 }
 
-function HeroCard({ href, icon, label, borderLeft }: {
+function HeroCard({ href, icon, label }: {
   href: string
   icon: React.ReactNode
   label: string
-  borderLeft?: boolean
 }) {
   return (
     <Link href={href} style={{ textDecoration: 'none' }}>
       <div
+        className="hero-card"
         style={{
           background: '#fff',
-          padding: '24px 36px',
+          borderRadius: 8,
+          padding: '20px 24px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: 16,
+          gap: 12,
           cursor: 'pointer',
           transition: 'background 0.2s',
-          borderLeft: borderLeft ? '1px solid rgba(0,0,0,0.08)' : 'none',
-        }}
-        className="hero-card"
-        onMouseEnter={e => {
-          e.currentTarget.style.background = '#14008C'
-          e.currentTarget.querySelectorAll('[data-text]').forEach((el: Element) => {
-            (el as HTMLElement).style.color = '#fff'
-          })
-          const arrow = e.currentTarget.querySelector('[data-arrow]') as HTMLElement
-          if (arrow) arrow.style.color = '#fff'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.background = '#fff'
-          e.currentTarget.querySelectorAll('[data-text]').forEach((el: Element) => {
-            (el as HTMLElement).style.color = ''
-          })
-          const arrow = e.currentTarget.querySelector('[data-arrow]') as HTMLElement
-          if (arrow) arrow.style.color = '#14008C'
+          boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div data-text="" style={{ color: '#14008C', flexShrink: 0, transition: 'color 0.2s' }}>{icon}</div>
           <span data-text="" style={{
-            fontSize: 'clamp(13px, 1.4vw, 17px)',
+            fontSize: 'clamp(12px, 1.2vw, 15px)',
             fontWeight: 800,
             letterSpacing: '0.08em',
             color: '#0D0D0D',
@@ -396,7 +384,7 @@ function HeroCard({ href, icon, label, borderLeft }: {
             {label}
           </span>
         </div>
-        <span data-arrow="" style={{ fontSize: 22, fontWeight: 700, color: '#14008C', transition: 'color 0.2s' }}>→</span>
+        <span data-arrow="" style={{ fontSize: 20, fontWeight: 700, color: '#14008C', transition: 'color 0.2s' }}>→</span>
       </div>
     </Link>
   )

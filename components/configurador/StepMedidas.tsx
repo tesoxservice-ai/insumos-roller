@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import type { Tela, ReglaPrecio, ConfiguradorState } from '@/types'
 import { calcularPrecio } from '@/lib/precio'
+import StepHeader from '@/components/configurador/StepHeader'
+
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
 interface StepMedidasProps {
   ancho: number
@@ -11,6 +14,8 @@ interface StepMedidasProps {
   telaSeleccionada: Tela | null
   onChange: (ancho: number, alto: number) => void
   onFueraDeRango: () => void
+  pasoActual: number
+  onClickPaso: (i: number) => void
 }
 
 export default function StepMedidas({
@@ -20,6 +25,8 @@ export default function StepMedidas({
   telaSeleccionada,
   onChange,
   onFueraDeRango,
+  pasoActual,
+  onClickPaso,
 }: StepMedidasProps) {
   const [anchoLocal, setAnchoLocal] = useState(ancho > 0 ? String(ancho) : '')
   const [altoLocal, setAltoLocal] = useState(alto > 0 ? String(alto) : '')
@@ -66,25 +73,22 @@ export default function StepMedidas({
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <p style={{
-          fontSize: 11, fontWeight: 700, color: '#14008C',
-          letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 12,
-        }}>
-          PASO 3 DE 6
-        </p>
-        <h2 style={{
-          fontSize: 'clamp(24px, 3vw, 36px)',
-          fontWeight: 700, color: '#0A0A14',
-          letterSpacing: '-0.02em', margin: '0 0 12px 0',
-          fontStyle: 'italic',
-        }}>
-          Ingresá las medidas
-        </h2>
-        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-        <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
-          Medí el ancho y el alto del hueco donde va la cortina, de soporte a soporte.
-        </p>
+      <div style={{ marginBottom: 36 }}>
+        <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <h2 style={{
+            fontSize: 'clamp(24px, 3vw, 36px)',
+            fontWeight: 700, color: '#0A0A14',
+            letterSpacing: '-0.02em', margin: '0 0 12px 0',
+            fontStyle: 'italic',
+          }}>
+            Ingresá las medidas
+          </h2>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
+          <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
+            Medí el ancho y el alto del hueco donde va la cortina, de soporte a soporte.
+          </p>
+        </div>
       </div>
 
       {/* Layout dos columnas */}

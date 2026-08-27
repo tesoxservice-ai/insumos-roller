@@ -3,12 +3,17 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { Tela } from '@/types'
+import StepHeader from '@/components/configurador/StepHeader'
+
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
 interface StepTelaProps {
   telas: Tela[]
   telasFiltradas: Tela[]
   seleccionada: Tela | null
   onSelect: (tela: Tela) => void
+  pasoActual: number
+  onClickPaso: (i: number) => void
 }
 
 const IMAGEN_MAP: Record<string, string> = {
@@ -78,7 +83,7 @@ function TelaImagen({ nombre }: { nombre: string }) {
       src={src}
       alt={nombre}
       fill
-      sizes="(max-width: 640px) 90vw, 30vw"
+      sizes="33vw"
       style={{ objectFit: 'cover', objectPosition: 'center' }}
       onError={() => setImgError(true)}
     />
@@ -104,11 +109,11 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
     >
       <div style={{
         position: 'relative',
-        height: 280,
+        paddingBottom: '140%',
         transformStyle: 'preserve-3d',
         transition: 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        borderRadius: 8,
+        borderRadius: 10,
       }}>
 
         {/* FRENTE — foto */}
@@ -133,7 +138,7 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
               padding: '32px 16px 14px',
             }}>
               <span style={{
-                fontSize: 13, fontWeight: 800,
+                fontSize: 15, fontWeight: 800,
                 color: '#fff', letterSpacing: '0.1em',
               }}>
                 {tela.nombre.toUpperCase()}
@@ -191,7 +196,7 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
             <span style={{ fontSize: 24 }}>{getEmoji(tela.nombre)}</span>
             <span style={{
-              fontSize: 13, fontWeight: 800,
+              fontSize: 15, fontWeight: 800,
               color: esOscuro ? '#F0EAE0' : '#0A0A14',
               letterSpacing: '0.08em',
             }}>
@@ -206,7 +211,7 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
           }} />
 
           <p style={{
-            fontSize: 12,
+            fontSize: 15,
             color: esOscuro ? '#B0A898' : '#666',
             lineHeight: 1.55,
             margin: '0 0 14px 0',
@@ -222,10 +227,10 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
               {tela.checks.map((check, i) => (
                 <li key={i} style={{
                   display: 'flex', alignItems: 'flex-start', gap: 8,
-                  fontSize: 12,
+                  fontSize: 15,
                   color: esOscuro ? '#C8BFB5' : '#444',
                 }}>
-                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>✓</span>
+                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>✓</span>
                   {check}
                 </li>
               ))}
@@ -237,14 +242,14 @@ function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
             style={{
               marginTop: 16,
               width: '100%',
-              padding: '9px',
+              padding: '13px',
               background: activo
                 ? '#14008C'
                 : esOscuro ? 'rgba(255,255,255,0.1)' : '#14008C',
               border: esOscuro && !activo ? '1px solid rgba(255,255,255,0.2)' : 'none',
               borderRadius: 6,
               color: '#fff',
-              fontSize: 12,
+              fontSize: 15,
               fontWeight: 700,
               cursor: 'pointer',
               letterSpacing: '0.06em',
@@ -267,37 +272,34 @@ export default function StepTela({
   telasFiltradas,
   seleccionada,
   onSelect,
+  pasoActual,
+  onClickPaso,
 }: StepTelaProps) {
   const lista = telasFiltradas.length > 0 ? telasFiltradas : telas
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <p style={{
-          fontSize: 11, fontWeight: 700, color: '#14008C',
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-          marginBottom: 12,
-        }}>
-          PASO 2 DE 6
-        </p>
-        <h2 style={{
-          fontSize: 'clamp(24px, 3vw, 36px)',
-          fontWeight: 700, color: '#0A0A14',
-          letterSpacing: '-0.02em',
-          margin: '0 0 12px 0',
-          fontStyle: 'italic',
-        }}>
-          Elegí el tipo de tela
-        </h2>
-        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-        <p style={{
-          fontSize: 14, color: '#999', margin: 0,
-          maxWidth: 440, marginLeft: 'auto', marginRight: 'auto',
-          lineHeight: 1.6,
-        }}>
-          Pasá el mouse sobre cada tela para ver sus características.
-        </p>
+      <div style={{ marginBottom: 36 }}>
+        <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <h2 style={{
+            fontSize: 'clamp(36px, 4.5vw, 52px)',
+            fontWeight: 700, color: '#0A0A14',
+            letterSpacing: '-0.02em',
+            margin: '0 0 16px 0',
+          }}>
+            Elegí el tipo de tela
+          </h2>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 20px' }} />
+          <p style={{
+            fontSize: 17, color: '#444', margin: 0,
+            maxWidth: 440, marginLeft: 'auto', marginRight: 'auto',
+            lineHeight: 1.6,
+          }}>
+            Pasá el mouse sobre cada tela para ver sus características.
+          </p>
+        </div>
       </div>
 
       <div style={{
@@ -318,47 +320,6 @@ export default function StepTela({
         ))}
       </div>
 
-      {/* Simulador de luz */}
-      <div style={{
-        background: '#F7F7FB',
-        border: '1px dashed #C8C8DC',
-        borderRadius: 6,
-        padding: '20px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-      }}>
-        <div style={{
-          width: 40, height: 40,
-          background: '#EEEEF8',
-          borderRadius: '50%',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 18, flexShrink: 0,
-        }}>
-          💡
-        </div>
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0A14', marginBottom: 2 }}>
-            Simulador de luz
-          </div>
-          <div style={{ fontSize: 12, color: '#999' }}>
-            Próximamente podrás ver cuánta luz entra con cada tipo de tela.
-          </div>
-        </div>
-        <div style={{
-          marginLeft: 'auto',
-          fontSize: 10, fontWeight: 700,
-          color: '#14008C',
-          background: 'rgba(20,0,140,0.07)',
-          border: '1px solid rgba(20,0,140,0.18)',
-          borderRadius: 100,
-          padding: '3px 10px',
-          letterSpacing: '0.08em',
-          flexShrink: 0,
-        }}>
-          PRÓXIMAMENTE
-        </div>
-      </div>
 
       <style>{`
         @media (max-width: 640px) {

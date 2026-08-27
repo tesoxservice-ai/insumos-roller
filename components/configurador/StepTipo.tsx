@@ -3,11 +3,16 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { TipoCortina } from '@/types'
+import StepHeader from '@/components/configurador/StepHeader'
+
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
 interface StepTipoProps {
   tipos: TipoCortina[]
   seleccionado: TipoCortina | null
   onSelect: (tipo: TipoCortina) => void
+  pasoActual: number
+  onClickPaso: (i: number) => void
 }
 
 const DESCRIPCIONES: Record<string, string> = {
@@ -166,7 +171,7 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
         borderRadius: 10,
       }}>
 
-        {/* FRENTE — foto */}
+        {/* FRENTE */}
         <div style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden',
@@ -179,12 +184,10 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
           display: 'flex',
           flexDirection: 'column',
         }}>
-          {/* Imagen ocupa casi todo */}
           <div style={{ position: 'relative', flex: 1, borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
             <TipoImagen nombre={tipo.nombre} />
           </div>
 
-          {/* Nombre abajo fuera de la imagen */}
           <div style={{
             padding: '14px 18px',
             background: '#fff',
@@ -222,7 +225,7 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
           </div>
         </div>
 
-        {/* DORSO — info */}
+        {/* DORSO */}
         <div style={{
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden',
@@ -286,31 +289,27 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
   )
 }
 
-export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
+export default function StepTipo({ tipos, seleccionado, onSelect, pasoActual, onClickPaso }: StepTipoProps) {
   return (
     <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <p style={{
-          fontSize: 11, fontWeight: 700, color: '#14008C',
-          letterSpacing: '0.16em', textTransform: 'uppercase',
-          marginBottom: 12,
-        }}>
-          PASO 1 DE 6
-        </p>
-        <h2 style={{
-          fontSize: 'clamp(28px, 3.5vw, 42px)',
-          fontWeight: 700, color: '#0A0A14',
-          letterSpacing: '-0.02em',
-          margin: '0 0 12px 0',
-        }}>
-          Elegí el tipo de cortina
-        </h2>
-        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-        <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
-          Pasá el mouse sobre cada tipo para ver sus características.
-        </p>
+      <div style={{ marginBottom: 48 }}>
+        <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <h2 style={{
+            fontSize: 'clamp(36px, 4.5vw, 52px)',
+            fontWeight: 700, color: '#0A0A14',
+            letterSpacing: '-0.02em',
+            margin: '0 0 16px 0',
+          }}>
+            Elegí el tipo de cortina
+          </h2>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 20px' }} />
+          <p style={{ fontSize: 17, color: '#444', margin: 0, lineHeight: 1.6 }}>
+            Pasá el mouse sobre cada tipo para ver sus características.
+          </p>
+        </div>
       </div>
 
       {/* Grilla */}

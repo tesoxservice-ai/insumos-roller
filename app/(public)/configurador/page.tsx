@@ -6,7 +6,6 @@ import { usePresupuesto } from '@/hooks/usePresupuesto'
 import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
 import type { CatalogoCompleto, Color } from '@/types'
 
-import StepHeader from '@/components/configurador/StepHeader'
 import StepTipo from '@/components/configurador/StepTipo'
 import StepTela from '@/components/configurador/StepTela'
 import StepColor from '@/components/configurador/StepColor'
@@ -67,6 +66,10 @@ export default function ConfiguradorPage() {
     }
   }
 
+  function handleClickPaso(i: number) {
+    if (i < paso) irA(i)
+  }
+
   function handleFueraDeRango() {
     const msg = generarMensajeWhatsApp(state, 0)
     const url = generarUrlWhatsApp(
@@ -120,12 +123,6 @@ export default function ConfiguradorPage() {
   return (
     <main style={{ background: '#FAFAFA', height: 'auto', paddingBottom: 100 }}>
 
-      <StepHeader
-        pasos={PASOS}
-        pasoActual={paso}
-        onClickPaso={(i) => { if (i < paso) irA(i) }}
-      />
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px 0' }}>
 
         {items.length > 0 && (
@@ -152,6 +149,8 @@ export default function ConfiguradorPage() {
               tipos={catalogo.tipos}
               seleccionado={state.tipo}
               onSelect={tipo => { setTipo(tipo); irA(1) }}
+              pasoActual={paso}
+              onClickPaso={handleClickPaso}
             />
           )}
 
@@ -161,6 +160,8 @@ export default function ConfiguradorPage() {
               telasFiltradas={catalogo.telas.filter(t => t.tipo_id === state.tipo?.id)}
               seleccionada={state.tela}
               onSelect={tela => { setTela(tela); irA(2) }}
+              pasoActual={paso}
+              onClickPaso={handleClickPaso}
             />
           )}
 
@@ -174,6 +175,8 @@ export default function ConfiguradorPage() {
               telaNombre={state.tela?.nombre ?? ''}
               caida={state.caida}
               onCaidaChange={setCaida}
+              pasoActual={paso}
+              onClickPaso={handleClickPaso}
             />
           )}
 
@@ -185,6 +188,8 @@ export default function ConfiguradorPage() {
               telaSeleccionada={state.tela}
               onChange={setMedidas}
               onFueraDeRango={handleFueraDeRango}
+              pasoActual={paso}
+              onClickPaso={handleClickPaso}
             />
           )}
 
@@ -195,6 +200,8 @@ export default function ConfiguradorPage() {
               onSistemaChange={(sis, extra) => setSistema(sis, extra)}
               onInstalacionChange={(activa, extra) => setInstalacion(activa, extra)}
               regla={catalogo.precios.find(p => p.tela_id === state.tela?.id) ?? null}
+              pasoActual={paso}
+              onClickPaso={handleClickPaso}
             />
           )}
 

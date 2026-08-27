@@ -8,19 +8,16 @@ interface StepHeaderProps {
 
 export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeaderProps) {
   return (
-    <header style={{
+    <div style={{
       width: '100%',
       background: '#fff',
-      borderBottom: '1px solid #EBEBEB',
-      position: 'sticky',
-      top: 72,
-      zIndex: 30,
+      paddingBottom: 8,
     }}>
       <div style={{
         maxWidth: 960,
         margin: '0 auto',
-        padding: '0 32px',
-        height: 52,
+        padding: '0 8px',
+        height: 72,
         display: 'flex',
         alignItems: 'center',
         gap: 0,
@@ -48,19 +45,19 @@ export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeade
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 7,
+                  gap: 10,
                   background: 'none',
                   border: 'none',
                   cursor: clickable ? 'pointer' : 'default',
-                  padding: '4px 0',
+                  padding: '6px 0',
                   flexShrink: 0,
                   outline: 'none',
                 }}
               >
-                {/* Número / check */}
+                {/* Círculo */}
                 <div style={{
-                  width: 22,
-                  height: 22,
+                  width: 34,
+                  height: 34,
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
@@ -73,16 +70,16 @@ export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeade
                     : 'transparent',
                   border: completado || activo
                     ? 'none'
-                    : '1.5px solid #D0D0D0',
+                    : '2px solid #D0D0D0',
                   transition: 'all 0.2s',
                 }}>
                   {completado ? (
-                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+                    <svg width="15" height="15" viewBox="0 0 11 11" fill="none">
                       <path d="M2 5.5L4.5 8L9 3" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   ) : (
                     <span style={{
-                      fontSize: 10,
+                      fontSize: 14,
                       fontWeight: 700,
                       color: activo ? '#fff' : '#BBBBBB',
                       lineHeight: 1,
@@ -94,7 +91,7 @@ export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeade
 
                 {/* Nombre */}
                 <span style={{
-                  fontSize: 11,
+                  fontSize: 13,
                   fontWeight: activo ? 700 : completado ? 600 : 500,
                   color: activo
                     ? '#14008C'
@@ -114,17 +111,17 @@ export default function StepHeader({ pasos, pasoActual, onClickPaso }: StepHeade
               {!esUltimo && (
                 <div style={{
                   flex: 1,
-                  height: 1,
-                  margin: '0 10px',
+                  height: 1.5,
+                  margin: '0 14px',
                   background: completado ? '#0A0A14' : '#E8E8E8',
                   transition: 'background 0.3s',
-                  minWidth: 12,
+                  minWidth: 16,
                 }} />
               )}
             </div>
           )
         })}
       </div>
-    </header>
+    </div>
   )
 }

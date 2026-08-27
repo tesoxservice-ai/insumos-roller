@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import type { Color } from '@/types'
+import StepHeader from '@/components/configurador/StepHeader'
+
+const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
 interface StepColorProps {
   colores: Color[]
@@ -12,6 +15,8 @@ interface StepColorProps {
   telaNombre: string
   caida: 'detras' | 'delante'
   onCaidaChange: (caida: 'detras' | 'delante') => void
+  pasoActual: number
+  onClickPaso: (i: number) => void
 }
 
 export default function StepColor({
@@ -23,6 +28,8 @@ export default function StepColor({
   telaNombre,
   caida,
   onCaidaChange,
+  pasoActual,
+  onClickPaso,
 }: StepColorProps) {
   const lista = coloresFiltrados.length > 0 ? coloresFiltrados : colores
 
@@ -30,25 +37,22 @@ export default function StepColor({
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 36 }}>
-        <p style={{
-          fontSize: 11, fontWeight: 700, color: '#14008C',
-          letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 12,
-        }}>
-          PASO 3 DE 6
-        </p>
-        <h2 style={{
-          fontSize: 'clamp(24px, 3vw, 36px)',
-          fontWeight: 700, color: '#0A0A14',
-          letterSpacing: '-0.02em', margin: '0 0 12px 0',
-          fontStyle: 'italic',
-        }}>
-          Color y accesorios
-        </h2>
-        <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-        <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
-          Elegí el color y la caída del rollo para tu cortina.
-        </p>
+      <div style={{ marginBottom: 36 }}>
+        <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
+        <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <h2 style={{
+            fontSize: 'clamp(24px, 3vw, 36px)',
+            fontWeight: 700, color: '#0A0A14',
+            letterSpacing: '-0.02em', margin: '0 0 12px 0',
+            fontStyle: 'italic',
+          }}>
+            Color y accesorios
+          </h2>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
+          <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
+            Elegí el color y la caída del rollo para tu cortina.
+          </p>
+        </div>
       </div>
 
       {/* COLORES */}

@@ -5,8 +5,10 @@ import Link from 'next/link'
 
 const LINKS = [
   { label: 'Productos', href: '/#productos' },
+  { label: 'Nosotros', href: '/#nosotros' },
   { label: 'Inspiración', href: '/#inspiracion' },
   { label: 'Guías', href: '/#guias' },
+  { label: 'Contacto', href: '/#contacto' },
 ]
 
 export default function Nav() {
@@ -32,14 +34,14 @@ export default function Nav() {
       <div style={{
         width: '100%',
         padding: '0 48px',
-        height: 72,
-        display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        height: 76,
+        display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
       }}>
 
         {/* Logo — izquierda */}
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1.1, justifySelf: 'start' }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1.1, flexShrink: 0 }}>
           <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text)' }}>
             INSUM<span style={{ color: 'var(--primary)' }}>O</span>S
           </span>
@@ -49,12 +51,18 @@ export default function Nav() {
         </Link>
 
         {/* Links — centro */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 48 }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          flex: 1,
+          justifyContent: 'center',
+          gap: 'clamp(20px, 4vw, 64px)',
+        }}>
           {LINKS.map(link => (
             <Link
               key={link.href}
               href={link.href}
-              style={{ fontSize: 14, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--text-mid)', textDecoration: 'none', transition: 'color 0.15s' }}
+              style={{ fontSize: 16, fontWeight: 600, letterSpacing: '0.03em', color: 'var(--text-mid)', textDecoration: 'none', transition: 'color 0.15s', whiteSpace: 'nowrap' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-mid)')}
             >
@@ -63,8 +71,24 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* CTA — derecha */}
-        <div style={{ justifySelf: 'end' }}>
+        {/* CTA + carrito — derecha */}
+        <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 16 }}>
+
+          {/* Carrito */}
+          <Link
+            href="/stock"
+            style={{ position: 'relative', color: 'var(--text-mid)', textDecoration: 'none', display: 'flex', alignItems: 'center', transition: 'color 0.15s' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-mid)')}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+          </Link>
+
+          {/* Cotizá ahora */}
           <Link
             href="/configurador"
             style={{
@@ -72,7 +96,7 @@ export default function Nav() {
               color: '#fff',
               borderRadius: '100px',
               padding: '11px 28px',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 700,
               letterSpacing: '0.04em',
               textDecoration: 'none',

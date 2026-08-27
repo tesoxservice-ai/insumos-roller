@@ -4,49 +4,33 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 const AMBIENTES = [
-  { img: '/images/DORMITORIO.png', label: 'DORMITORIOS', icon: '🛏' },
-  { img: '/images/OFICINA.png', label: 'OFICINAS', icon: '💼' },
-  { img: '/images/COMEDOR.png', label: 'COMEDORES', icon: '🍽' },
-  { img: '/images/COCINA.png', label: 'COCINAS', icon: '🍳' },
+  { img: '/images/DORMITORIO.png', label: 'DORMITORIOS' },
+  { img: '/images/OFICINA.png', label: 'OFICINAS' },
+  { img: '/images/COMEDOR.png', label: 'COMEDORES' },
+  { img: '/images/COCINA.png', label: 'COCINAS' },
 ]
 
 const ACCESOS = [
   {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>
-      </svg>
-    ),
+    num: '01',
     titulo: 'GUÍA DE MEDICIÓN',
     desc: 'Aprendé a tomar las medidas correctas para tu cortina.',
     href: '/guia-medicion',
   },
   {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>
-      </svg>
-    ),
+    num: '02',
     titulo: 'GUÍA DE INSTALACIÓN',
     desc: 'Instrucciones simples para instalar tu cortina paso a paso.',
     href: '/guia-instalacion',
   },
   {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
-      </svg>
-    ),
+    num: '03',
     titulo: 'ELEGÍ LA MEJOR OPCIÓN',
     desc: 'Conocé las diferencias entre nuestros sistemas y telas.',
     href: '/configurador',
   },
   {
-    icon: (
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-    ),
+    num: '04',
     titulo: 'PREGUNTAS FRECUENTES',
     desc: 'Respondemos las dudas más comunes antes de tu compra.',
     href: '/#',
@@ -170,55 +154,45 @@ export default function HomePage() {
       </section>
 
       {/* ── GALERÍA AMBIENTES ── */}
-      <section style={{ padding: '80px 0', background: 'var(--bg)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <p style={{
-              color: 'var(--primary)', fontSize: 12, fontWeight: 700,
-              letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: 10,
-            }}>
-              INSPIRATE EN ESTOS DISEÑOS
-            </p>
-            <h2 style={{
-              fontSize: 'clamp(28px, 3.5vw, 44px)', fontWeight: 800,
-              letterSpacing: '-0.02em', color: 'var(--text)', margin: 0,
-            }}>
-              Descubrí ambientes únicos
-            </h2>
-          </div>
+      <section style={{ padding: '64px 0 0', background: 'var(--bg)' }}>
+        <div style={{ textAlign: 'center', marginBottom: 32, padding: '0 48px' }}>
+          <p style={{ color: 'var(--primary)', fontSize: 12, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>
+            INSPIRATE EN ESTOS DISEÑOS
+          </p>
+          <h2 style={{
+            fontSize: 'clamp(28px, 3vw, 44px)', fontWeight: 800,
+            letterSpacing: '-0.03em', color: 'var(--text)', margin: 0,
+          }}>
+            Descubrí ambientes únicos
+          </h2>
+        </div>
 
+        <div style={{ padding: '0 48px' }}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 16,
+            gap: 8,
           }}>
             {AMBIENTES.map(a => (
               <Link key={a.label} href="/configurador" style={{ textDecoration: 'none' }}>
-                <div>
+                <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', borderRadius: 'var(--radius)' }}>
+                  <Image
+                    src={a.img}
+                    alt={a.label}
+                    fill
+                    style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
+                    className="ambiente-img"
+                  />
                   <div style={{
-                    position: 'relative', aspectRatio: '4/3',
-                    overflow: 'hidden', borderRadius: 'var(--radius)',
-                    marginBottom: 12,
+                    position: 'absolute', bottom: 0, left: 0, right: 0,
+                    padding: '40px 24px 24px',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
+                    display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
                   }}>
-                    <Image
-                      src={a.img}
-                      alt={a.label}
-                      fill
-                      style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
-                      className="ambiente-img"
-                    />
-                  </div>
-                  <div style={{
-                    display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between', padding: '0 4px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 16 }}>{a.icon}</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--text)' }}>
-                        {a.label}
-                      </span>
-                    </div>
-                    <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 16 }}>→</span>
+                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>
+                      {a.label}
+                    </span>
+                    <span style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>→</span>
                   </div>
                 </div>
               </Link>
@@ -228,40 +202,38 @@ export default function HomePage() {
       </section>
 
       {/* ── ACCESOS RÁPIDOS ── */}
-      <section style={{ padding: '80px 0', background: 'var(--surface)' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 20,
-          }}>
-            {ACCESOS.map(a => (
-              <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
-                <div style={{
-                  background: 'var(--bg)',
-                  border: '1px solid var(--border)',
-                  borderRadius: 'var(--radius)',
-                  padding: '28px 24px',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 12,
-                  transition: 'border-color 0.2s, box-shadow 0.2s',
-                }}
-                  className="acceso-card"
-                >
-                  <div style={{ color: 'var(--primary)' }}>{a.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.08em', color: 'var(--text)' }}>
-                    {a.titulo}
-                  </div>
-                  <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.55, margin: 0, flex: 1 }}>
-                    {a.desc}
-                  </p>
-                  <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 18 }}>→</span>
+      <section style={{ padding: '12px 48px 64px', background: 'var(--bg)' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 8,
+        }}>
+          {ACCESOS.map(a => (
+            <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
+              <div style={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+                padding: '32px 28px',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+                transition: 'border-color 0.2s, box-shadow 0.2s',
+              }}
+                className="acceso-card"
+              >
+                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.1em' }}>{a.num}</div>
+                <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--text)' }}>
+                  {a.titulo}
                 </div>
-              </Link>
-            ))}
-          </div>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0, flex: 1 }}>
+                  {a.desc}
+                </p>
+                <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 20 }}>→</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -274,21 +246,21 @@ export default function HomePage() {
             gap: 32,
             marginBottom: 48,
             paddingBottom: 48,
-            borderBottom: '1px solid rgba(253, 0, 0, 0.08)',
+            borderBottom: '1px solid rgba(0,0,0,0.08)',
           }}
             className="footer-grid"
           >
             <div>
               <div style={{ marginBottom: 16 }}>
-                <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: '#fff' }}>
-                  INSUM<span style={{ color: '#4444CC' }}>O</span>S
+                <span style={{ fontSize: 20, fontWeight: 900, letterSpacing: '-0.02em', color: '#0A0A14' }}>
+                  INSUM<span style={{ color: '#14008C' }}>O</span>S
                 </span>
                 <br />
-                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.22em', color: '#4444CC' }}>
-                  R<span style={{ color: '#fff' }}>O</span>LLER
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.22em', color: '#14008C' }}>
+                  R<span style={{ color: '#0A0A14' }}>O</span>LLER
                 </span>
               </div>
-              <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.7, margin: 0 }}>
+              <p style={{ fontSize: 12, color: '#8888A8', lineHeight: 1.7, margin: 0 }}>
                 Fabricación a medida.<br />Envíos a todo el país.
               </p>
             </div>
@@ -297,7 +269,7 @@ export default function HomePage() {
               <div key={titulo}>
                 <p style={{
                   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.35)',
+                  color: '#8888A8',
                   textTransform: 'uppercase', margin: '0 0 16px 0',
                 }}>
                   {titulo}
@@ -305,7 +277,7 @@ export default function HomePage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {links.map(l => (
                     <Link key={l.label} href={l.href} style={{
-                      fontSize: 13, color: 'rgba(255,255,255,0.6)',
+                      fontSize: 13, color: '#3D3D5C',
                       textDecoration: 'none', transition: 'color 0.15s',
                     }}>
                       {l.label}
@@ -320,13 +292,13 @@ export default function HomePage() {
             display: 'flex', justifyContent: 'space-between',
             alignItems: 'center', flexWrap: 'wrap', gap: 16,
           }}>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', margin: 0 }}>
+            <p style={{ fontSize: 12, color: '#8888A8', margin: 0 }}>
               © 2025 Insumos Roller. Todos los derechos reservados.
             </p>
             <div style={{ display: 'flex', gap: 20 }}>
               {['Términos y condiciones', 'Política de privacidad'].map(t => (
                 <Link key={t} href="/#" style={{
-                  fontSize: 12, color: 'rgba(255,255,255,0.25)', textDecoration: 'none',
+                  fontSize: 12, color: '#8888A8', textDecoration: 'none',
                 }}>
                   {t}
                 </Link>

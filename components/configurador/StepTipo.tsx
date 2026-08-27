@@ -132,7 +132,7 @@ function TipoImagen({ nombre }: { nombre: string }) {
       src={src}
       alt={nombre}
       fill
-      sizes="(max-width: 640px) 33vw, 20vw"
+      sizes="33vw"
       style={{ objectFit: 'cover', objectPosition: 'center' }}
       onError={() => setImgError(true)}
     />
@@ -159,12 +159,11 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
     >
       <div style={{
         position: 'relative',
-        // Mantiene el aspect ratio 3/4 del diseño original
-        paddingBottom: '133%',
+        paddingBottom: '140%',
         transformStyle: 'preserve-3d',
         transition: 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
         transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-        borderRadius: 6,
+        borderRadius: 10,
       }}>
 
         {/* FRENTE — foto */}
@@ -172,51 +171,50 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
           position: 'absolute', inset: 0,
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
-          borderRadius: 6,
-          overflow: 'hidden',
-          border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
-          boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.1)' : '0 2px 8px rgba(0,0,0,0.06)',
+          borderRadius: 10,
+          overflow: 'visible',
+          border: `2px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo ? '0 0 0 4px rgba(20,0,140,0.1)' : '0 4px 16px rgba(0,0,0,0.08)',
           background: '#F5F0E8',
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-          <TipoImagen nombre={tipo.nombre} />
+          {/* Imagen ocupa casi todo */}
+          <div style={{ position: 'relative', flex: 1, borderRadius: '8px 8px 0 0', overflow: 'hidden' }}>
+            <TipoImagen nombre={tipo.nombre} />
+          </div>
 
-          {/* Gradiente + nombre abajo */}
+          {/* Nombre abajo fuera de la imagen */}
           <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
-            padding: '40px 14px 14px',
+            padding: '14px 18px',
+            background: '#fff',
+            borderTop: '1px solid #EBEBEB',
+            borderRadius: '0 0 8px 8px',
           }}>
-            <span style={{
-              fontSize: 11, fontWeight: 800,
-              color: '#fff', letterSpacing: '0.1em',
-            }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#0A0A14', letterSpacing: '0.1em' }}>
               {tipo.nombre.toUpperCase()}
             </span>
           </div>
 
-          {/* Check si está seleccionado */}
           {activo && (
             <div style={{
-              position: 'absolute', top: 10, right: 10,
-              width: 22, height: 22,
+              position: 'absolute', top: 14, right: 14,
+              width: 26, height: 26,
               background: '#14008C',
               borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 11, fontWeight: 700,
+              color: '#fff', fontSize: 13, fontWeight: 700,
               zIndex: 2,
-            }}>
-              ✓
-            </div>
+            }}>✓</div>
           )}
 
-          {/* Hint */}
           <div style={{
-            position: 'absolute', top: 10, left: 10,
-            fontSize: 9, fontWeight: 700,
+            position: 'absolute', top: 14, left: 14,
+            fontSize: 10, fontWeight: 700,
             color: 'rgba(255,255,255,0.9)',
             background: 'rgba(0,0,0,0.28)',
             borderRadius: 100,
-            padding: '3px 7px',
+            padding: '4px 10px',
             letterSpacing: '0.06em',
             backdropFilter: 'blur(4px)',
           }}>
@@ -230,65 +228,47 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
           backfaceVisibility: 'hidden',
           WebkitBackfaceVisibility: 'hidden',
           transform: 'rotateY(180deg)',
-          borderRadius: 6,
+          borderRadius: 10,
           overflow: 'hidden',
-          border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
-          boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.1)' : '0 2px 8px rgba(0,0,0,0.06)',
+          border: `2px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo ? '0 0 0 4px rgba(20,0,140,0.1)' : '0 4px 16px rgba(0,0,0,0.08)',
           background: '#FAFAF8',
           display: 'flex',
           flexDirection: 'column',
-          padding: '18px 16px 14px',
+          padding: '24px 22px 20px',
         }}>
-          {/* Nombre */}
-          <div style={{
-            fontSize: 11, fontWeight: 800,
-            color: '#14008C',
-            letterSpacing: '0.1em',
-            marginBottom: 8,
-          }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#14008C', letterSpacing: '0.1em', marginBottom: 10 }}>
             {tipo.nombre.toUpperCase()}
           </div>
 
-          <div style={{ height: 1, background: '#EBEBEB', marginBottom: 10 }} />
+          <div style={{ height: 1, background: '#EBEBEB', marginBottom: 14 }} />
 
-          {/* Descripción */}
-          <p style={{
-            fontSize: 11, color: '#666',
-            lineHeight: 1.55, margin: '0 0 12px 0',
-          }}>
+          <p style={{ fontSize: 15, color: '#666', lineHeight: 1.6, margin: '0 0 16px 0' }}>
             {desc}
           </p>
 
-          {/* Checks */}
           {checks.length > 0 && (
-            <ul style={{
-              listStyle: 'none', padding: 0, margin: '0 0 auto 0',
-              display: 'flex', flexDirection: 'column', gap: 6,
-            }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {checks.map((check, i) => (
-                <li key={i} style={{
-                  display: 'flex', alignItems: 'flex-start', gap: 7,
-                  fontSize: 11, color: '#444',
-                }}>
-                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>✓</span>
+                <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 15, color: '#444' }}>
+                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>✓</span>
                   {check}
                 </li>
               ))}
             </ul>
           )}
 
-          {/* Botón */}
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(tipo) }}
             style={{
-              marginTop: 14,
+              marginTop: 18,
               width: '100%',
-              padding: '8px',
-              background: activo ? '#14008C' : '#14008C',
+              padding: '13px',
+              background: '#14008C',
               border: 'none',
-              borderRadius: 5,
+              borderRadius: 7,
               color: '#fff',
-              fontSize: 11,
+              fontSize: 14,
               fontWeight: 700,
               cursor: 'pointer',
               letterSpacing: '0.06em',
@@ -308,10 +288,10 @@ function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
 
 export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto' }}>
+    <div style={{ width: '100%', maxWidth: 1100, margin: '0 auto', padding: '0 24px' }}>
 
       {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: 40 }}>
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
         <p style={{
           fontSize: 11, fontWeight: 700, color: '#14008C',
           letterSpacing: '0.16em', textTransform: 'uppercase',
@@ -320,16 +300,15 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
           PASO 1 DE 6
         </p>
         <h2 style={{
-          fontSize: 'clamp(24px, 3vw, 36px)',
+          fontSize: 'clamp(28px, 3.5vw, 42px)',
           fontWeight: 700, color: '#0A0A14',
           letterSpacing: '-0.02em',
           margin: '0 0 12px 0',
-          fontStyle: 'Fraunces',
         }}>
           Elegí el tipo de cortina
         </h2>
         <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-        <p style={{ fontSize: 14, color: '#999', margin: 0, maxWidth: 400, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
           Pasá el mouse sobre cada tipo para ver sus características.
         </p>
       </div>
@@ -338,7 +317,7 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
       <div style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${Math.min(tipos.length, 5)}, 1fr)`,
-        gap: 16,
+        gap: 20,
         marginBottom: 32,
       }}
         className="tipo-grid"
@@ -352,7 +331,7 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
           />
         ))}
       </div>
-      
+
       <style>{`
         @media (max-width: 640px) {
           .tipo-grid { grid-template-columns: repeat(3, 1fr) !important; }

@@ -118,7 +118,7 @@ export default function ConfiguradorPage() {
   }
 
   return (
-    <main style={{ background: '#FAFAFA', minHeight: '100vh', paddingBottom: 100 }}>
+    <main style={{ background: '#FAFAFA', height: 'auto', paddingBottom: 100 }}>
 
       <StepHeader
         pasos={PASOS}
@@ -126,7 +126,7 @@ export default function ConfiguradorPage() {
         onClickPaso={(i) => { if (i < paso) irA(i) }}
       />
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 24px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px 0' }}>
 
         {items.length > 0 && (
           <div style={{ marginBottom: 24 }}>
@@ -145,7 +145,7 @@ export default function ConfiguradorPage() {
           background: '#fff',
           border: '1px solid #EBEBEB',
           borderRadius: 8,
-          padding: '36px 32px',
+          padding: '40px 40px',
         }}>
           {paso === 0 && (
             <StepTipo

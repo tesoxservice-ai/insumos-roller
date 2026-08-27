@@ -20,12 +20,21 @@ const DESCRIPCIONES: Record<string, string> = {
   'Bandas': 'Elegantes y funcionales. Ideales para grandes ventanales.',
 }
 
-// Mapeo nombre → archivo en /public/images/
+const CHECKS: Record<string, string[]> = {
+  'Roller': ['Fácil de operar', 'Ideal para cualquier ambiente', 'Amplia variedad de telas'],
+  'Verticales': ['Perfectas para ventanales grandes', 'Control preciso de luz', 'Diseño moderno'],
+  'Textiles': ['Filtran la luz suavemente', 'Aportan calidez decorativa', 'Variedad de texturas'],
+  'Bandas': ['Perfectas para ventanales grandes', 'Control preciso de luz', 'Diseño moderno'],
+  'Tradicionales': ['Clásicas y atemporales', 'Gran variedad de diseños', 'Fácil mantenimiento'],
+  'Horizontales': ['Control total de luz', 'Muy duraderas', 'Aptas para cocina y baño'],
+  'Dúo': ['Privacidad + vista exterior', 'Un solo mecanismo', 'Máxima versatilidad'],
+}
+
 const IMAGEN_MAP: Record<string, string> = {
-  'roller':    '/images/ROLLER.png',
-  'vertical':  '/images/VERTICALES.png',
-  'banda':     '/images/VERTICALES.png',
-  'textil':    '/images/TEXTILES.png',
+  'roller':   '/images/ROLLER.png',
+  'vertical': '/images/VERTICALES.png',
+  'banda':    '/images/VERTICALES.png',
+  'textil':   '/images/TEXTILES.png',
 }
 
 function getImagenSrc(nombre: string): string | null {
@@ -34,6 +43,20 @@ function getImagenSrc(nombre: string): string | null {
     if (lower.includes(key)) return src
   }
   return null
+}
+
+function getDescripcion(nombre: string) {
+  for (const key of Object.keys(DESCRIPCIONES)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return DESCRIPCIONES[key]
+  }
+  return ''
+}
+
+function getChecks(nombre: string): string[] {
+  for (const key of Object.keys(CHECKS)) {
+    if (nombre.toLowerCase().includes(key.toLowerCase())) return CHECKS[key]
+  }
+  return []
 }
 
 const PLACEHOLDERS: Record<string, React.ReactNode> = {
@@ -58,32 +81,20 @@ const PLACEHOLDERS: Record<string, React.ReactNode> = {
       ))}
     </svg>
   ),
-  Tradicionales: (
+  Textiles: (
     <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       <rect x="15" y="18" width="110" height="6" rx="3" fill="#C8C0B0"/>
       {[28, 44, 60, 76, 92, 108].map((y, i) => (
         <rect key={i} x="20" y={y} width="100" height="12" rx="1" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
       ))}
       <rect x="20" y="120" width="100" height="8" rx="2" fill="#C8C0B0"/>
-      <line x1="118" y1="24" x2="118" y2="122" stroke="#C8C0B0" strokeWidth="1.5"/>
-      <circle cx="118" cy="128" r="3" fill="#C8C0B0"/>
-    </svg>
-  ),
-  Horizontales: (
-    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-      <rect x="15" y="18" width="110" height="8" rx="3" fill="#C8C0B0"/>
-      {[32, 46, 60, 74, 88, 102, 116, 130].map((y, i) => (
-        <rect key={i} x="20" y={y} width="100" height="8" rx="1" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
-      ))}
     </svg>
   ),
   Dúo: (
     <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       <rect x="15" y="18" width="110" height="8" rx="3" fill="#C8C0B0"/>
       {Array.from({ length: 10 }).map((_, i) => (
-        <rect
-          key={i}
-          x="20" y={30 + i * 13} width="100" height="8" rx="1"
+        <rect key={i} x="20" y={30 + i * 13} width="100" height="8" rx="1"
           fill={i % 2 === 0 ? '#E8E0D0' : 'rgba(200,192,176,0.25)'}
           stroke="#D0C8B8" strokeWidth="0.5"
         />
@@ -99,20 +110,21 @@ function getPlaceholder(nombre: string) {
   return PLACEHOLDERS['Roller']
 }
 
-function getDescripcion(nombre: string) {
-  for (const key of Object.keys(DESCRIPCIONES)) {
-    if (nombre.toLowerCase().includes(key.toLowerCase())) return DESCRIPCIONES[key]
-  }
-  return ''
-}
-
-// Componente interno que maneja imagen real + fallback SVG
 function TipoImagen({ nombre }: { nombre: string }) {
   const src = getImagenSrc(nombre)
   const [imgError, setImgError] = useState(false)
 
   if (!src || imgError) {
-    return <>{getPlaceholder(nombre)}</>
+    return (
+      <div style={{
+        width: '100%', height: '100%',
+        background: '#F5F0E8',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '24px 20px',
+      }}>
+        {getPlaceholder(nombre)}
+      </div>
+    )
   }
 
   return (
@@ -127,9 +139,174 @@ function TipoImagen({ nombre }: { nombre: string }) {
   )
 }
 
-export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
-  const [hoverId, setHoverId] = useState<string | null>(null)
+interface FlipCardProps {
+  tipo: TipoCortina
+  activo: boolean
+  onSelect: (tipo: TipoCortina) => void
+}
 
+function FlipCard({ tipo, activo, onSelect }: FlipCardProps) {
+  const [flipped, setFlipped] = useState(false)
+  const desc = getDescripcion(tipo.nombre)
+  const checks = getChecks(tipo.nombre)
+
+  return (
+    <div
+      style={{ perspective: '1000px', cursor: 'pointer' }}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onClick={() => onSelect(tipo)}
+    >
+      <div style={{
+        position: 'relative',
+        // Mantiene el aspect ratio 3/4 del diseño original
+        paddingBottom: '133%',
+        transformStyle: 'preserve-3d',
+        transition: 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        borderRadius: 6,
+      }}>
+
+        {/* FRENTE — foto */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          borderRadius: 6,
+          overflow: 'hidden',
+          border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
+          boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.1)' : '0 2px 8px rgba(0,0,0,0.06)',
+          background: '#F5F0E8',
+        }}>
+          <TipoImagen nombre={tipo.nombre} />
+
+          {/* Gradiente + nombre abajo */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0,
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
+            padding: '40px 14px 14px',
+          }}>
+            <span style={{
+              fontSize: 11, fontWeight: 800,
+              color: '#fff', letterSpacing: '0.1em',
+            }}>
+              {tipo.nombre.toUpperCase()}
+            </span>
+          </div>
+
+          {/* Check si está seleccionado */}
+          {activo && (
+            <div style={{
+              position: 'absolute', top: 10, right: 10,
+              width: 22, height: 22,
+              background: '#14008C',
+              borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 11, fontWeight: 700,
+              zIndex: 2,
+            }}>
+              ✓
+            </div>
+          )}
+
+          {/* Hint */}
+          <div style={{
+            position: 'absolute', top: 10, left: 10,
+            fontSize: 9, fontWeight: 700,
+            color: 'rgba(255,255,255,0.9)',
+            background: 'rgba(0,0,0,0.28)',
+            borderRadius: 100,
+            padding: '3px 7px',
+            letterSpacing: '0.06em',
+            backdropFilter: 'blur(4px)',
+          }}>
+            VER DETALLES
+          </div>
+        </div>
+
+        {/* DORSO — info */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          borderRadius: 6,
+          overflow: 'hidden',
+          border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
+          boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.1)' : '0 2px 8px rgba(0,0,0,0.06)',
+          background: '#FAFAF8',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '18px 16px 14px',
+        }}>
+          {/* Nombre */}
+          <div style={{
+            fontSize: 11, fontWeight: 800,
+            color: '#14008C',
+            letterSpacing: '0.1em',
+            marginBottom: 8,
+          }}>
+            {tipo.nombre.toUpperCase()}
+          </div>
+
+          <div style={{ height: 1, background: '#EBEBEB', marginBottom: 10 }} />
+
+          {/* Descripción */}
+          <p style={{
+            fontSize: 11, color: '#666',
+            lineHeight: 1.55, margin: '0 0 12px 0',
+          }}>
+            {desc}
+          </p>
+
+          {/* Checks */}
+          {checks.length > 0 && (
+            <ul style={{
+              listStyle: 'none', padding: 0, margin: '0 0 auto 0',
+              display: 'flex', flexDirection: 'column', gap: 6,
+            }}>
+              {checks.map((check, i) => (
+                <li key={i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 7,
+                  fontSize: 11, color: '#444',
+                }}>
+                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 12, flexShrink: 0 }}>✓</span>
+                  {check}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Botón */}
+          <button
+            onClick={(e) => { e.stopPropagation(); onSelect(tipo) }}
+            style={{
+              marginTop: 14,
+              width: '100%',
+              padding: '8px',
+              background: activo ? '#14008C' : '#14008C',
+              border: 'none',
+              borderRadius: 5,
+              color: '#fff',
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.06em',
+              fontFamily: 'inherit',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            {activo ? '✓ SELECCIONADA' : 'ELEGIR ESTE TIPO →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProps) {
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
@@ -144,17 +321,16 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
         </p>
         <h2 style={{
           fontSize: 'clamp(24px, 3vw, 36px)',
-          fontWeight: 700,
-          color: '#0A0A14',
+          fontWeight: 700, color: '#0A0A14',
           letterSpacing: '-0.02em',
           margin: '0 0 12px 0',
-          fontStyle: 'italic',
+          fontStyle: 'Fraunces',
         }}>
           Elegí el tipo de cortina
         </h2>
         <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
         <p style={{ fontSize: 14, color: '#999', margin: 0, maxWidth: 400, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
-          Cada tipo tiene características únicas para distintos ambientes y necesidades.
+          Pasá el mouse sobre cada tipo para ver sus características.
         </p>
       </div>
 
@@ -167,138 +343,16 @@ export default function StepTipo({ tipos, seleccionado, onSelect }: StepTipoProp
       }}
         className="tipo-grid"
       >
-        {tipos.map(tipo => {
-          const activo = seleccionado?.id === tipo.id
-          const hover = hoverId === tipo.id
-          const desc = getDescripcion(tipo.nombre)
-          const tieneImagen = !!getImagenSrc(tipo.nombre)
-
-          return (
-            <div
-              key={tipo.id}
-              onClick={() => onSelect(tipo)}
-              onMouseEnter={() => setHoverId(tipo.id)}
-              onMouseLeave={() => setHoverId(null)}
-              style={{
-                cursor: 'pointer',
-                border: `1.5px solid ${activo ? '#14008C' : hover ? '#C0C0D8' : '#EBEBEB'}`,
-                borderRadius: 6,
-                overflow: 'hidden',
-                transition: 'all 0.18s',
-                background: activo ? '#F7F7FB' : '#fff',
-                boxShadow: hover && !activo ? '0 4px 16px rgba(0,0,0,0.08)' : 'none',
-              }}
-            >
-              {/* Zona de imagen */}
-              <div style={{
-                background: '#F5F0E8',
-                aspectRatio: '3/4',
-                position: 'relative',
-                overflow: 'hidden',
-                // Padding solo si es SVG (sin imagen real)
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: tieneImagen ? 0 : '24px 20px',
-              }}>
-                <TipoImagen nombre={tipo.nombre} />
-
-                {activo && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 10, right: 10,
-                    width: 22, height: 22,
-                    background: '#14008C',
-                    borderRadius: '50%',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#fff', fontSize: 12, fontWeight: 700,
-                    zIndex: 2,
-                  }}>
-                    ✓
-                  </div>
-                )}
-
-                {/* Overlay sutil al hover para imagen real */}
-                {tieneImagen && hover && !activo && (
-                  <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'rgba(20,0,140,0.06)',
-                    zIndex: 1,
-                  }} />
-                )}
-              </div>
-
-              {/* Info */}
-              <div style={{ padding: '14px 14px 16px' }}>
-                <div style={{
-                  fontSize: 12, fontWeight: 800,
-                  color: activo ? '#14008C' : '#0A0A14',
-                  letterSpacing: '0.06em',
-                  marginBottom: 5,
-                }}>
-                  {tipo.nombre.toUpperCase()}
-                </div>
-                <p style={{
-                  fontSize: 11, color: '#999',
-                  lineHeight: 1.5, margin: '0 0 10px 0',
-                }}>
-                  {desc}
-                </p>
-                <span style={{
-                  fontSize: 16,
-                  color: activo ? '#14008C' : hover ? '#14008C' : '#CCC',
-                  transition: 'color 0.15s',
-                }}>
-                  →
-                </span>
-              </div>
-            </div>
-          )
-        })}
+        {tipos.map(tipo => (
+          <FlipCard
+            key={tipo.id}
+            tipo={tipo}
+            activo={seleccionado?.id === tipo.id}
+            onSelect={onSelect}
+          />
+        ))}
       </div>
-
-      {/* Banner ayuda */}
-      <div style={{
-        background: '#F7F7FB',
-        border: '1px solid #E8E8F0',
-        borderRadius: 6,
-        padding: '16px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 16,
-        flexWrap: 'wrap',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <div style={{
-            width: 36, height: 36,
-            background: '#EEEEF8',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 16, flexShrink: 0,
-          }}>
-            ?
-          </div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: '#0A0A14', marginBottom: 2 }}>
-              ¿No sabés cuál elegir?
-            </div>
-            <div style={{ fontSize: 12, color: '#999' }}>
-              Te ayudamos a encontrar la mejor opción para vos.
-            </div>
-          </div>
-        </div>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          color: '#14008C', fontSize: 13, fontWeight: 700,
-          letterSpacing: '0.04em', cursor: 'pointer',
-          borderBottom: '1.5px solid #14008C',
-          paddingBottom: 1,
-        }}>
-          VER GUÍA DE TIPOS →
-        </div>
-      </div>
-
+      
       <style>{`
         @media (max-width: 640px) {
           .tipo-grid { grid-template-columns: repeat(3, 1fr) !important; }

@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import Image from 'next/image'
 import type { Tela } from '@/types'
 
 interface StepTelaProps {
@@ -9,30 +11,255 @@ interface StepTelaProps {
   onSelect: (tela: Tela) => void
 }
 
-const EMOJIS: Record<string, string> = {
-  Blackout: '🌙',
-  Sunscreen: '☀️',
-  Doble: '✨',
+const IMAGEN_MAP: Record<string, string> = {
+  'blackout':  '/images/blackout.png',
+  'sunscreen': '/images/sunscreen.png',
+  'doble':     '/images/duo.png',
+  'duo':       '/images/duo.png',
+  'dúo':       '/images/duo.png',
+}
+
+function getImagenSrc(nombre: string): string | null {
+  const lower = nombre.toLowerCase()
+  for (const [key, src] of Object.entries(IMAGEN_MAP)) {
+    if (lower.includes(key)) return src
+  }
+  return null
 }
 
 const COLORES_FONDO: Record<string, string> = {
-  Blackout: '#2A2520',
-  Sunscreen: '#F0EAE0',
-  Doble: '#E8E4DC',
+  blackout:  '#2A2520',
+  sunscreen: '#F0EAE0',
+  doble:     '#E8E4DC',
+}
+
+function getFondo(nombre: string) {
+  const lower = nombre.toLowerCase()
+  for (const [key, color] of Object.entries(COLORES_FONDO)) {
+    if (lower.includes(key)) return color
+  }
+  return '#F0EAE0'
+}
+
+const EMOJIS: Record<string, string> = {
+  blackout:  '🌙',
+  sunscreen: '☀️',
+  doble:     '✨',
 }
 
 function getEmoji(nombre: string) {
-  for (const key of Object.keys(EMOJIS)) {
-    if (nombre.toLowerCase().includes(key.toLowerCase())) return EMOJIS[key]
+  const lower = nombre.toLowerCase()
+  for (const [key, emoji] of Object.entries(EMOJIS)) {
+    if (lower.includes(key)) return emoji
   }
   return '✨'
 }
 
-function getFondo(nombre: string) {
-  for (const key of Object.keys(COLORES_FONDO)) {
-    if (nombre.toLowerCase().includes(key.toLowerCase())) return COLORES_FONDO[key]
+function TelaImagen({ nombre }: { nombre: string }) {
+  const src = getImagenSrc(nombre)
+  const [imgError, setImgError] = useState(false)
+  const fondo = getFondo(nombre)
+
+  if (!src || imgError) {
+    return (
+      <div style={{
+        width: '100%', height: '100%',
+        background: fondo,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 48,
+      }}>
+        {getEmoji(nombre)}
+      </div>
+    )
   }
-  return '#F0EAE0'
+
+  return (
+    <Image
+      src={src}
+      alt={nombre}
+      fill
+      sizes="(max-width: 640px) 90vw, 30vw"
+      style={{ objectFit: 'cover', objectPosition: 'center' }}
+      onError={() => setImgError(true)}
+    />
+  )
+}
+
+interface FlipCardProps {
+  tela: Tela
+  activo: boolean
+  onSelect: (tela: Tela) => void
+}
+
+function FlipCard({ tela, activo, onSelect }: FlipCardProps) {
+  const [flipped, setFlipped] = useState(false)
+  const esOscuro = tela.nombre.toLowerCase().includes('blackout')
+
+  return (
+    <div
+      style={{ perspective: '1000px', cursor: 'pointer' }}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onClick={() => onSelect(tela)}
+    >
+      <div style={{
+        position: 'relative',
+        height: 280,
+        transformStyle: 'preserve-3d',
+        transition: 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        borderRadius: 8,
+      }}>
+
+        {/* FRENTE — foto */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          borderRadius: 8,
+          overflow: 'hidden',
+          border: `1.5px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo
+            ? '0 0 0 3px rgba(20,0,140,0.1)'
+            : '0 2px 12px rgba(0,0,0,0.06)',
+        }}>
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <TelaImagen nombre={tela.nombre} />
+
+            {/* Gradiente con nombre */}
+            <div style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              background: 'linear-gradient(transparent, rgba(0,0,0,0.55))',
+              padding: '32px 16px 14px',
+            }}>
+              <span style={{
+                fontSize: 13, fontWeight: 800,
+                color: '#fff', letterSpacing: '0.1em',
+              }}>
+                {tela.nombre.toUpperCase()}
+              </span>
+            </div>
+
+            {/* Check activo */}
+            {activo && (
+              <div style={{
+                position: 'absolute', top: 10, right: 10,
+                width: 24, height: 24,
+                background: '#14008C',
+                borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 12, fontWeight: 700,
+              }}>
+                ✓
+              </div>
+            )}
+
+            {/* Hint */}
+            <div style={{
+              position: 'absolute', top: 10, left: 10,
+              fontSize: 10, fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              background: 'rgba(0,0,0,0.28)',
+              borderRadius: 100,
+              padding: '3px 8px',
+              letterSpacing: '0.06em',
+              backdropFilter: 'blur(4px)',
+            }}>
+              VER DETALLES
+            </div>
+          </div>
+        </div>
+
+        {/* DORSO — info */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          borderRadius: 8,
+          overflow: 'hidden',
+          border: `1.5px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo
+            ? '0 0 0 3px rgba(20,0,140,0.1)'
+            : '0 2px 12px rgba(0,0,0,0.06)',
+          background: esOscuro ? '#1E1A18' : '#FAFAF8',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '20px 20px 16px',
+        }}>
+          {/* Emoji + nombre */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+            <span style={{ fontSize: 24 }}>{getEmoji(tela.nombre)}</span>
+            <span style={{
+              fontSize: 13, fontWeight: 800,
+              color: esOscuro ? '#F0EAE0' : '#0A0A14',
+              letterSpacing: '0.08em',
+            }}>
+              {tela.nombre.toUpperCase()}
+            </span>
+          </div>
+
+          <div style={{
+            height: 1,
+            background: esOscuro ? 'rgba(255,255,255,0.08)' : '#EBEBEB',
+            marginBottom: 12,
+          }} />
+
+          <p style={{
+            fontSize: 12,
+            color: esOscuro ? '#B0A898' : '#666',
+            lineHeight: 1.55,
+            margin: '0 0 14px 0',
+          }}>
+            {tela.descripcion}
+          </p>
+
+          {tela.checks && tela.checks.length > 0 && (
+            <ul style={{
+              listStyle: 'none', padding: 0, margin: '0 0 auto 0',
+              display: 'flex', flexDirection: 'column', gap: 7,
+            }}>
+              {tela.checks.map((check, i) => (
+                <li key={i} style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 8,
+                  fontSize: 12,
+                  color: esOscuro ? '#C8BFB5' : '#444',
+                }}>
+                  <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>✓</span>
+                  {check}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <button
+            onClick={(e) => { e.stopPropagation(); onSelect(tela) }}
+            style={{
+              marginTop: 16,
+              width: '100%',
+              padding: '9px',
+              background: activo
+                ? '#14008C'
+                : esOscuro ? 'rgba(255,255,255,0.1)' : '#14008C',
+              border: esOscuro && !activo ? '1px solid rgba(255,255,255,0.2)' : 'none',
+              borderRadius: 6,
+              color: '#fff',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.06em',
+              fontFamily: 'inherit',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            {activo ? '✓ SELECCIONADA' : 'ELEGIR ESTA TELA →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function StepTela({
@@ -46,7 +273,6 @@ export default function StepTela({
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
-      {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 36 }}>
         <p style={{
           fontSize: 11, fontWeight: 700, color: '#14008C',
@@ -57,8 +283,7 @@ export default function StepTela({
         </p>
         <h2 style={{
           fontSize: 'clamp(24px, 3vw, 36px)',
-          fontWeight: 700,
-          color: '#0A0A14',
+          fontWeight: 700, color: '#0A0A14',
           letterSpacing: '-0.02em',
           margin: '0 0 12px 0',
           fontStyle: 'italic',
@@ -71,148 +296,29 @@ export default function StepTela({
           maxWidth: 440, marginLeft: 'auto', marginRight: 'auto',
           lineHeight: 1.6,
         }}>
-          Cada tela tiene propiedades únicas de luz, privacidad y temperatura.
+          Pasá el mouse sobre cada tela para ver sus características.
         </p>
       </div>
 
-      {/* Cards */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${Math.min(lista.length, 3)}, 1fr)`,
-        gap: 16,
+        gap: 20,
         marginBottom: 24,
       }}
         className="tela-grid"
       >
-        {lista.map(tela => {
-          const activo = seleccionada?.id === tela.id
-          const fondo = getFondo(tela.nombre)
-          const esOscuro = tela.nombre.toLowerCase().includes('blackout')
-
-          return (
-            <div
-              key={tela.id}
-              onClick={() => onSelect(tela)}
-              style={{
-                border: `1.5px solid ${activo ? '#14008C' : '#EBEBEB'}`,
-                borderRadius: 6,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                transition: 'all 0.18s',
-                background: '#fff',
-                boxShadow: activo ? '0 0 0 3px rgba(20,0,140,0.08)' : 'none',
-              }}
-            >
-              {/* Imagen placeholder de textura */}
-              <div style={{
-                background: fondo,
-                height: 160,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-              }}>
-                {/* Textura simulada con SVG */}
-                <svg
-                  viewBox="0 0 200 160"
-                  width="100%"
-                  height="100%"
-                  style={{ position: 'absolute', inset: 0 }}
-                  preserveAspectRatio="xMidYMid slice"
-                >
-                  {Array.from({ length: 20 }).map((_, i) => (
-                    <line
-                      key={`h${i}`}
-                      x1="0" y1={i * 8} x2="200" y2={i * 8}
-                      stroke={esOscuro ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)'}
-                      strokeWidth="1"
-                    />
-                  ))}
-                  {Array.from({ length: 25 }).map((_, i) => (
-                    <line
-                      key={`v${i}`}
-                      x1={i * 8} y1="0" x2={i * 8} y2="160"
-                      stroke={esOscuro ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'}
-                      strokeWidth="1"
-                    />
-                  ))}
-                  {/* Pliegues diagonales sutiles */}
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <line
-                      key={`d${i}`}
-                      x1={i * 40 - 20} y1="0"
-                      x2={i * 40 + 20} y2="160"
-                      stroke={esOscuro ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}
-                      strokeWidth="3"
-                    />
-                  ))}
-                </svg>
-
-                {/* Emoji centrado */}
-                <span style={{
-                  fontSize: 36,
-                  position: 'relative',
-                  zIndex: 1,
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
-                }}>
-                  {getEmoji(tela.nombre)}
-                </span>
-
-                {/* Radio button */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: 12, right: 12,
-                  width: 22, height: 22,
-                  borderRadius: '50%',
-                  border: `2px solid ${activo ? '#14008C' : esOscuro ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.2)'}`,
-                  background: activo ? '#14008C' : 'transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {activo && (
-                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />
-                  )}
-                </div>
-              </div>
-
-              {/* Info */}
-              <div style={{ padding: '16px 18px 18px' }}>
-                <div style={{
-                  fontSize: 13, fontWeight: 800,
-                  color: activo ? '#14008C' : '#0A0A14',
-                  letterSpacing: '0.06em',
-                  marginBottom: 6,
-                }}>
-                  {tela.nombre.toUpperCase()}
-                </div>
-                <p style={{
-                  fontSize: 12, color: '#888',
-                  lineHeight: 1.55, margin: '0 0 12px 0',
-                }}>
-                  {tela.descripcion}
-                </p>
-
-                {/* Checks */}
-                {tela.checks && tela.checks.length > 0 && (
-                  <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 5 }}>
-                    {tela.checks.map((check, i) => (
-                      <li key={i} style={{
-                        display: 'flex', alignItems: 'flex-start', gap: 7,
-                        fontSize: 12, color: '#555',
-                      }}>
-                        <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 13, flexShrink: 0, marginTop: 0 }}>✓</span>
-                        {check}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          )
-        })}
+        {lista.map(tela => (
+          <FlipCard
+            key={tela.id}
+            tela={tela}
+            activo={seleccionada?.id === tela.id}
+            onSelect={onSelect}
+          />
+        ))}
       </div>
 
-      {/* Placeholder simulador de luz */}
+      {/* Simulador de luz */}
       <div style={{
         background: '#F7F7FB',
         border: '1px dashed #C8C8DC',
@@ -221,7 +327,6 @@ export default function StepTela({
         display: 'flex',
         alignItems: 'center',
         gap: 16,
-        marginBottom: 0,
       }}>
         <div style={{
           width: 40, height: 40,

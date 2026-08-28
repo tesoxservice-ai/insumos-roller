@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useCart } from '@/context/CartContext'
 
 const LINKS = [
   { label: 'Productos', href: '/#productos' },
-  { label: 'Nosotros', href: '/#nosotros' },
+  { label: 'Nosotros', href: '/faq#nosotros' },
   { label: 'Inspiración', href: '/#inspiracion' },
   { label: 'Guías', href: '/#guias' },
-  { label: 'Contacto', href: '/#contacto' },
+  { label: 'Contacto', href: 'https://wa.me/541133802658?text=Hola%2C%20quiero%20hacer%20una%20consulta', external: true },
 ]
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
+  const { count, abrirDrawer } = useCart()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -40,7 +42,7 @@ export default function Nav() {
         justifyContent: 'space-between',
       }}>
 
-        {/* Logo — izquierda */}
+        {/* Logo */}
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1.1, flexShrink: 0 }}>
           <span style={{ fontSize: 22, fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--text)' }}>
             INSUM<span style={{ color: 'var(--primary)' }}>O</span>S
@@ -50,18 +52,17 @@ export default function Nav() {
           </span>
         </Link>
 
-        {/* Links — centro */}
+        {/* Links */}
         <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          flex: 1,
-          justifyContent: 'center',
-          gap: 'clamp(20px, 4vw, 64px)',
+          display: 'flex', alignItems: 'center', flex: 1,
+          justifyContent: 'center', gap: 'clamp(20px, 4vw, 64px)',
         }}>
           {LINKS.map(link => (
             <Link
               key={link.href}
               href={link.href}
+              target={link.external ? '_blank' : undefined}
+              rel={link.external ? 'noopener noreferrer' : undefined}
               style={{ fontSize: 16, fontWeight: 600, letterSpacing: '0.03em', color: 'var(--text-mid)', textDecoration: 'none', transition: 'color 0.15s', whiteSpace: 'nowrap' }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-mid)')}
@@ -71,13 +72,18 @@ export default function Nav() {
           ))}
         </div>
 
-        {/* CTA + carrito — derecha */}
+        {/* CTA + carrito */}
         <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 16 }}>
 
-          {/* Carrito */}
-          <Link
-            href="/stock"
-            style={{ position: 'relative', color: 'var(--text-mid)', textDecoration: 'none', display: 'flex', alignItems: 'center', transition: 'color 0.15s' }}
+          {/* Carrito con badge */}
+          <button
+            onClick={abrirDrawer}
+            style={{
+              position: 'relative', background: 'none', border: 'none',
+              cursor: 'pointer', color: 'var(--text-mid)',
+              display: 'flex', alignItems: 'center',
+              padding: 4, transition: 'color 0.15s',
+            }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--primary)')}
             onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-mid)')}
           >
@@ -86,21 +92,34 @@ export default function Nav() {
               <line x1="3" y1="6" x2="21" y2="6"/>
               <path d="M16 10a4 4 0 01-8 0"/>
             </svg>
-          </Link>
+            {count > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: -4, right: -6,
+                background: '#14008C',
+                color: '#fff',
+                fontSize: 10,
+                fontWeight: 800,
+                borderRadius: '100px',
+                minWidth: 18, height: 18,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                padding: '0 4px',
+                lineHeight: 1,
+              }}>
+                {count > 99 ? '99+' : count}
+              </span>
+            )}
+          </button>
 
           {/* Cotizá ahora */}
           <Link
             href="/configurador"
             style={{
-              backgroundColor: 'var(--primary)',
-              color: '#fff',
-              borderRadius: '100px',
-              padding: '11px 28px',
-              fontSize: 15,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              textDecoration: 'none',
-              display: 'inline-block',
+              backgroundColor: 'var(--primary)', color: '#fff',
+              borderRadius: '100px', padding: '11px 28px',
+              fontSize: 15, fontWeight: 700, letterSpacing: '0.04em',
+              textDecoration: 'none', display: 'inline-block',
+              transition: 'opacity 0.15s',
             }}
             onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
             onMouseLeave={e => (e.currentTarget.style.opacity = '1')}

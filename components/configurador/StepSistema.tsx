@@ -45,6 +45,9 @@ export default function StepSistema({
   const motorExtra = regla?.motorizada_extra ?? 35000
   const instExtra = regla?.instalacion_extra ?? 20000
 
+  const sistemaManual = sistema === 'manual' || sistema === 'Cadena'
+  const sistemaMotor  = sistema === 'motorizado' || sistema === 'Motorizada'
+
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
 
@@ -53,27 +56,36 @@ export default function StepSistema({
         <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
         <div style={{ textAlign: 'center', marginTop: 40 }}>
           <h2 style={{
-            fontSize: 'clamp(24px, 3vw, 36px)',
-            fontWeight: 700, color: '#0A0A14',
-            letterSpacing: '-0.02em', margin: '0 0 12px 0',
-            fontStyle: 'italic',
+            fontSize: 'clamp(36px, 4.5vw, 52px)',
+            fontWeight: 700,
+            color: '#0A0A14',
+            letterSpacing: '-0.02em',
+            margin: '0 0 16px 0',
           }}>
-            Elegí el sistema e instalación
+            Sistema e instalación
           </h2>
-          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-          <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 20px' }} />
+          <p style={{
+            fontSize: 17,
+            color: '#444',
+            margin: 0,
+            maxWidth: 440,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+            lineHeight: 1.6,
+          }}>
             Elegí cómo vas a manejar tu cortina y si necesitás que la instalemos.
           </p>
         </div>
       </div>
 
       {/* SISTEMA */}
-      <div style={{ marginBottom: 32 }}>
+      <div style={{ marginBottom: 28 }}>
         <p style={{
-          fontSize: 11, fontWeight: 800, color: '#14008C',
-          letterSpacing: '0.16em', marginBottom: 14,
+          fontSize: 12, fontWeight: 800, color: '#14008C',
+          letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16,
         }}>
-          SISTEMA DE ACCIONAMIENTO
+          Sistema de accionamiento
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
           className="sistema-grid"
@@ -82,17 +94,16 @@ export default function StepSistema({
           <div
             onClick={() => onSistemaChange('manual', 0)}
             style={{
-              border: `1.5px solid ${sistema === 'manual' || sistema === 'Cadena' ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
+              border: `1.5px solid ${sistemaManual ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 10,
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
               transition: 'all 0.18s',
               background: '#fff',
-              boxShadow: sistema === 'manual' || sistema === 'Cadena' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+              boxShadow: sistemaManual ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
             }}
           >
-            {/* Imagen placeholder */}
             <div style={{
               width: 140, flexShrink: 0,
               background: '#F5F0E8',
@@ -113,17 +124,16 @@ export default function StepSistema({
                 ))}
               </svg>
             </div>
-            {/* Info */}
-            <div style={{ padding: '20px 16px 20px 16px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 18, marginBottom: 8 }}>🔗</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 20, marginBottom: 10 }}>🔗</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
                 Cadena manual
               </div>
-              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: 0 }}>
+              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: 0 }}>
                 Sistema clásico con cadena plástica o metálica. Simple, silencioso y sin necesidad de electricidad.
               </p>
-              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
-                <RadioCircle activo={sistema === 'manual' || sistema === 'Cadena'} />
+              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
+                <RadioCircle activo={sistemaManual} />
               </div>
             </div>
           </div>
@@ -132,17 +142,16 @@ export default function StepSistema({
           <div
             onClick={() => onSistemaChange('motorizado', motorExtra)}
             style={{
-              border: `1.5px solid ${sistema === 'motorizado' || sistema === 'Motorizada' ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
+              border: `1.5px solid ${sistemaMotor ? '#14008C' : '#EBEBEB'}`,
+              borderRadius: 10,
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
               transition: 'all 0.18s',
               background: '#fff',
-              boxShadow: sistema === 'motorizado' || sistema === 'Motorizada' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
+              boxShadow: sistemaMotor ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
             }}
           >
-            {/* Imagen placeholder */}
             <div style={{
               width: 140, flexShrink: 0,
               background: '#F5F0E8',
@@ -159,20 +168,19 @@ export default function StepSistema({
                 <rect x="14" y="84" width="52" height="6" rx="2" fill="#C8C0B0"/>
               </svg>
             </div>
-            {/* Info */}
-            <div style={{ padding: '20px 16px 20px 16px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 18, marginBottom: 8 }}>⚡</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 20, marginBottom: 10 }}>⚡</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
                 Motorizado
               </div>
-              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: '0 0 8px 0' }}>
+              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '0 0 10px 0' }}>
                 Motor silencioso controlable por control remoto o app. Ideal para cortinas de difícil acceso o grandes dimensiones.
               </p>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#14008C' }}>
                 + ${motorExtra.toLocaleString('es-AR')}
               </div>
-              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
-                <RadioCircle activo={sistema === 'motorizado' || sistema === 'Motorizada'} />
+              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
+                <RadioCircle activo={sistemaMotor} />
               </div>
             </div>
           </div>
@@ -182,10 +190,10 @@ export default function StepSistema({
       {/* INSTALACIÓN */}
       <div>
         <p style={{
-          fontSize: 11, fontWeight: 800, color: '#14008C',
-          letterSpacing: '0.16em', marginBottom: 14,
+          fontSize: 12, fontWeight: 800, color: '#14008C',
+          letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16,
         }}>
-          INSTALACIÓN
+          Instalación
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
           className="inst-grid"
@@ -195,7 +203,7 @@ export default function StepSistema({
             onClick={() => onInstalacionChange(false, 0)}
             style={{
               border: `1.5px solid ${!instalacion ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
+              borderRadius: 10,
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
@@ -208,19 +216,19 @@ export default function StepSistema({
               width: 140, flexShrink: 0,
               background: '#F5F0E8',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16, fontSize: 40,
+              padding: 16, fontSize: 44,
             }}>
               📦
             </div>
-            <div style={{ padding: '20px 16px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 18, marginBottom: 8 }}>🔩</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#0A0A14', marginBottom: 6 }}>
+            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 20, marginBottom: 10 }}>🔩</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
                 La instalo yo
               </div>
-              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: 0 }}>
+              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: 0 }}>
                 Te enviamos la cortina con instrucciones claras. La mayoría de las personas la instala en menos de 30 minutos.
               </p>
-              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
                 <RadioCircle activo={!instalacion} />
               </div>
             </div>
@@ -231,7 +239,7 @@ export default function StepSistema({
             onClick={() => onInstalacionChange(true, instExtra)}
             style={{
               border: `1.5px solid ${instalacion ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
+              borderRadius: 10,
               overflow: 'hidden',
               cursor: 'pointer',
               display: 'flex',
@@ -244,22 +252,22 @@ export default function StepSistema({
               width: 140, flexShrink: 0,
               background: '#F5F0E8',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16, fontSize: 40,
+              padding: 16, fontSize: 44,
             }}>
               👷
             </div>
-            <div style={{ padding: '20px 16px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 18, marginBottom: 8 }}>🏠</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: instalacion ? '#14008C' : '#0A0A14', marginBottom: 6 }}>
+            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
+              <div style={{ fontSize: 20, marginBottom: 10 }}>🏠</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: instalacion ? '#14008C' : '#0A0A14', marginBottom: 8 }}>
                 Quiero instalación profesional
               </div>
-              <p style={{ fontSize: 12, color: '#888', lineHeight: 1.55, margin: '0 0 8px 0' }}>
+              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '0 0 10px 0' }}>
                 Nuestro equipo instala la cortina en tu domicilio. Incluye medición final, colocación y prueba del sistema.
               </p>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#14008C' }}>
                 + ${instExtra.toLocaleString('es-AR')}
               </div>
-              <div style={{ position: 'absolute', bottom: 16, right: 16 }}>
+              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
                 <RadioCircle activo={instalacion} />
               </div>
             </div>

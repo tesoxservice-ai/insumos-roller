@@ -25,7 +25,7 @@ const ACCESOS = [
   },
   {
     num: '03',
-    titulo: 'ELEGÍ LA MEJOR OPCIÓN',
+    titulo: 'simulador de luz',
     desc: 'Conocé las diferencias entre nuestros sistemas y telas.',
     href: '/configurador',
   },
@@ -33,7 +33,7 @@ const ACCESOS = [
     num: '04',
     titulo: 'PREGUNTAS FRECUENTES',
     desc: 'Respondemos las dudas más comunes antes de tu compra.',
-    href: '/#',
+    href: '/faq',
   },
 ]
 
@@ -43,17 +43,17 @@ const FOOTER_LINKS = {
     { label: 'Listas para llevar', href: '/stock' },
   ],
   'INFORMACIÓN': [
-    { label: 'Quiénes somos', href: '/#' },
+    { label: 'Quiénes somos', href: '/faq#nosotros' },
     { label: 'Envíos', href: '/#' },
     { label: 'Cambios y devoluciones', href: '/#' },
   ],
   'AYUDA': [
     { label: 'Guía de medición', href: '/guia-medicion' },
     { label: 'Guía de instalación', href: '/guia-instalacion' },
-    { label: 'Preguntas frecuentes', href: '/#' },
+    { label: 'Preguntas frecuentes', href: '/faq' },
   ],
   'CONTACTO': [
-    { label: 'WhatsApp', href: '/#' },
+    { label: 'WhatsApp', href: 'https://wa.me/541133802658?text=Hola%2C%20quiero%20hacer%20una%20consulta' },
     { label: 'Email', href: '/#' },
     { label: 'Formulario de contacto', href: '/#' },
   ],
@@ -72,13 +72,10 @@ export default function HomePage() {
           style={{ objectFit: 'cover', objectPosition: 'center' }}
           priority
         />
-        {/* Overlay */}
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)',
         }} />
-
-        {/* Texto hero — más chico y más arriba */}
         <div style={{
           position: 'absolute',
           top: '40%',
@@ -117,8 +114,6 @@ export default function HomePage() {
             </span>
           </h1>
         </div>
-
-        {/* Cards de acción — superpuestas sobre la imagen, parte inferior */}
         <div style={{
           position: 'absolute',
           bottom: 0, left: 0, right: 0,
@@ -154,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* ── GALERÍA AMBIENTES ── */}
-      <section style={{ padding: '64px 0 0', background: 'var(--bg)' }}>
+      <section id="inspiracion" style={{ padding: '64px 0 0', background: 'var(--bg)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32, padding: '0 48px' }}>
           <p style={{ color: 'var(--primary)', fontSize: 12, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', margin: '0 0 10px 0' }}>
             INSPIRATE EN ESTOS DISEÑOS
@@ -166,13 +161,8 @@ export default function HomePage() {
             Descubrí ambientes únicos
           </h2>
         </div>
-
         <div style={{ padding: '0 48px' }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 8,
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
             {AMBIENTES.map(a => (
               <Link key={a.label} href="/configurador" style={{ textDecoration: 'none' }}>
                 <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', borderRadius: 'var(--radius)' }}>
@@ -189,9 +179,7 @@ export default function HomePage() {
                     background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
                     display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
                   }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>
-                      {a.label}
-                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.12em', color: '#fff' }}>{a.label}</span>
                     <span style={{ color: '#fff', fontWeight: 700, fontSize: 18 }}>→</span>
                   </div>
                 </div>
@@ -202,34 +190,27 @@ export default function HomePage() {
       </section>
 
       {/* ── ACCESOS RÁPIDOS ── */}
-      <section style={{ padding: '12px 48px 64px', background: 'var(--bg)' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 8,
-        }}>
+      <section id="guias" style={{ padding: '12px 48px 64px', background: 'var(--bg)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
           {ACCESOS.map(a => (
             <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
-              <div style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius)',
-                padding: '32px 28px',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 14,
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-              }}
+              <div
+                style={{
+                  background: 'var(--surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  padding: '32px 28px',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 14,
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
+                }}
                 className="acceso-card"
               >
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.1em' }}>{a.num}</div>
-                <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--text)' }}>
-                  {a.titulo}
-                </div>
-                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0, flex: 1 }}>
-                  {a.desc}
-                </p>
+                <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: '0.06em', color: 'var(--text)' }}>{a.titulo}</div>
+                <p style={{ fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.6, margin: 0, flex: 1 }}>{a.desc}</p>
                 <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 20 }}>→</span>
               </div>
             </Link>
@@ -264,13 +245,11 @@ export default function HomePage() {
                 Fabricación a medida.<br />Envíos a todo el país.
               </p>
             </div>
-
             {Object.entries(FOOTER_LINKS).map(([titulo, links]) => (
               <div key={titulo}>
                 <p style={{
                   fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
-                  color: '#8888A8',
-                  textTransform: 'uppercase', margin: '0 0 16px 0',
+                  color: '#8888A8', textTransform: 'uppercase', margin: '0 0 16px 0',
                 }}>
                   {titulo}
                 </p>
@@ -287,7 +266,6 @@ export default function HomePage() {
               </div>
             ))}
           </div>
-
           <div style={{
             display: 'flex', justifyContent: 'space-between',
             alignItems: 'center', flexWrap: 'wrap', gap: 16,
@@ -297,9 +275,7 @@ export default function HomePage() {
             </p>
             <div style={{ display: 'flex', gap: 20 }}>
               {['Términos y condiciones', 'Política de privacidad'].map(t => (
-                <Link key={t} href="/#" style={{
-                  fontSize: 12, color: '#8888A8', textDecoration: 'none',
-                }}>
+                <Link key={t} href="/#" style={{ fontSize: 12, color: '#8888A8', textDecoration: 'none' }}>
                   {t}
                 </Link>
               ))}

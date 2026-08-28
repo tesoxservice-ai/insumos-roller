@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { Color } from '@/types'
 import StepHeader from '@/components/configurador/StepHeader'
 
@@ -19,13 +20,205 @@ interface StepColorProps {
   onClickPaso: (i: number) => void
 }
 
+const CAIDAS = [
+  {
+    key: 'detras' as const,
+    label: 'Caída por detrás',
+    img: '/images/CAIDA_DETRAS.png',
+    desc: 'El rollo queda pegado a la pared. La tela cae entre el tubo y la pared.',
+    checks: [
+      'Más discreto y minimalista',
+      'Ideal para ventanas con poco espacio',
+      'Aspecto más limpio desde adentro',
+    ],
+  },
+  {
+    key: 'delante' as const,
+    label: 'Caída por delante',
+    img: '/images/CAIDA_DELANTE.png',
+    desc: 'El rollo queda separado de la pared. La tela cae por el frente.',
+    checks: [
+      'Más volumen y presencia visual',
+      'Mayor cobertura lateral',
+      'Recomendada para blackout total',
+    ],
+  },
+]
+
+interface CaidaFlipCardProps {
+  caida: typeof CAIDAS[0]
+  activo: boolean
+  onSelect: (key: 'detras' | 'delante') => void
+}
+
+function CaidaFlipCard({ caida, activo, onSelect }: CaidaFlipCardProps) {
+  const [flipped, setFlipped] = useState(false)
+  const [imgError, setImgError] = useState(false)
+
+  return (
+    <div
+      style={{ perspective: '1000px', cursor: 'pointer' }}
+      onMouseEnter={() => setFlipped(true)}
+      onMouseLeave={() => setFlipped(false)}
+      onClick={() => onSelect(caida.key)}
+    >
+      <div style={{
+        position: 'relative',
+        paddingBottom: '130%',
+        transformStyle: 'preserve-3d',
+        transition: 'transform 0.55s cubic-bezier(0.4, 0, 0.2, 1)',
+        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        borderRadius: 10,
+      }}>
+
+        {/* FRENTE */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          borderRadius: 10,
+          overflow: 'hidden',
+          border: `2px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo ? '0 0 0 4px rgba(20,0,140,0.1)' : '0 4px 16px rgba(0,0,0,0.08)',
+          background: '#F5F0E8',
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          {/* Imagen */}
+          <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
+            {!imgError ? (
+              <Image
+                src={caida.img}
+                alt={caida.label}
+                fill
+                sizes="40vw"
+                style={{ objectFit: 'cover', objectPosition: 'center top' }}
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div style={{
+                width: '100%', height: '100%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: '#F5F0E8',
+              }}>
+                <svg viewBox="0 0 120 140" width="100" height="120" fill="none">
+                  <rect x="20" y="18" width="80" height="8" rx="4" fill="#B0A898"/>
+                  <rect x="24" y="14" width="72" height="10" rx="5" fill="#C8C0B0"/>
+                  <rect x="28" y="24" width="64" height="90" rx="2" fill="#E0D8CC" opacity="0.95"/>
+                  {[40,56,72,88,104].map(y => (
+                    <line key={y} x1="28" y1={y} x2="92" y2={y} stroke="rgba(0,0,0,0.05)" strokeWidth="1"/>
+                  ))}
+                  <rect x="26" y="112" width="68" height="6" rx="3" fill="#C8C0B0"/>
+                </svg>
+              </div>
+            )}
+
+            {/* Badge VER DETALLES */}
+            <div style={{
+              position: 'absolute', top: 14, left: 14,
+              fontSize: 10, fontWeight: 700,
+              color: 'rgba(255,255,255,0.9)',
+              background: 'rgba(0,0,0,0.28)',
+              borderRadius: 100,
+              padding: '4px 10px',
+              letterSpacing: '0.06em',
+              backdropFilter: 'blur(4px)',
+            }}>
+              VER DETALLES
+            </div>
+
+            {/* Check activo */}
+            {activo && (
+              <div style={{
+                position: 'absolute', top: 14, right: 14,
+                width: 26, height: 26,
+                background: '#14008C',
+                borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 13, fontWeight: 700,
+              }}>✓</div>
+            )}
+          </div>
+
+          {/* Nombre */}
+          <div style={{
+            padding: '14px 18px',
+            background: '#fff',
+            borderTop: '1px solid #EBEBEB',
+          }}>
+            <span style={{ fontSize: 13, fontWeight: 800, color: '#0A0A14', letterSpacing: '0.1em' }}>
+              {caida.label.toUpperCase()}
+            </span>
+          </div>
+        </div>
+
+        {/* DORSO */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backfaceVisibility: 'hidden',
+          WebkitBackfaceVisibility: 'hidden',
+          transform: 'rotateY(180deg)',
+          borderRadius: 10,
+          overflow: 'hidden',
+          border: `2px solid ${activo ? '#14008C' : '#E8E8E8'}`,
+          boxShadow: activo ? '0 0 0 4px rgba(20,0,140,0.1)' : '0 4px 16px rgba(0,0,0,0.08)',
+          background: '#FAFAF8',
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '24px 22px 20px',
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: '#14008C', letterSpacing: '0.1em', marginBottom: 10 }}>
+            {caida.label.toUpperCase()}
+          </div>
+
+          <div style={{ height: 1, background: '#EBEBEB', marginBottom: 14 }} />
+
+          <p style={{ fontSize: 15, color: '#666', lineHeight: 1.6, margin: '0 0 16px 0' }}>
+            {caida.desc}
+          </p>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 auto 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {caida.checks.map((check, i) => (
+              <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 15, color: '#444' }}>
+                <span style={{ color: '#0D7A4E', fontWeight: 700, fontSize: 16, flexShrink: 0 }}>✓</span>
+                {check}
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={e => { e.stopPropagation(); onSelect(caida.key) }}
+            style={{
+              marginTop: 18,
+              width: '100%',
+              padding: '13px',
+              background: '#14008C',
+              border: 'none',
+              borderRadius: 7,
+              color: '#fff',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              letterSpacing: '0.06em',
+              fontFamily: 'inherit',
+              transition: 'opacity 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+            onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+          >
+            {activo ? '✓ SELECCIONADA' : 'ELEGIR ESTA CAÍDA →'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function StepColor({
   colores,
   coloresFiltrados,
   seleccionado,
   onSelect,
-  tipoNombre,
-  telaNombre,
   caida,
   onCaidaChange,
   pasoActual,
@@ -41,15 +234,14 @@ export default function StepColor({
         <StepHeader pasos={PASOS} pasoActual={pasoActual} onClickPaso={onClickPaso} />
         <div style={{ textAlign: 'center', marginTop: 40 }}>
           <h2 style={{
-            fontSize: 'clamp(24px, 3vw, 36px)',
+            fontSize: 'clamp(36px, 4.5vw, 52px)',
             fontWeight: 700, color: '#0A0A14',
-            letterSpacing: '-0.02em', margin: '0 0 12px 0',
-            fontStyle: 'italic',
+            letterSpacing: '-0.02em', margin: '0 0 16px 0',
           }}>
             Color y accesorios
           </h2>
-          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 14px' }} />
-          <p style={{ fontSize: 14, color: '#999', margin: 0, lineHeight: 1.6 }}>
+          <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 20px' }} />
+          <p style={{ fontSize: 17, color: '#444', margin: 0, maxWidth: 440, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
             Elegí el color y la caída del rollo para tu cortina.
           </p>
         </div>
@@ -57,63 +249,37 @@ export default function StepColor({
 
       {/* COLORES */}
       <div style={{
-        background: '#fff',
-        border: '1px solid #EBEBEB',
-        borderRadius: 8,
-        padding: '24px 28px',
-        marginBottom: 16,
+        background: '#fff', border: '1px solid #EBEBEB',
+        borderRadius: 10, padding: '28px 32px', marginBottom: 20,
       }}>
-        <p style={{
-          fontSize: 11, fontWeight: 800, color: '#14008C',
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-          marginBottom: 20,
-        }}>
-          COLOR DE LA TELA
+        <p style={{ fontSize: 12, fontWeight: 800, color: '#14008C', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 24 }}>
+          Color de la tela
         </p>
 
         {lista.length === 0 ? (
-          <p style={{ fontSize: 13, color: '#BBB' }}>
-            No hay colores disponibles para esta tela.
-          </p>
+          <p style={{ fontSize: 15, color: '#BBB' }}>No hay colores disponibles para esta tela.</p>
         ) : (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
             {lista.map(color => {
               const isSelected = seleccionado?.id === color.id
               return (
                 <button
                   key={color.id}
                   onClick={() => onSelect(color)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                 >
                   <div style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: '50%',
+                    width: 60, height: 60, borderRadius: '50%',
                     background: color.hex,
                     border: isSelected ? '3px solid #14008C' : '2px solid #E0E0E0',
-                    boxShadow: isSelected
-                      ? '0 0 0 3px rgba(20,0,140,0.12)'
-                      : '0 1px 4px rgba(0,0,0,0.1)',
+                    boxShadow: isSelected ? '0 0 0 4px rgba(20,0,140,0.12)' : '0 2px 6px rgba(0,0,0,0.1)',
                     transition: 'all 0.15s',
-                    transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                    transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                   }} />
                   <span style={{
-                    fontSize: 11,
-                    fontWeight: isSelected ? 700 : 400,
-                    color: isSelected ? '#14008C' : '#888',
-                    maxWidth: 60,
-                    textAlign: 'center',
-                    lineHeight: 1.3,
-                    transition: 'color 0.15s',
+                    fontSize: 13, fontWeight: isSelected ? 700 : 400,
+                    color: isSelected ? '#14008C' : '#666',
+                    maxWidth: 72, textAlign: 'center', lineHeight: 1.3,
                   }}>
                     {color.nombre}
                   </span>
@@ -123,41 +289,24 @@ export default function StepColor({
           </div>
         )}
 
-        {/* Preview del color seleccionado */}
         {seleccionado && (
           <div style={{
-            marginTop: 20,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            padding: '12px 16px',
-            background: '#F7F7FB',
-            borderRadius: 6,
+            marginTop: 24, display: 'flex', alignItems: 'center', gap: 14,
+            padding: '14px 20px', background: '#F7F7FB', borderRadius: 8,
           }}>
             <div style={{
-              width: 32, height: 32,
-              borderRadius: '50%',
+              width: 40, height: 40, borderRadius: '50%',
               background: seleccionado.hex,
-              border: '2px solid #fff',
-              boxShadow: '0 0 0 1.5px #DDD',
-              flexShrink: 0,
+              border: '2px solid #fff', boxShadow: '0 0 0 1.5px #DDD', flexShrink: 0,
             }} />
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0A0A14' }}>
-                {seleccionado.nombre}
-              </div>
-              <div style={{ fontSize: 11, color: '#BBB' }}>
-                {seleccionado.hex.toUpperCase()}
-              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14' }}>{seleccionado.nombre}</div>
+              <div style={{ fontSize: 12, color: '#BBB', marginTop: 2 }}>{seleccionado.hex.toUpperCase()}</div>
             </div>
             <div style={{
-              marginLeft: 'auto',
-              fontSize: 10, fontWeight: 700,
-              color: '#0D7A4E',
-              background: 'rgba(13,122,78,0.08)',
-              border: '1px solid rgba(13,122,78,0.2)',
-              borderRadius: 100,
-              padding: '3px 10px',
+              marginLeft: 'auto', fontSize: 12, fontWeight: 700, color: '#0D7A4E',
+              background: 'rgba(13,122,78,0.08)', border: '1px solid rgba(13,122,78,0.2)',
+              borderRadius: 100, padding: '5px 14px',
             }}>
               ✓ Seleccionado
             </div>
@@ -165,161 +314,34 @@ export default function StepColor({
         )}
       </div>
 
-      {/* CAÍDA DEL ROLLO */}
+      {/* CAÍDA DEL ROLLO — flip cards */}
       <div style={{
-        background: '#fff',
-        border: '1px solid #EBEBEB',
-        borderRadius: 8,
-        padding: '24px 28px',
+        background: '#fff', border: '1px solid #EBEBEB',
+        borderRadius: 10, padding: '28px 32px',
       }}>
-        <p style={{
-          fontSize: 11, fontWeight: 800, color: '#14008C',
-          letterSpacing: '0.14em', textTransform: 'uppercase',
-          marginBottom: 6,
-        }}>
-          CAÍDA DEL ROLLO
+        <p style={{ fontSize: 12, fontWeight: 800, color: '#14008C', letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 6 }}>
+          Caída del rollo
         </p>
-        <p style={{ fontSize: 13, color: '#999', marginBottom: 20 }}>
-          Define cómo se enrolla la cortina y cómo queda instalada en la ventana.
+        <p style={{ fontSize: 15, color: '#666', marginBottom: 28, lineHeight: 1.6 }}>
+          Define cómo se enrolla la cortina y cómo queda instalada en la ventana. Pasá el mouse sobre cada opción para ver los detalles.
         </p>
 
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: 14,
+          gap: 32,
+          maxWidth: 780,
         }}
           className="caida-grid"
         >
-          {/* Caída por detrás */}
-          <div
-            onClick={() => onCaidaChange('detras')}
-            style={{
-              border: `1.5px solid ${caida === 'detras' ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
-              padding: '20px 20px 16px',
-              cursor: 'pointer',
-              background: caida === 'detras' ? '#F7F7FB' : '#fff',
-              boxShadow: caida === 'detras' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-              transition: 'all 0.18s',
-            }}
-          >
-            {/* Ilustración SVG caída por detrás */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-              <svg viewBox="0 0 120 100" width="120" height="100" fill="none">
-                {/* Pared */}
-                <rect x="0" y="0" width="120" height="100" fill="#F5F0E8"/>
-                {/* Soporte en la pared */}
-                <rect x="20" y="18" width="80" height="8" rx="4" fill="#B0A898"/>
-                {/* Tubo pegado a la pared */}
-                <rect x="24" y="14" width="72" height="10" rx="5" fill="#C8C0B0"/>
-                {/* Tela cae por DETRÁS — entre tubo y pared */}
-                <rect x="28" y="24" width="8" height="60" rx="2"
-                  fill={seleccionado?.hex ?? '#E0D8CC'}
-                  opacity="0.95"
-                />
-                {/* Resto de la tela */}
-                <rect x="28" y="24" width="64" height="60" rx="2"
-                  fill={seleccionado?.hex ?? '#E0D8CC'}
-                  opacity="0.95"
-                />
-                {/* Barra inferior */}
-                <rect x="26" y="82" width="68" height="6" rx="3" fill="#C8C0B0"/>
-                {/* Flecha indicando dirección */}
-                <text x="60" y="96" textAnchor="middle" fontSize="9" fill="#888">↑ pegada a la pared</text>
-              </svg>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{
-                  fontSize: 13, fontWeight: 700,
-                  color: caida === 'detras' ? '#14008C' : '#0A0A14',
-                  marginBottom: 4,
-                }}>
-                  Caída por detrás
-                </div>
-                <p style={{ fontSize: 12, color: '#888', margin: 0, lineHeight: 1.5 }}>
-                  El rollo queda pegado a la pared. La tela cae entre el tubo y la pared. Más discreto y minimalista.
-                </p>
-              </div>
-              <div style={{
-                width: 20, height: 20, borderRadius: '50%',
-                border: `2px solid ${caida === 'detras' ? '#14008C' : '#CCC'}`,
-                background: caida === 'detras' ? '#14008C' : '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, marginLeft: 12, marginTop: 2,
-              }}>
-                {caida === 'detras' && (
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#fff' }} />
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Caída por delante */}
-          <div
-            onClick={() => onCaidaChange('delante')}
-            style={{
-              border: `1.5px solid ${caida === 'delante' ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 8,
-              padding: '20px 20px 16px',
-              cursor: 'pointer',
-              background: caida === 'delante' ? '#F7F7FB' : '#fff',
-              boxShadow: caida === 'delante' ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-              transition: 'all 0.18s',
-            }}
-          >
-            {/* Ilustración SVG caída por delante */}
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
-              <svg viewBox="0 0 120 100" width="120" height="100" fill="none">
-                {/* Pared */}
-                <rect x="0" y="0" width="120" height="100" fill="#F5F0E8"/>
-                {/* Soporte en la pared */}
-                <rect x="20" y="18" width="80" height="8" rx="4" fill="#B0A898"/>
-                {/* Tubo separado de la pared */}
-                <rect x="24" y="14" width="72" height="10" rx="5" fill="#C8C0B0"/>
-                {/* Tela cae por DELANTE — por el frente del tubo */}
-                <rect x="28" y="24" width="64" height="60" rx="2"
-                  fill={seleccionado?.hex ?? '#E0D8CC'}
-                  opacity="0.95"
-                />
-                {/* Espacio entre tela y pared */}
-                <rect x="28" y="24" width="8" height="60"
-                  fill="#F5F0E8"
-                  opacity="0.7"
-                />
-                {/* Barra inferior desplazada hacia adelante */}
-                <rect x="26" y="82" width="68" height="6" rx="3" fill="#C8C0B0"/>
-                <text x="60" y="96" textAnchor="middle" fontSize="9" fill="#888">↑ separada de la pared</text>
-              </svg>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <div style={{
-                  fontSize: 13, fontWeight: 700,
-                  color: caida === 'delante' ? '#14008C' : '#0A0A14',
-                  marginBottom: 4,
-                }}>
-                  Caída por delante
-                </div>
-                <p style={{ fontSize: 12, color: '#888', margin: 0, lineHeight: 1.5 }}>
-                  El rollo queda separado de la pared. La tela cae por el frente. Más volumen y presencia visual.
-                </p>
-              </div>
-              <div style={{
-                width: 20, height: 20, borderRadius: '50%',
-                border: `2px solid ${caida === 'delante' ? '#14008C' : '#CCC'}`,
-                background: caida === 'delante' ? '#14008C' : '#fff',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, marginLeft: 12, marginTop: 2,
-              }}>
-                {caida === 'delante' && (
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#fff' }} />
-                )}
-              </div>
-            </div>
-          </div>
+          {CAIDAS.map(c => (
+            <CaidaFlipCard
+              key={c.key}
+              caida={c}
+              activo={caida === c.key}
+              onSelect={onCaidaChange}
+            />
+          ))}
         </div>
       </div>
 

@@ -10,6 +10,7 @@ export interface CartItem {
   cantidad: number
   tipo: 'stock' | 'medida'
   medidaEspecial?: boolean
+  imagen_url?: string
 }
 
 interface CartContextType {

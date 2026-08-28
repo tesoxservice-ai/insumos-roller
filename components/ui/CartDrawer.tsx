@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useCart } from '@/context/CartContext'
 
 export default function CartDrawer() {
@@ -133,18 +134,30 @@ export default function CartDrawer() {
                     gap: 20,
                     padding: '20px 0',
                   }}>
-                    {/* Imagen / placeholder */}
+                    {/* Imagen */}
                     <div style={{
-                      width: 90, height: 90, flexShrink: 0,
-                      background: 'linear-gradient(135deg, #F0EEF8 0%, #E8E5F5 100%)',
+                      width: 120, height: 120, flexShrink: 0,
                       borderRadius: 10,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      overflow: 'hidden',
                       border: '1px solid #EBEBEB',
+                      position: 'relative',
+                      background: '#fff',
                     }}>
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C4BEE8" strokeWidth="1">
-                        <rect x="3" y="3" width="18" height="18" rx="2"/>
-                        <path d="M3 9h18M9 21V9"/>
-                      </svg>
+                      {item.imagen_url ? (
+                        <Image
+                          src={item.imagen_url}
+                          alt={item.nombre}
+                          fill
+                          style={{ objectFit: 'contain' }}
+                        />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F0EEF8 0%, #E8E5F5 100%)' }}>
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C4BEE8" strokeWidth="1">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                            <path d="M3 9h18M9 21V9"/>
+                          </svg>
+                        </div>
+                      )}
                     </div>
 
                     {/* Info */}

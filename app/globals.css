@@ -13,9 +13,9 @@
   --border2: #C8C8DC;
 
   /* COLOR PRIMARIO — azul/violeta del logo */
-  --primary: #14008C;
-  --primary-soft: rgba(20, 0, 140, 0.07);
-  --primary-border: rgba(20, 0, 140, 0.18);
+  --primary: #1500CC;
+  --primary-soft: rgba(21, 0, 204, 0.07);
+  --primary-border: rgba(21, 0, 204, 0.18);
 
   /* TEXTOS */
   --text: #0D0D0D;
@@ -30,9 +30,9 @@
   --red-soft: rgba(192, 57, 43, 0.08);
 
   /* COMPATIBILIDAD — aliases para no romper componentes existentes */
-  --gold: #14008C;
-  --gold-soft: rgba(20, 0, 140, 0.07);
-  --gold-border: rgba(20, 0, 140, 0.18);
+  --gold: #1500CC;
+  --gold-soft: rgba(21, 0, 204, 0.07);
+  --gold-border: rgba(21, 0, 204, 0.18);
 
   /* RADIO */
   --radius: 12px;

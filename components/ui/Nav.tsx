@@ -49,7 +49,7 @@ export default function Nav() {
       <div style={{
         width: '100%',
         padding: '0 48px',
-        height: 100,
+        height: 80,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',

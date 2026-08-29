@@ -1,7 +1,7 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     qualities: [85, 100],
+    unoptimized: true,  // ← agregá esto
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -10,5 +10,3 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 };
-
-export default nextConfig;

@@ -14,7 +14,6 @@ const LINKS = [
   { label: 'Contacto', href: 'https://wa.me/541133802658?text=Hola%2C%20quiero%20hacer%20una%20consulta', external: true },
 ]
 
-// Solo en el home el nav arranca transparente
 const RUTAS_TRANSPARENTES = ['/']
 
 export default function Nav() {
@@ -49,7 +48,7 @@ export default function Nav() {
       <div style={{
         width: '100%',
         padding: '0 48px',
-        height: 80,
+        height: 64,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -62,7 +61,7 @@ export default function Nav() {
             alt="Insumos Roller"
             width={320}
             height={120}
-            style={{ objectFit: 'contain', height: 80, width: 'auto', transition: 'opacity 0.3s' }}
+            style={{ objectFit: 'contain', height: 52, width: 'auto', transition: 'opacity 0.3s' }}
             priority
           />
         </Link>

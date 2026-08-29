@@ -3,6 +3,23 @@
 import Image from 'next/image'
 import { useCart } from '@/context/CartContext'
 
+// Mapeo color + tipo → imagen
+function getImagenColor(descripcion: string, nombreItem: string): string {
+  const slugs: Record<string, string> = {
+    'Blanco': 'blanco',
+    'Natural': 'natural',
+    'Beige': 'beige',
+    'Gris': 'gris',
+    'Gris Marengo': 'gris-marengo',
+    'Negro': 'negro',
+  }
+  const prefix = nombreItem.toLowerCase().includes('vertical') ? 'vertical' : 'roller'
+  for (const [nombre, slug] of Object.entries(slugs)) {
+    if (descripcion.includes(nombre)) return `/images/colores/${prefix}-${slug}.jpg`
+  }
+  return ''
+}
+
 export default function CartDrawer() {
   const {
     items, total, count, drawerOpen, hayMedidasEspeciales,
@@ -127,130 +144,129 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-              {items.map((item, idx) => (
-                <div key={item.id}>
-                  <div style={{
-                    display: 'flex',
-                    gap: 20,
-                    padding: '20px 0',
-                  }}>
-                    {/* Imagen */}
-                    <div style={{
-                      width: 120, height: 120, flexShrink: 0,
-                      borderRadius: 10,
-                      overflow: 'hidden',
-                      border: '1px solid #EBEBEB',
-                      position: 'relative',
-                      background: '#fff',
-                    }}>
-                      {item.imagen_url ? (
-                        <Image
-                          src={item.imagen_url}
-                          alt={item.nombre}
-                          fill
-                          style={{ objectFit: 'contain' }}
-                        />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F0EEF8 0%, #E8E5F5 100%)' }}>
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C4BEE8" strokeWidth="1">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <path d="M3 9h18M9 21V9"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
+              {items.map((item, idx) => {
+                // Determinar imagen: primero imagen_url, si no buscar por color en descripción
+                const imgSrc = item.imagen_url || (item.tipo === 'medida' ? getImagenColor(item.descripcion, item.nombre) : '')
 
-                    {/* Info */}
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <p style={{ fontSize: 15, fontWeight: 800, color: '#0A0A14', margin: 0, lineHeight: 1.3 }}>
-                          {item.nombre}
-                        </p>
-                        <p style={{ fontSize: 16, fontWeight: 800, color: '#0A0A14', margin: 0, flexShrink: 0, marginLeft: 12 }}>
-                          ${(item.precio * item.cantidad).toLocaleString('es-AR')}
-                          {item.medidaEspecial && (
-                            <span style={{ fontSize: 10, color: '#92400E', marginLeft: 3 }}>*</span>
-                          )}
-                        </p>
-                      </div>
-
-                      {/* Descripción con íconos */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                        {item.descripcion.split(' · ').map((parte, i) => (
-                          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <span style={{ color: '#BBBBCC', flexShrink: 0 }}>
-                              {i === 0 ? (
-                                // tela
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                                </svg>
-                              ) : i === 1 ? (
-                                // color / tamaño
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
-                                  <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
-                                </svg>
-                              ) : (
-                                // sistema
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                  <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/>
-                                </svg>
-                              )}
-                            </span>
-                            <span style={{ fontSize: 13, color: '#888' }}>{parte}</span>
+                return (
+                  <div key={item.id}>
+                    <div style={{ display: 'flex', gap: 20, padding: '20px 0' }}>
+                      {/* Imagen */}
+                      <div style={{
+                        width: 120, height: 120, flexShrink: 0,
+                        borderRadius: 10,
+                        overflow: 'hidden',
+                        border: '1px solid #EBEBEB',
+                        position: 'relative',
+                        background: '#F5F0E8',
+                      }}>
+                        {imgSrc ? (
+                          <Image
+                            src={imgSrc}
+                            alt={item.nombre}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            sizes="120px"
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #F0EEF8 0%, #E8E5F5 100%)' }}>
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C4BEE8" strokeWidth="1">
+                              <rect x="3" y="3" width="18" height="18" rx="2"/>
+                              <path d="M3 9h18M9 21V9"/>
+                            </svg>
                           </div>
-                        ))}
+                        )}
                       </div>
 
-                      {/* Tipo + acciones */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                        <span style={{
-                          fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
-                          color: item.tipo === 'medida' ? '#14008C' : '#0D7A4E',
-                          background: item.tipo === 'medida' ? 'rgba(20,0,140,0.07)' : 'rgba(13,122,78,0.07)',
-                          borderRadius: '100px', padding: '3px 8px',
-                        }}>
-                          {item.tipo === 'medida' ? 'A MEDIDA' : 'STOCK'}
-                        </span>
-                        <button
-                          onClick={() => quitarItem(item.id)}
-                          style={{
-                            background: 'none', border: 'none', cursor: 'pointer',
-                            fontSize: 12, color: '#CCC', fontFamily: 'inherit',
-                            display: 'flex', alignItems: 'center', gap: 4,
-                            transition: 'color 0.15s', padding: 0,
-                          }}
-                          onMouseEnter={e => e.currentTarget.style.color = '#E53E3E'}
-                          onMouseLeave={e => e.currentTarget.style.color = '#CCC'}
-                        >
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
-                          </svg>
-                          Eliminar
-                        </button>
-                      </div>
-
-                      {/* Aviso medida especial */}
-                      {item.medidaEspecial && (
-                        <div style={{
-                          background: 'rgba(245,158,11,0.07)',
-                          border: '1px solid rgba(245,158,11,0.2)',
-                          borderRadius: 6, padding: '7px 10px',
-                          display: 'flex', alignItems: 'flex-start', gap: 6,
-                        }}>
-                          <span style={{ fontSize: 11, flexShrink: 0 }}>⚠️</span>
-                          <p style={{ fontSize: 11, color: '#92400E', margin: 0, lineHeight: 1.4 }}>
-                            Medidas especiales — precio a confirmar por WhatsApp
+                      {/* Info */}
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <p style={{ fontSize: 15, fontWeight: 800, color: '#0A0A14', margin: 0, lineHeight: 1.3 }}>
+                            {item.nombre}
+                          </p>
+                          <p style={{ fontSize: 16, fontWeight: 800, color: '#0A0A14', margin: 0, flexShrink: 0, marginLeft: 12 }}>
+                            ${(item.precio * item.cantidad).toLocaleString('es-AR')}
+                            {item.medidaEspecial && (
+                              <span style={{ fontSize: 10, color: '#92400E', marginLeft: 3 }}>*</span>
+                            )}
                           </p>
                         </div>
-                      )}
+
+                        {/* Descripción con íconos */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {item.descripcion.split(' · ').map((parte, i) => (
+                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ color: '#BBBBCC', flexShrink: 0 }}>
+                                {i === 0 ? (
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                  </svg>
+                                ) : i === 1 ? (
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                                    <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                                  </svg>
+                                ) : (
+                                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/>
+                                  </svg>
+                                )}
+                              </span>
+                              <span style={{ fontSize: 13, color: '#888' }}>{parte}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Tipo + acciones */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
+                            color: item.tipo === 'medida' ? '#14008C' : '#0D7A4E',
+                            background: item.tipo === 'medida' ? 'rgba(20,0,140,0.07)' : 'rgba(13,122,78,0.07)',
+                            borderRadius: '100px', padding: '3px 8px',
+                          }}>
+                            {item.tipo === 'medida' ? 'A MEDIDA' : 'STOCK'}
+                          </span>
+                          <button
+                            onClick={() => quitarItem(item.id)}
+                            style={{
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              fontSize: 12, color: '#CCC', fontFamily: 'inherit',
+                              display: 'flex', alignItems: 'center', gap: 4,
+                              transition: 'color 0.15s', padding: 0,
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = '#E53E3E'}
+                            onMouseLeave={e => e.currentTarget.style.color = '#CCC'}
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+                            </svg>
+                            Eliminar
+                          </button>
+                        </div>
+
+                        {/* Aviso medida especial */}
+                        {item.medidaEspecial && (
+                          <div style={{
+                            background: 'rgba(245,158,11,0.07)',
+                            border: '1px solid rgba(245,158,11,0.2)',
+                            borderRadius: 6, padding: '7px 10px',
+                            display: 'flex', alignItems: 'flex-start', gap: 6,
+                          }}>
+                            <span style={{ fontSize: 11, flexShrink: 0 }}>⚠️</span>
+                            <p style={{ fontSize: 11, color: '#92400E', margin: 0, lineHeight: 1.4 }}>
+                              Medidas especiales — precio a confirmar por WhatsApp
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    {idx < items.length - 1 && (
+                      <div style={{ height: 1, background: '#F0F0F0' }} />
+                    )}
                   </div>
-                  {idx < items.length - 1 && (
-                    <div style={{ height: 1, background: '#F0F0F0' }} />
-                  )}
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
@@ -265,7 +281,6 @@ export default function CartDrawer() {
             flexDirection: 'column',
             gap: 14,
           }}>
-
             {/* Total */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <div>

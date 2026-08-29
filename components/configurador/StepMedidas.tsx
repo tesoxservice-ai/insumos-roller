@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import type { Tela, ReglaPrecio, ConfiguradorState } from '@/types'
-import { calcularPrecio } from '@/lib/precio'
+import { useState, useEffect, useCallback } from 'react'
+import type { Tela, ReglaPrecio } from '@/types'
+import { estaEnRango, fetchPrecio, MIN_ANCHO, MAX_ANCHO, MIN_ALTO, MAX_ALTO } from '@/lib/precio'
 import StepHeader from '@/components/configurador/StepHeader'
 
 const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
@@ -32,42 +32,47 @@ export default function StepMedidas({
   const [altoLocal, setAltoLocal] = useState(alto > 0 ? String(alto) : '')
   const [anchoFocus, setAnchoFocus] = useState(false)
   const [altoFocus, setAltoFocus] = useState(false)
-
-  const regla = telaSeleccionada
-    ? reglas.find(r => r.tela_id === telaSeleccionada.id) ?? null
-    : null
+  const [precioBase, setPrecioBase] = useState<number | null>(null)
+  const [anchoRedondeado, setAnchoRedondeado] = useState<number | null>(null)
+  const [altoRedondeado, setAltoRedondeado] = useState<number | null>(null)
+  const [cargandoPrecio, setCargandoPrecio] = useState(false)
 
   const anchoNum = Number(anchoLocal)
   const altoNum = Number(altoLocal)
   const ambosIngresados = anchoNum > 0 && altoNum > 0
+  const fueraDeRango = ambosIngresados && !estaEnRango(anchoNum, altoNum)
 
-  const fueraDeRango = regla && ambosIngresados && (
-    anchoNum < regla.minimo_ancho ||
-    anchoNum > regla.maximo_ancho ||
-    altoNum < regla.minimo_alto ||
-    altoNum > regla.maximo_alto
-  )
+  // Fetch precio cuando cambian las medidas
+  const buscarPrecio = useCallback(async () => {
+    if (!ambosIngresados || fueraDeRango) {
+      setPrecioBase(null)
+      setAnchoRedondeado(null)
+      setAltoRedondeado(null)
+      return
+    }
+    setCargandoPrecio(true)
+    const result = await fetchPrecio(anchoNum, altoNum)
+    setCargandoPrecio(false)
+    if (result.fueraDeRango) {
+      setPrecioBase(null)
+    } else {
+      setPrecioBase(result.precio)
+      setAnchoRedondeado(result.anchoRedondeado ?? null)
+      setAltoRedondeado(result.altoRedondeado ?? null)
+    }
+  }, [anchoNum, altoNum, ambosIngresados, fueraDeRango])
 
-  const estadoDummy: ConfiguradorState = {
-    tipo: null,
-    tela: telaSeleccionada,
-    color: null,
-    colorHex: '',
-    ancho: anchoNum,
-    alto: altoNum,
-    sistema: '',
-    sistemaExtra: 0,
-    instalacion: false,
-    instExtra: 0,
-  }
-
-  const precioBase = ambosIngresados && !fueraDeRango
-    ? calcularPrecio(estadoDummy, reglas)
-    : null
+  useEffect(() => {
+    const timer = setTimeout(buscarPrecio, 400)
+    return () => clearTimeout(timer)
+  }, [buscarPrecio])
 
   useEffect(() => {
     if (ambosIngresados) onChange(anchoNum, altoNum)
   }, [anchoNum, altoNum, onChange, ambosIngresados])
+
+  const mostrarRedondeo = anchoRedondeado !== null && altoRedondeado !== null &&
+    (anchoRedondeado !== anchoNum || altoRedondeado !== altoNum)
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -86,53 +91,104 @@ export default function StepMedidas({
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, alignItems: 'start' }} className="medidas-layout">
         <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 10, padding: '32px 36px 28px' }}>
+
+          {/* Ancho */}
           <div style={{ marginBottom: 32 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: '#14008C', letterSpacing: '0.14em', marginBottom: 12 }}>ANCHO (cm)</label>
             <div style={{ position: 'relative' }}>
-              <input type="number" min={regla?.minimo_ancho ?? 30} max={regla?.maximo_ancho ?? 400} value={anchoLocal}
+              <input
+                type="number"
+                min={MIN_ANCHO}
+                max={MAX_ANCHO}
+                value={anchoLocal}
                 onChange={e => setAnchoLocal(e.target.value)}
-                onFocus={() => setAnchoFocus(true)} onBlur={() => setAnchoFocus(false)}
+                onFocus={() => setAnchoFocus(true)}
+                onBlur={() => setAnchoFocus(false)}
                 placeholder="Ej: 120"
-                style={{ width: '100%', padding: '18px 60px 18px 20px', border: `1.5px solid ${anchoFocus ? '#14008C' : '#E0E0E0'}`, borderRadius: 10, fontSize: 20, color: '#0A0A14', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fff', boxSizing: 'border-box' }}
+                style={{
+                  width: '100%', padding: '18px 60px 18px 20px',
+                  border: `1.5px solid ${anchoFocus ? '#14008C' : '#E0E0E0'}`,
+                  borderRadius: 10, fontSize: 20, color: '#0A0A14',
+                  outline: 'none', fontFamily: 'inherit',
+                  transition: 'border-color 0.15s', background: '#fff',
+                  boxSizing: 'border-box',
+                }}
               />
               <span style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', fontSize: 15, color: '#BBB', fontWeight: 600 }}>cm</span>
             </div>
-            <p style={{ fontSize: 13, color: '#BBB', margin: '10px 0 0 0' }}>Mínimo {regla?.minimo_ancho ?? 30} cm · Máximo {regla?.maximo_ancho ?? 400} cm</p>
+            <p style={{ fontSize: 13, color: '#BBB', margin: '10px 0 0 0' }}>
+              Mínimo {MIN_ANCHO} cm · Máximo {MAX_ANCHO} cm
+            </p>
           </div>
 
+          {/* Alto */}
           <div style={{ marginBottom: 32 }}>
             <label style={{ display: 'block', fontSize: 13, fontWeight: 800, color: '#14008C', letterSpacing: '0.14em', marginBottom: 12 }}>ALTO (cm)</label>
             <div style={{ position: 'relative' }}>
-              <input type="number" min={regla?.minimo_alto ?? 30} max={regla?.maximo_alto ?? 350} value={altoLocal}
+              <input
+                type="number"
+                min={MIN_ALTO}
+                max={MAX_ALTO}
+                value={altoLocal}
                 onChange={e => setAltoLocal(e.target.value)}
-                onFocus={() => setAltoFocus(true)} onBlur={() => setAltoFocus(false)}
+                onFocus={() => setAltoFocus(true)}
+                onBlur={() => setAltoFocus(false)}
                 placeholder="Ej: 165"
-                style={{ width: '100%', padding: '18px 60px 18px 20px', border: `1.5px solid ${altoFocus ? '#14008C' : '#E0E0E0'}`, borderRadius: 10, fontSize: 20, color: '#0A0A14', outline: 'none', fontFamily: 'inherit', transition: 'border-color 0.15s', background: '#fff', boxSizing: 'border-box' }}
+                style={{
+                  width: '100%', padding: '18px 60px 18px 20px',
+                  border: `1.5px solid ${altoFocus ? '#14008C' : '#E0E0E0'}`,
+                  borderRadius: 10, fontSize: 20, color: '#0A0A14',
+                  outline: 'none', fontFamily: 'inherit',
+                  transition: 'border-color 0.15s', background: '#fff',
+                  boxSizing: 'border-box',
+                }}
               />
               <span style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', fontSize: 15, color: '#BBB', fontWeight: 600 }}>cm</span>
             </div>
-            <p style={{ fontSize: 13, color: '#BBB', margin: '10px 0 0 0' }}>Mínimo {regla?.minimo_alto ?? 30} cm · Máximo {regla?.maximo_alto ?? 350} cm</p>
+            <p style={{ fontSize: 13, color: '#BBB', margin: '10px 0 0 0' }}>
+              Mínimo {MIN_ALTO} cm · Máximo {MAX_ALTO} cm
+            </p>
           </div>
 
-          {precioBase !== null && (
+          {/* Precio base */}
+          {cargandoPrecio && (
+            <div style={{ background: '#F7F7FB', borderRadius: 8, padding: '14px 18px', marginBottom: 20 }}>
+              <p style={{ fontSize: 15, color: '#BBB', margin: 0 }}>Calculando precio…</p>
+            </div>
+          )}
+
+          {!cargandoPrecio && precioBase !== null && (
             <div style={{ background: 'rgba(13,122,78,0.06)', border: '1px solid rgba(13,122,78,0.2)', borderRadius: 8, padding: '14px 18px', marginBottom: 20 }}>
               <p style={{ fontSize: 16, color: '#0D7A4E', margin: 0, fontWeight: 500 }}>
                 Precio estimado base: <strong>${precioBase.toLocaleString('es-AR')}</strong>
                 <span style={{ opacity: 0.7, fontWeight: 400 }}> (sin sistema ni instalación)</span>
               </p>
+              {mostrarRedondeo && (
+                <p style={{ fontSize: 12, color: '#888', margin: '6px 0 0 0' }}>
+                  Calculado para {anchoRedondeado} × {altoRedondeado} cm (redondeado al múltiplo de 10 superior)
+                </p>
+              )}
             </div>
           )}
 
+          {/* Fuera de rango */}
           {fueraDeRango && (
             <div style={{ background: 'rgba(20,0,140,0.05)', border: '1px solid rgba(20,0,140,0.15)', borderRadius: 8, padding: '16px 18px', marginBottom: 20 }}>
-              <p style={{ fontSize: 16, fontWeight: 600, color: '#14008C', margin: '0 0 10px 0' }}>Para estas medidas necesitamos asesorarte. ¿Hablamos?</p>
-              <button onClick={onFueraDeRango} style={{ fontSize: 15, fontWeight: 700, color: '#14008C', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', fontFamily: 'inherit' }}>
+              <p style={{ fontSize: 16, fontWeight: 600, color: '#14008C', margin: '0 0 10px 0' }}>
+                Las medidas deben estar entre {MIN_ANCHO}-{MAX_ANCHO} cm de ancho y {MIN_ALTO}-{MAX_ALTO} cm de alto. ¿Necesitás medidas especiales?
+              </p>
+              <button
+                onClick={onFueraDeRango}
+                style={{ fontSize: 15, fontWeight: 700, color: '#14008C', background: 'none', border: 'none', cursor: 'pointer', padding: 0, textDecoration: 'underline', fontFamily: 'inherit' }}
+              >
                 Consultar por WhatsApp →
               </button>
             </div>
           )}
 
-          <a href="/guia-medicion" target="_blank" rel="noopener noreferrer"
+          {/* Link guía */}
+          <a
+            href="/guia-medicion" target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'flex-start', gap: 16, background: '#F7F7FB', borderRadius: 10, padding: '18px 20px', textDecoration: 'none', border: '1.5px solid transparent', transition: 'border-color 0.15s, box-shadow 0.15s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = '#14008C'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(20,0,140,0.07)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.boxShadow = 'none' }}
@@ -146,6 +202,7 @@ export default function StepMedidas({
           </a>
         </div>
 
+        {/* Diagrama SVG */}
         <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 10, padding: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 480 }}>
           <svg viewBox="0 0 320 380" width="100%" height="100%" fill="none" style={{ maxHeight: 480 }}>
             <rect x="60" y="40" width="200" height="260" rx="4" fill="#F0F0F0" stroke="#DDD" strokeWidth="2"/>

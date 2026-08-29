@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import type { ConfiguradorState, ReglaPrecio } from '@/types'
 import { useCart } from '@/context/CartContext'
 
@@ -46,6 +47,22 @@ const FILAS = [
   },
 ]
 
+// Mapeo color + tipo → imagen
+function getImagenColor(colorNombre: string, tipoNombre: string): string {
+  const slug: Record<string, string> = {
+    'Blanco': 'blanco',
+    'Natural': 'natural',
+    'Beige': 'beige',
+    'Gris': 'gris',
+    'Gris Marengo': 'gris-marengo',
+    'Negro': 'negro',
+  }
+  const key = slug[colorNombre]
+  if (!key) return ''
+  const prefix = tipoNombre.toLowerCase().includes('vertical') ? 'vertical' : 'roller'
+  return `/images/colores/${prefix}-${key}.jpg`
+}
+
 export default function StepCierre({
   state, precioEstimado, onNuevoProducto,
 }: StepCierreProps) {
@@ -53,6 +70,7 @@ export default function StepCierre({
   const { agregarItem } = useCart()
 
   const medidaEspecial = state.ancho > MAX_ANCHO || state.alto > MAX_ALTO
+  const imagenColor = state.color ? getImagenColor(state.color.nombre, state.tipo?.nombre ?? '') : ''
 
   const handleAgregarAlCarrito = () => {
     const descripcion = [
@@ -70,6 +88,7 @@ export default function StepCierre({
       precio: precioEstimado,
       tipo: 'medida',
       medidaEspecial,
+      imagen_url: imagenColor || undefined,
     }, false)
 
     setAgregadoAlCarrito(true)
@@ -167,25 +186,34 @@ export default function StepCierre({
           </div>
         </div>
 
-        {/* Imagen ilustrativa */}
+        {/* Imagen del color */}
         <div style={{
           background: '#F5F0E8', border: '1px solid #EBEBEB',
           borderRadius: 16, overflow: 'hidden',
           display: 'flex', flexDirection: 'column',
         }}>
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32, minHeight: 280 }}>
-            <svg viewBox="0 0 200 260" width="160" height="220" fill="none">
-              <rect x="20" y="20" width="160" height="200" rx="4" fill="#E8E0D4" stroke="#C8C0B0" strokeWidth="2"/>
-              <rect x="22" y="20" width="156" height="140" rx="2" fill={state.color?.hex ?? '#E0D8CC'} opacity="0.95"/>
-              {[40,60,80,100,120,140].map(y => (
-                <line key={y} x1="22" y1={y} x2="178" y2={y} stroke="rgba(0,0,0,0.04)" strokeWidth="1"/>
-              ))}
-              <rect x="14" y="12" width="172" height="14" rx="7" fill="#B0A898"/>
-              <rect x="20" y="158" width="160" height="8" rx="3" fill="#C8C0B0"/>
-              <rect x="24" y="168" width="152" height="48" rx="2" fill="#A8C8A8" opacity="0.4"/>
-              <line x1="168" y1="26" x2="168" y2="158" stroke="#B0A898" strokeWidth="1.5"/>
-              {[34,42,50,58,66].map(y => <circle key={y} cx="168" cy={y} r="2" fill="#B0A898"/>)}
-            </svg>
+          <div style={{ flex: 1, position: 'relative', minHeight: 280 }}>
+            {imagenColor ? (
+              <Image
+                src={imagenColor}
+                alt={`Cortina ${state.color?.nombre ?? ''}`}
+                fill
+                style={{ objectFit: 'cover' }}
+                sizes="450px"
+              />
+            ) : (
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+                <svg viewBox="0 0 200 260" width="160" height="220" fill="none">
+                  <rect x="20" y="20" width="160" height="200" rx="4" fill="#E8E0D4" stroke="#C8C0B0" strokeWidth="2"/>
+                  <rect x="22" y="20" width="156" height="140" rx="2" fill={state.color?.hex ?? '#E0D8CC'} opacity="0.95"/>
+                  {[40,60,80,100,120,140].map(y => (
+                    <line key={y} x1="22" y1={y} x2="178" y2={y} stroke="rgba(0,0,0,0.04)" strokeWidth="1"/>
+                  ))}
+                  <rect x="14" y="12" width="172" height="14" rx="7" fill="#B0A898"/>
+                  <rect x="20" y="158" width="160" height="8" rx="3" fill="#C8C0B0"/>
+                </svg>
+              </div>
+            )}
           </div>
           <div style={{ padding: '14px 20px', background: '#fff', borderTop: '1px solid #EBEBEB', display: 'flex', alignItems: 'center', gap: 10 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CCC" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
@@ -263,4 +291,4 @@ export default function StepCierre({
       `}</style>
     </div>
   )
-} 
+}

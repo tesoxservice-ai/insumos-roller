@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import Image from 'next/image'
 import type { ReglaPrecio } from '@/types'
 import StepHeader from '@/components/configurador/StepHeader'
 
@@ -19,15 +19,99 @@ interface StepSistemaProps {
 function RadioCircle({ activo }: { activo: boolean }) {
   return (
     <div style={{
-      width: 22, height: 22,
+      width: 26, height: 26,
       borderRadius: '50%',
-      border: `2px solid ${activo ? '#14008C' : '#CCC'}`,
-      background: activo ? '#14008C' : '#fff',
+      border: `2px solid ${activo ? '#14008C' : 'rgba(255,255,255,0.8)'}`,
+      background: activo ? '#14008C' : 'rgba(255,255,255,0.5)',
+      backdropFilter: 'blur(4px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       flexShrink: 0,
       transition: 'all 0.15s',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
     }}>
-      {activo && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
+      {activo && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#fff' }} />}
+    </div>
+  )
+}
+
+function Card({
+  src,
+  alt,
+  activo,
+  onClick,
+  titulo,
+  desc,
+  precio,
+}: {
+  src: string
+  alt: string
+  activo: boolean
+  onClick: () => void
+  titulo: string
+  desc: string
+  precio?: string | null
+}) {
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        borderRadius: 12,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        border: '1px solid #EBEBEB',
+        background: '#fff',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'box-shadow 0.18s',
+      }}
+    >
+      {/* Imagen */}
+      <div style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: '3/4',
+        background: '#F5F3EF',
+        border: activo ? '2.5px solid #14008C' : '2.5px solid transparent',
+        borderRadius: 10,
+        overflow: 'hidden',
+        transition: 'border 0.18s',
+      }}>
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          style={{ objectFit: 'contain' }}
+          sizes="380px"
+        />
+        <div style={{ position: 'absolute', bottom: 14, right: 14 }}>
+          <RadioCircle activo={activo} />
+        </div>
+      </div>
+
+      {/* Info debajo */}
+      <div style={{ padding: '16px 18px 20px' }}>
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+          <span style={{
+            fontSize: 15, fontWeight: 700,
+            color: activo ? '#14008C' : '#0A0A14',
+            transition: 'color 0.15s',
+          }}>
+            {titulo}
+          </span>
+          {precio ? (
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#14008C', flexShrink: 0, marginLeft: 8 }}>
+              {precio}
+            </span>
+          ) : (
+            <span style={{ fontSize: 13, fontWeight: 600, color: '#0D7A4E', flexShrink: 0, marginLeft: 8 }}>
+              Sin costo adicional
+            </span>
+          )}
+        </div>
+        <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, margin: 0 }}>
+          {desc}
+        </p>
+      </div>
     </div>
   )
 }
@@ -84,106 +168,31 @@ export default function StepSistema({
         <p style={{
           fontSize: 12, fontWeight: 800, color: '#14008C',
           letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16,
+          textAlign: 'center',
         }}>
           Sistema de accionamiento
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 380px))', gap: 16, justifyContent: 'center' }}
           className="sistema-grid"
         >
-          {/* Cadena */}
-          <div
+          <Card
+            src="/images/sistema-manual.png"
+            alt="Cadena manual"
+            activo={sistemaManual}
             onClick={() => onSistemaChange('manual', 0)}
-            style={{
-              border: `1.5px solid ${sistemaManual ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 10,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              display: 'flex',
-              transition: 'all 0.18s',
-              background: '#fff',
-              boxShadow: sistemaManual ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-            }}
-          >
-            <div style={{
-              width: 140, flexShrink: 0,
-              background: '#F5F0E8',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16,
-            }}>
-              <svg viewBox="0 0 80 100" width="80" height="100" fill="none">
-                <rect x="10" y="8" width="60" height="8" rx="4" fill="#C8C0B0"/>
-                <rect x="14" y="16" width="52" height="68" rx="2" fill="#E8E0D0"/>
-                {[28, 40, 52, 64, 76].map(y => (
-                  <line key={y} x1="14" y1={y} x2="66" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
-                ))}
-                <rect x="14" y="82" width="52" height="6" rx="2" fill="#C8C0B0"/>
-                <line x1="56" y1="16" x2="56" y2="82" stroke="#C8C0B0" strokeWidth="1.5"/>
-                <circle cx="56" cy="88" r="3" fill="#C8C0B0"/>
-                {[92, 96, 100].map(y => (
-                  <circle key={y} cx="56" cy={y} r="1.5" fill="#C8C0B0"/>
-                ))}
-              </svg>
-            </div>
-            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 20, marginBottom: 10 }}>🔗</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
-                Cadena manual
-              </div>
-              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: 0 }}>
-                Sistema clásico con cadena plástica o metálica. Simple, silencioso y sin necesidad de electricidad.
-              </p>
-              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-                <RadioCircle activo={sistemaManual} />
-              </div>
-            </div>
-          </div>
-
-          {/* Motorizado */}
-          <div
+            titulo="Cadena manual"
+            desc="Sistema clásico con cadena. Simple, silencioso y sin necesidad de electricidad."
+            precio={null}
+          />
+          <Card
+            src="/images/sistema-motorizado.png"
+            alt="Motorizado"
+            activo={sistemaMotor}
             onClick={() => onSistemaChange('motorizado', motorExtra)}
-            style={{
-              border: `1.5px solid ${sistemaMotor ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 10,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              display: 'flex',
-              transition: 'all 0.18s',
-              background: '#fff',
-              boxShadow: sistemaMotor ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-            }}
-          >
-            <div style={{
-              width: 140, flexShrink: 0,
-              background: '#F5F0E8',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16,
-            }}>
-              <svg viewBox="0 0 80 100" width="80" height="100" fill="none">
-                <rect x="10" y="8" width="60" height="10" rx="5" fill="#B0A898"/>
-                <rect x="28" y="6" width="24" height="6" rx="3" fill="#8A8278"/>
-                <rect x="14" y="18" width="52" height="68" rx="2" fill="#E8E0D0"/>
-                {[30, 42, 54, 66, 78].map(y => (
-                  <line key={y} x1="14" y1={y} x2="66" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1"/>
-                ))}
-                <rect x="14" y="84" width="52" height="6" rx="2" fill="#C8C0B0"/>
-              </svg>
-            </div>
-            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 20, marginBottom: 10 }}>⚡</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
-                Motorizado
-              </div>
-              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '0 0 10px 0' }}>
-                Motor silencioso controlable por control remoto o app. Ideal para cortinas de difícil acceso o grandes dimensiones.
-              </p>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#14008C' }}>
-                + ${motorExtra.toLocaleString('es-AR')}
-              </div>
-              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-                <RadioCircle activo={sistemaMotor} />
-              </div>
-            </div>
-          </div>
+            titulo="Motorizado"
+            desc="Motor silencioso controlable por control remoto o app. Ideal para cortinas de difícil acceso."
+            precio={`+ $${motorExtra.toLocaleString('es-AR')}`}
+          />
         </div>
       </div>
 
@@ -192,86 +201,31 @@ export default function StepSistema({
         <p style={{
           fontSize: 12, fontWeight: 800, color: '#14008C',
           letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16,
+          textAlign: 'center',
         }}>
           Instalación
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 380px))', gap: 16, justifyContent: 'center' }}
           className="inst-grid"
         >
-          {/* La instalo yo */}
-          <div
+          <Card
+            src="/images/instalacion-yo.png"
+            alt="La instalo yo"
+            activo={!instalacion}
             onClick={() => onInstalacionChange(false, 0)}
-            style={{
-              border: `1.5px solid ${!instalacion ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 10,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              display: 'flex',
-              transition: 'all 0.18s',
-              background: '#fff',
-              boxShadow: !instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-            }}
-          >
-            <div style={{
-              width: 140, flexShrink: 0,
-              background: '#F5F0E8',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16, fontSize: 44,
-            }}>
-              📦
-            </div>
-            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 20, marginBottom: 10 }}>🔩</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
-                La instalo yo
-              </div>
-              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: 0 }}>
-                Te enviamos la cortina con instrucciones claras. La mayoría de las personas la instala en menos de 30 minutos.
-              </p>
-              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-                <RadioCircle activo={!instalacion} />
-              </div>
-            </div>
-          </div>
-
-          {/* Instalación profesional */}
-          <div
+            titulo="La instalo yo"
+            desc="Recibís todo listo con instrucciones claras. La mayoría lo instala en menos de 30 minutos."
+            precio={null}
+          />
+          <Card
+            src="/images/instalacion-profesional.png"
+            alt="Instalación profesional"
+            activo={instalacion}
             onClick={() => onInstalacionChange(true, instExtra)}
-            style={{
-              border: `1.5px solid ${instalacion ? '#14008C' : '#EBEBEB'}`,
-              borderRadius: 10,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              display: 'flex',
-              transition: 'all 0.18s',
-              background: '#fff',
-              boxShadow: instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-            }}
-          >
-            <div style={{
-              width: 140, flexShrink: 0,
-              background: '#F5F0E8',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              padding: 16, fontSize: 44,
-            }}>
-              👷
-            </div>
-            <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-              <div style={{ fontSize: 20, marginBottom: 10 }}>🏠</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: instalacion ? '#14008C' : '#0A0A14', marginBottom: 8 }}>
-                Quiero instalación profesional
-              </div>
-              <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '0 0 10px 0' }}>
-                Nuestro equipo instala la cortina en tu domicilio. Incluye medición final, colocación y prueba del sistema.
-              </p>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#14008C' }}>
-                + ${instExtra.toLocaleString('es-AR')}
-              </div>
-              <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-                <RadioCircle activo={instalacion} />
-              </div>
-            </div>
-          </div>
+            titulo="Instalación profesional"
+            desc="Nuestro equipo instala en tu domicilio. Incluye medición final, colocación y prueba."
+            precio={`+ $${instExtra.toLocaleString('es-AR')}`}
+          />
         </div>
       </div>
 

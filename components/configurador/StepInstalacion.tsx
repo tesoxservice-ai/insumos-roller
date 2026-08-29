@@ -1,26 +1,29 @@
 'use client'
 
+import Image from 'next/image'
+
 interface StepInstalacionProps {
   instalacion: boolean
   onChange: (activa: boolean, extra: number) => void
   instExtra?: number
 }
 
-function RadioCircle({ activo }: { activo: boolean }) {
-  return (
-    <div style={{
-      width: 22, height: 22,
-      borderRadius: '50%',
-      border: `2px solid ${activo ? '#14008C' : '#CCC'}`,
-      background: activo ? '#14008C' : '#fff',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      flexShrink: 0,
-      transition: 'all 0.15s',
-    }}>
-      {activo && <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#fff' }} />}
-    </div>
-  )
-}
+const OPCIONES = [
+  {
+    key: false,
+    img: '/images/instalacion-yo.png',
+    titulo: 'La instalo yo',
+    desc: 'Recibís todo listo con instrucciones claras. La mayoría lo instala en menos de 30 minutos.',
+    precio: null,
+  },
+  {
+    key: true,
+    img: '/images/instalacion-profesional.png',
+    titulo: 'Instalación profesional',
+    desc: 'Nuestro equipo instala en tu domicilio. Incluye medición final, colocación y prueba.',
+    precio: 'extra',
+  },
+]
 
 export default function StepInstalacion({
   instalacion,
@@ -31,88 +34,94 @@ export default function StepInstalacion({
     <div>
       <p style={{
         fontSize: 12, fontWeight: 800, color: '#14008C',
-        letterSpacing: '0.14em', textTransform: 'uppercase', marginBottom: 16,
+        letterSpacing: '0.14em', textTransform: 'uppercase',
+        marginBottom: 16, textAlign: 'center',
       }}>
         Instalación
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 380px))',
+        gap: 16, justifyContent: 'center',
+      }}
         className="inst-standalone-grid"
       >
-        {/* La instalo yo */}
-        <div
-          onClick={() => onChange(false, 0)}
-          style={{
-            border: `1.5px solid ${!instalacion ? '#14008C' : '#EBEBEB'}`,
-            borderRadius: 10,
-            overflow: 'hidden',
-            cursor: 'pointer',
-            display: 'flex',
-            transition: 'all 0.18s',
-            background: '#fff',
-            boxShadow: !instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-          }}
-        >
-          <div style={{
-            width: 140, flexShrink: 0,
-            background: '#F5F0E8',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 16, fontSize: 44,
-          }}>
-            📦
-          </div>
-          <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-            <div style={{ fontSize: 20, marginBottom: 10 }}>🔩</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#0A0A14', marginBottom: 8 }}>
-              La instalo yo
-            </div>
-            <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: 0 }}>
-              Te enviamos la cortina con instrucciones claras. La mayoría de las personas la instala en menos de 30 minutos.
-            </p>
-            <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-              <RadioCircle activo={!instalacion} />
-            </div>
-          </div>
-        </div>
+        {OPCIONES.map(op => {
+          const activo = instalacion === op.key
+          return (
+            <div
+              key={String(op.key)}
+              onClick={() => onChange(op.key, op.key ? instExtra : 0)}
+              style={{
+                border: '1px solid #EBEBEB',
+                borderRadius: 12,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                background: '#fff',
+                transition: 'box-shadow 0.18s',
+              }}
+            >
+              {/* Imagen */}
+              <div style={{
+                position: 'relative', width: '100%', aspectRatio: '3/4',
+                background: '#F5F3EF',
+                border: activo ? '2px solid #14008C' : '2px solid transparent',
+                borderRadius: 10,
+                overflow: 'hidden',
+                transition: 'border 0.18s',
+              }}>
+                <Image
+                  src={op.img}
+                  alt={op.titulo}
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  sizes="380px"
+                />
+                {/* Radio overlay */}
+                <div style={{
+                  position: 'absolute', bottom: 14, right: 14,
+                  width: 26, height: 26, borderRadius: '50%',
+                  border: `2px solid ${activo ? '#14008C' : 'rgba(255,255,255,0.8)'}`,
+                  background: activo ? '#14008C' : 'rgba(255,255,255,0.5)',
+                  backdropFilter: 'blur(4px)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+                  transition: 'all 0.15s',
+                }}>
+                  {activo && <div style={{ width: 9, height: 9, borderRadius: '50%', background: '#fff' }} />}
+                </div>
+              </div>
 
-        {/* Instalación profesional */}
-        <div
-          onClick={() => onChange(true, instExtra)}
-          style={{
-            border: `1.5px solid ${instalacion ? '#14008C' : '#EBEBEB'}`,
-            borderRadius: 10,
-            overflow: 'hidden',
-            cursor: 'pointer',
-            display: 'flex',
-            transition: 'all 0.18s',
-            background: '#fff',
-            boxShadow: instalacion ? '0 0 0 3px rgba(20,0,140,0.07)' : 'none',
-          }}
-        >
-          <div style={{
-            width: 140, flexShrink: 0,
-            background: '#F5F0E8',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            padding: 16, fontSize: 44,
-          }}>
-            👷
-          </div>
-          <div style={{ padding: '20px 18px', flex: 1, position: 'relative' }}>
-            <div style={{ fontSize: 20, marginBottom: 10 }}>🏠</div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: instalacion ? '#14008C' : '#0A0A14', marginBottom: 8 }}>
-              Quiero instalación profesional
+              {/* Info debajo */}
+              <div style={{ padding: '16px 18px 20px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{
+                    fontSize: 15, fontWeight: 700,
+                    color: activo ? '#14008C' : '#0A0A14',
+                    transition: 'color 0.15s',
+                  }}>
+                    {op.titulo}
+                  </span>
+                  {op.precio === 'extra' && (
+                    <span style={{ fontSize: 13, fontWeight: 700, color: '#14008C' }}>
+                      + ${instExtra.toLocaleString('es-AR')}
+                    </span>
+                  )}
+                  {op.precio === null && (
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#0D7A4E' }}>
+                      Sin costo adicional
+                    </span>
+                  )}
+                </div>
+                <p style={{ fontSize: 13, color: '#888', lineHeight: 1.6, margin: 0 }}>
+                  {op.desc}
+                </p>
+              </div>
             </div>
-            <p style={{ fontSize: 14, color: '#666', lineHeight: 1.55, margin: '0 0 10px 0' }}>
-              Nuestro equipo instala la cortina en tu domicilio. Incluye medición final, colocación y prueba del sistema.
-            </p>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#14008C' }}>
-              + ${instExtra.toLocaleString('es-AR')}
-            </div>
-            <div style={{ position: 'absolute', bottom: 18, right: 18 }}>
-              <RadioCircle activo={instalacion} />
-            </div>
-          </div>
-        </div>
+          )
+        })}
       </div>
 
       <style>{`

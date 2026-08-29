@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useConfigurador } from '@/hooks/useConfigurador'
 import { usePresupuesto } from '@/hooks/usePresupuesto'
 import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
+import { estaEnRango } from '@/lib/precio'
 import type { CatalogoCompleto, Color } from '@/types'
 
 import StepTipo from '@/components/configurador/StepTipo'
@@ -28,7 +29,6 @@ export default function ConfiguradorPage() {
     setSistema,
     setInstalacion,
     setCaida,
-    calcularPrecioActual,
     resetear,
   } = useConfigurador()
 
@@ -44,7 +44,9 @@ export default function ConfiguradorPage() {
   const [catalogo, setCatalogo] = useState<CatalogoCompleto | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [precio, setPrecio] = useState<number | null>(null)
 
+  // Cargar catálogo
   useEffect(() => {
     fetch('/api/catalogo')
       .then(res => res.json())
@@ -53,7 +55,34 @@ export default function ConfiguradorPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  const precio = catalogo ? calcularPrecioActual(catalogo.precios) : null
+  // Fetch precio exacto cuando cambian medidas, sistema o instalación
+  const fetchPrecio = useCallback(async () => {
+    const { ancho, alto, sistemaExtra, instExtra } = state
+
+    if (!ancho || !alto || !estaEnRango(ancho, alto)) {
+      setPrecio(null)
+      return
+    }
+
+    try {
+      const params = new URLSearchParams({
+        ancho: String(ancho),
+        alto: String(alto),
+        sistemaExtra: String(sistemaExtra),
+        instExtra: String(instExtra),
+      })
+      const res = await fetch(`/api/precio?${params}`)
+      const data = await res.json()
+      setPrecio(data.fueraDeRango ? null : data.precio)
+    } catch {
+      setPrecio(null)
+    }
+  }, [state.ancho, state.alto, state.sistemaExtra, state.instExtra])
+
+  useEffect(() => {
+    const timer = setTimeout(fetchPrecio, 300)
+    return () => clearTimeout(timer)
+  }, [fetchPrecio])
 
   const coloresFiltrados: Color[] = (catalogo?.colores ?? []).filter(
     c => c.tela_id === state.tela?.id

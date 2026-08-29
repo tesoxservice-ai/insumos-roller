@@ -1,11 +1,26 @@
 'use client'
 
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 const AMBIENTES = [
   {
-    img: '/images/DORMITORIO.png', label: 'DORMITORIOS',
+    key: 'dormitorios',
+    img: '/images/DORMITORIO.png',
+    label: 'DORMITORIOS',
+    fotos: [
+      '/images/inspiracion/dormitorios/1.jpg',
+      '/images/inspiracion/dormitorios/2.jpg',
+      '/images/inspiracion/dormitorios/3.jpg',
+      '/images/inspiracion/dormitorios/4.jpg',
+      '/images/inspiracion/dormitorios/5.jpg',
+      '/images/inspiracion/dormitorios/6.jpg',
+      '/images/inspiracion/dormitorios/7.jpg',
+      '/images/inspiracion/dormitorios/8.jpg',
+      '/images/inspiracion/dormitorios/9.jpg',
+      '/images/inspiracion/dormitorios/10.jpg',
+    ],
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 19V9a2 2 0 012-2h16a2 2 0 012 2v10"/>
@@ -15,10 +30,23 @@ const AMBIENTES = [
         <path d="M2 19h20"/>
         <path d="M4 7V5a1 1 0 011-1h14a1 1 0 011 1v2"/>
       </svg>
-    )
+    ),
   },
   {
-    img: '/images/OFICINA.png', label: 'OFICINAS',
+    key: 'oficinas',
+    img: '/images/OFICINA.png',
+    label: 'OFICINAS',
+    fotos: [
+      '/images/inspiracion/oficina/1.jpg',
+      '/images/inspiracion/oficina/2.jpg',
+      '/images/inspiracion/oficina/3.jpg',
+      '/images/inspiracion/oficina/4.jpg',
+      '/images/inspiracion/oficina/5.jpg',
+      '/images/inspiracion/oficina/6.jpg',
+      '/images/inspiracion/oficina/7.jpg',
+      '/images/inspiracion/oficina/8.jpg',
+      '/images/inspiracion/oficina/9.jpg',
+    ],
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="3" width="20" height="14" rx="2"/>
@@ -27,10 +55,24 @@ const AMBIENTES = [
         <path d="M7 8h10"/>
         <path d="M7 11h6"/>
       </svg>
-    )
+    ),
   },
   {
-    img: '/images/COMEDOR.png', label: 'COMEDORES',
+    key: 'comedores',
+    img: '/images/COMEDOR.png',
+    label: 'COMEDORES',
+    fotos: [
+      '/images/inspiracion/comedor/1.jpg',
+      '/images/inspiracion/comedor/2.jpg',
+      '/images/inspiracion/comedor/3.jpg',
+      '/images/inspiracion/comedor/4.jpg',
+      '/images/inspiracion/comedor/5.jpg',
+      '/images/inspiracion/comedor/6.jpg',
+      '/images/inspiracion/comedor/7.jpg',
+      '/images/inspiracion/comedor/8.jpg',
+      '/images/inspiracion/comedor/9.jpg',
+      '/images/inspiracion/comedor/10.jpg',
+    ],
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 6h18"/>
@@ -41,10 +83,24 @@ const AMBIENTES = [
         <circle cx="12" cy="3" r="1"/>
         <circle cx="17" cy="3" r="1"/>
       </svg>
-    )
+    ),
   },
   {
-    img: '/images/COCINA.png', label: 'COCINAS',
+    key: 'cocinas',
+    img: '/images/COCINA.png',
+    label: 'COCINAS',
+    fotos: [
+      '/images/inspiracion/cocina/1.jpg',
+      '/images/inspiracion/cocina/2.jpg',
+      '/images/inspiracion/cocina/3.jpg',
+      '/images/inspiracion/cocina/4.jpg',
+      '/images/inspiracion/cocina/5.jpg',
+      '/images/inspiracion/cocina/6.jpg',
+      '/images/inspiracion/cocina/7.jpg',
+      '/images/inspiracion/cocina/8.jpg',
+      '/images/inspiracion/cocina/9.jpg',
+      '/images/inspiracion/cocina/10.jpg',
+    ],
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="1"/>
@@ -53,7 +109,7 @@ const AMBIENTES = [
         <path d="M15 11h4"/>
         <path d="M15 15h4"/>
       </svg>
-    )
+    ),
   },
 ]
 
@@ -142,6 +198,50 @@ const FOOTER_LINKS = {
 }
 
 export default function HomePage() {
+  const [modalAbierto, setModalAbierto] = useState(false)
+  const [ambienteActivo, setAmbienteActivo] = useState<typeof AMBIENTES[0] | null>(null)
+  const [fotoActiva, setFotoActiva] = useState(0)
+
+  const abrirModal = (ambiente: typeof AMBIENTES[0]) => {
+    if (ambiente.fotos.length === 0) return
+    setAmbienteActivo(ambiente)
+    setFotoActiva(0)
+    setModalAbierto(true)
+  }
+
+  const cerrarModal = () => {
+    setModalAbierto(false)
+    setAmbienteActivo(null)
+  }
+
+  const siguiente = useCallback(() => {
+    if (!ambienteActivo) return
+    setFotoActiva(i => (i + 1) % ambienteActivo.fotos.length)
+  }, [ambienteActivo])
+
+  const anterior = useCallback(() => {
+    if (!ambienteActivo) return
+    setFotoActiva(i => (i - 1 + ambienteActivo.fotos.length) % ambienteActivo.fotos.length)
+  }, [ambienteActivo])
+
+  // Teclado
+  useEffect(() => {
+    if (!modalAbierto) return
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') cerrarModal()
+      if (e.key === 'ArrowRight') siguiente()
+      if (e.key === 'ArrowLeft') anterior()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [modalAbierto, siguiente, anterior])
+
+  // Bloquear scroll cuando el modal está abierto
+  useEffect(() => {
+    document.body.style.overflow = modalAbierto ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [modalAbierto])
+
   return (
     <main style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
@@ -172,8 +272,6 @@ export default function HomePage() {
             </span>
           </h1>
         </div>
-
-        {/* Cards hero */}
         <div style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', display: 'grid', gridTemplateColumns: '1fr 1fr', maxWidth: 760, width: '100%', padding: '0 32px', gap: 16, paddingBottom: 48 }}>
           <HeroCard href="/configurador" icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>} label="CORTINAS A MEDIDA" />
           <HeroCard href="/stock" icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>} label="LISTAS PARA LLEVAR" />
@@ -189,26 +287,38 @@ export default function HomePage() {
         <div style={{ padding: '0 48px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
             {AMBIENTES.map(a => (
-              <Link key={a.label} href="/configurador" style={{ textDecoration: 'none' }}>
-                <div style={{ borderRadius: 'var(--radius)', overflow: 'hidden', border: '1px solid var(--border)', background: '#fff', transition: 'box-shadow 0.2s' }} className="ambiente-card">
-                  <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
-                    <Image src={a.img} alt={a.label} fill style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} className="ambiente-img" />
-                  </div>
-                  <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <span style={{ color: '#14008C', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{a.icon}</span>
-                      <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '0.12em', color: '#0A0A14' }}>{a.label}</span>
-                    </div>
-                    <span style={{ color: '#14008C', fontWeight: 600, fontSize: 18 }}>→</span>
-                  </div>
+              <div
+                key={a.label}
+                onClick={() => abrirModal(a)}
+                style={{
+                  borderRadius: 'var(--radius)',
+                  overflow: 'hidden',
+                  border: '1px solid var(--border)',
+                  background: '#fff',
+                  transition: 'box-shadow 0.2s',
+                  cursor: a.fotos.length > 0 ? 'pointer' : 'default',
+                }}
+                className="ambiente-card"
+              >
+                <div style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden' }}>
+                  <Image src={a.img} alt={a.label} fill style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }} className="ambiente-img" />
                 </div>
-              </Link>
+                <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ color: '#14008C', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{a.icon}</span>
+                    <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '0.12em', color: '#0A0A14' }}>{a.label}</span>
+                  </div>
+                  {a.fotos.length > 0 && (
+                    <span style={{ color: '#14008C', fontWeight: 600, fontSize: 18 }}>→</span>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── ACCESOS RÁPIDOS — nuevo diseño ── */}
+      {/* ── ACCESOS RÁPIDOS ── */}
       <section id="guias" style={{ padding: '64px 48px 80px', background: 'var(--bg)' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 24 }} className="accesos-grid">
           {ACCESOS.map(a => (
@@ -228,38 +338,14 @@ export default function HomePage() {
                   cursor: 'pointer',
                 }}
               >
-                {/* Ícono */}
-                <div style={{
-                  width: 52, height: 52,
-                  background: 'rgba(20,0,140,0.05)',
-                  borderRadius: 12,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#14008C',
-                  marginBottom: 20,
-                }}>
+                <div style={{ width: 52, height: 52, background: 'rgba(20,0,140,0.05)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#14008C', marginBottom: 20 }}>
                   {a.icon}
                 </div>
-
-                {/* Número */}
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C', letterSpacing: '0.14em', marginBottom: 12 }}>
-                  {a.num}
-                </div>
-
-                {/* Título */}
-                <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '0.04em', color: '#0A0A14', marginBottom: 14 }}>
-                  {a.titulo}
-                </div>
-
-                {/* Descripción */}
-                <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.7, margin: '0 0 24px 0', flex: 1 }}>
-                  {a.desc}
-                </p>
-
-                {/* Link */}
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#14008C', letterSpacing: '0.14em', marginBottom: 12 }}>{a.num}</div>
+                <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: '0.04em', color: '#0A0A14', marginBottom: 14 }}>{a.titulo}</div>
+                <p style={{ fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.7, margin: '0 0 24px 0', flex: 1 }}>{a.desc}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, borderTop: '1px solid var(--border)', paddingTop: 16 }}>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: '#14008C', letterSpacing: '0.1em' }}>
-                    {a.label}
-                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: '#14008C', letterSpacing: '0.1em' }}>{a.label}</span>
                   <span style={{ color: 'var(--primary)', fontSize: 14, fontWeight: 700 }}>→</span>
                 </div>
               </div>
@@ -283,7 +369,7 @@ export default function HomePage() {
                 <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: '#8888A8', textTransform: 'uppercase', margin: '0 0 16px 0' }}>{titulo}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {links.map(l => (
-                    <Link key={l.label} href={l.href} style={{ fontSize: 13, color: '#3D3D5C', textDecoration: 'none', transition: 'color 0.15s' }}>{l.label}</Link>
+                    <Link key={l.label} href={l.href} style={{ fontSize: 13, color: '#3D3D5C', textDecoration: 'none' }}>{l.label}</Link>
                   ))}
                 </div>
               </div>
@@ -299,6 +385,102 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* ── MODAL GALERÍA ── */}
+      {modalAbierto && ambienteActivo && (
+        <div
+          onClick={cerrarModal}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1000,
+            background: 'rgba(0,0,0,0.92)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: '24px',
+          }}
+        >
+          <div onClick={e => e.stopPropagation()} style={{ position: 'relative', width: '100%', maxWidth: 900, display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+            {/* Header modal */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ color: '#fff', opacity: 0.7 }}>{ambienteActivo.icon}</span>
+                <span style={{ color: '#fff', fontSize: 13, fontWeight: 700, letterSpacing: '0.14em' }}>
+                  {ambienteActivo.label}
+                </span>
+                <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>
+                  {fotoActiva + 1} / {ambienteActivo.fotos.length}
+                </span>
+              </div>
+              <button
+                onClick={cerrarModal}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 8, opacity: 0.7, fontSize: 24, lineHeight: 1 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Foto principal */}
+            <div style={{ position: 'relative', width: '100%', height: '65vh', borderRadius: 12, overflow: 'hidden', background: '#111' }}>
+              <Image
+                key={fotoActiva}
+                src={ambienteActivo.fotos[fotoActiva]}
+                alt={`${ambienteActivo.label} ${fotoActiva + 1}`}
+                sizes="(max-width: 900px) 100vw, 900px"
+                fill
+                style={{ objectFit: 'contain' }}
+              />
+
+              {/* Flechas */}
+              <button
+                onClick={anterior}
+                style={{
+                  position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)',
+                  background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)',
+                  border: 'none', borderRadius: '50%', width: 48, height: 48,
+                  cursor: 'pointer', color: '#fff', fontSize: 20,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.2s',
+                }}
+              >
+                ←
+              </button>
+              <button
+                onClick={siguiente}
+                style={{
+                  position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
+                  background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)',
+                  border: 'none', borderRadius: '50%', width: 48, height: 48,
+                  cursor: 'pointer', color: '#fff', fontSize: 20,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.2s',
+                }}
+              >
+                →
+              </button>
+            </div>
+
+            {/* Thumbnails */}
+            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+              {ambienteActivo.fotos.map((foto, i) => (
+                <div
+                  key={i}
+                  onClick={() => setFotoActiva(i)}
+                  style={{
+                    position: 'relative', flexShrink: 0,
+                    width: 72, height: 48,
+                    borderRadius: 6, overflow: 'hidden',
+                    cursor: 'pointer',
+                    border: i === fotoActiva ? '2px solid #fff' : '2px solid transparent',
+                    opacity: i === fotoActiva ? 1 : 0.5,
+                    transition: 'opacity 0.2s, border 0.2s',
+                  }}
+                >
+                  <Image src={foto} alt={`thumb ${i + 1}`} fill sizes="72px" style={{ objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .ambiente-img:hover { transform: scale(1.05); }

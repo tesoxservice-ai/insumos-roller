@@ -28,6 +28,18 @@ const COLORES_INFO: Record<string, string> = {
   'Negro': '#1A1A1A',
 }
 
+function limpiarNombre(nombre: string): string {
+  return nombre.replace(/\s+\d+[×x]\d+cm?/i, "").trim()
+}
+
+function getTipo(p: ProductoStockCompleto): string {
+  if (p.tipo) return p.tipo
+  const nombre = p.nombre.toLowerCase()
+  if (nombre.includes('romana')) return 'Romana'
+  if (nombre.includes('vertical')) return 'Vertical'
+  return 'Roller'
+}
+
 export default function StockPage() {
   const [productos, setProductos] = useState<ProductoStockCompleto[]>([])
   const [loading, setLoading] = useState(true)
@@ -36,7 +48,6 @@ export default function StockPage() {
   const [loadingPago, setLoadingPago] = useState(false)
   const [errorPago, setErrorPago] = useState<string | null>(null)
 
-  // Filtros
   const [filtroTipo, setFiltroTipo] = useState('Todos')
   const [filtroTela, setFiltroTela] = useState('Todas')
   const [filtroColor, setFiltroColor] = useState('Todos')
@@ -59,7 +70,6 @@ export default function StockPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Valores únicos para filtros
   const coloresUnicos = useMemo(() => {
     const set = new Set(productos.map(p => p.color?.nombre).filter(Boolean) as string[])
     return Array.from(set)
@@ -71,7 +81,9 @@ export default function StockPage() {
   const filtrados = useMemo(() => {
     let lista = [...productos]
 
-    if (filtroTipo !== 'Todos') lista = lista.filter(p => p.tipo === filtroTipo)
+    if (filtroTipo !== 'Todos') lista = lista.filter(p =>
+      p.tipo === filtroTipo || p.nombre.toLowerCase().includes(filtroTipo.toLowerCase())
+    )
     if (filtroTela !== 'Todas') lista = lista.filter(p => p.tela?.nombre === filtroTela)
     if (filtroColor !== 'Todos') lista = lista.filter(p => p.color?.nombre === filtroColor)
     if (soloDisponibles) lista = lista.filter(p => p.stock_cantidad > 0)
@@ -132,7 +144,6 @@ export default function StockPage() {
   return (
     <main style={{ background: '#FAFAFA', minHeight: '100vh', paddingTop: 76 }}>
 
-      {/* HEADER */}
       <div style={{ background: '#fff', borderBottom: '1px solid #EBEBEB', padding: '40px 48px 32px', textAlign: 'center' }}>
         <h1 style={{ fontSize: 'clamp(42px, 5vw, 64px)', fontWeight: 900, letterSpacing: '-0.04em', color: '#0A0A14', margin: '0 0 8px 0', lineHeight: 1 }}>
           LISTO PARA LLEVAR
@@ -143,11 +154,9 @@ export default function StockPage() {
 
       <div style={{ display: 'flex', maxWidth: 1400, margin: '0 auto', padding: '32px 48px', gap: 32, alignItems: 'flex-start' }}>
 
-        {/* PANEL FILTROS */}
         <aside style={{ width: 280, flexShrink: 0, position: 'sticky', top: 96, maxHeight: 'calc(100vh - 112px)', overflowY: 'auto', scrollbarWidth: 'thin' }}>
           <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 12, overflow: 'hidden' }}>
 
-            {/* Header filtros */}
             <div style={{ padding: '20px 24px', borderBottom: '1px solid #EBEBEB', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: 15, fontWeight: 800, color: '#0A0A14', letterSpacing: '0.08em' }}>FILTROS</span>
               {hayFiltrosActivos && (
@@ -163,7 +172,7 @@ export default function StockPage() {
               <div style={{ paddingTop: 20, marginBottom: 20, borderBottom: '1px solid #F0F0F0', paddingBottom: 20 }}>
                 <p style={{ fontSize: 13, fontWeight: 700, color: '#AAA', letterSpacing: '0.12em', margin: '0 0 12px 0' }}>TIPO DE CORTINA</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {['Todos', 'Roller', 'Vertical'].map(t => (
+                  {['Todos', 'Roller', 'Vertical', 'Romana'].map(t => (
                     <button key={t} onClick={() => setFiltroTipo(t)} style={{
                       textAlign: 'left', padding: '8px 12px', borderRadius: 8,
                       border: '1.5px solid', borderColor: filtroTipo === t ? '#14008C' : '#EBEBEB',
@@ -279,14 +288,11 @@ export default function StockPage() {
               {/* Solo disponibles */}
               <div style={{ marginBottom: 20, borderBottom: '1px solid #F0F0F0', paddingBottom: 20 }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-                  <div
-                    onClick={() => setSoloDisponibles(!soloDisponibles)}
-                    style={{
-                      width: 44, height: 24, borderRadius: 12, flexShrink: 0,
-                      background: soloDisponibles ? '#14008C' : '#DDD',
-                      position: 'relative', transition: 'background 0.2s', cursor: 'pointer',
-                    }}
-                  >
+                  <div onClick={() => setSoloDisponibles(!soloDisponibles)} style={{
+                    width: 44, height: 24, borderRadius: 12, flexShrink: 0,
+                    background: soloDisponibles ? '#14008C' : '#DDD',
+                    position: 'relative', transition: 'background 0.2s', cursor: 'pointer',
+                  }}>
                     <div style={{
                       width: 18, height: 18, borderRadius: '50%', background: '#fff',
                       position: 'absolute', top: 3,
@@ -343,7 +349,6 @@ export default function StockPage() {
             </div>
           )}
 
-          {/* BANNER */}
           <div style={{ marginTop: 48, background: '#fff', border: '1px solid #E8E8F0', borderRadius: 12, padding: '28px 36px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 24, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
               <div style={{ width: 48, height: 48, background: '#EEEEF8', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>📐</div>
@@ -357,13 +362,12 @@ export default function StockPage() {
             </Link>
           </div>
 
-          {/* DIFERENCIALES */}
           <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, paddingTop: 24, borderTop: '1px solid #EBEBEB' }} className="diff-grid">
             {[
               { icon: '🚚', titulo: 'ENVÍO RÁPIDO', desc: 'A todo el país' },
               { icon: '🔒', titulo: 'COMPRA SEGURA', desc: 'Protegemos tus datos' },
               { icon: '⭐', titulo: 'PRODUCTOS PREMIUM', desc: 'Calidad y diseño' },
-              { icon: '💳', titulo: 'HASTA 6 CUOTAS', desc: 'Sin interés' },
+              { icon: '💳', titulo: 'HASTA 6 CUOTAS', desc: 'Con interés' },
             ].map(d => (
               <div key={d.titulo} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{d.icon}</span>
@@ -397,17 +401,17 @@ export default function StockPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#14008C', letterSpacing: '0.12em', background: 'rgba(20,0,140,0.07)', borderRadius: 100, padding: '3px 10px' }}>
-                    {modalProducto.tela?.nombre?.toUpperCase()}
+                    {modalProducto.tela?.nombre?.toUpperCase() ?? 'ROMANA'}
                   </span>
                   <span style={{ fontSize: 11, fontWeight: 700, color: '#666', letterSpacing: '0.12em', background: '#F5F5F5', borderRadius: 100, padding: '3px 10px' }}>
-                    {modalProducto.tipo?.toUpperCase()}
+                    {getTipo(modalProducto).toUpperCase()}
                   </span>
                 </div>
                 <button onClick={() => { setModalProducto(null); setErrorPago(null) }} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#CCC' }}>×</button>
               </div>
 
               <div>
-                <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0A0A14', margin: '0 0 6px 0', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{modalProducto.nombre}</h2>
+                <h2 style={{ fontSize: 22, fontWeight: 900, color: '#0A0A14', margin: '0 0 6px 0', letterSpacing: '-0.02em', lineHeight: 1.2 }}>{limpiarNombre(modalProducto.nombre)}</h2>
                 <p style={{ fontSize: 14, color: '#999', margin: 0 }}>{modalProducto.color?.nombre} · {modalProducto.ancho_cm} × {modalProducto.alto_cm} cm</p>
               </div>
 
@@ -421,7 +425,7 @@ export default function StockPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {[
                   { label: 'Medidas', valor: `${modalProducto.ancho_cm} × ${modalProducto.alto_cm} cm` },
-                  { label: 'Tipo', valor: modalProducto.tipo ?? '—' },
+                  { label: 'Tipo', valor: getTipo(modalProducto) },
                   { label: 'Tela', valor: modalProducto.tela?.nombre ?? '—' },
                   { label: 'Sistema', valor: 'Cadena manual' },
                   { label: 'Stock', valor: modalProducto.stock_cantidad > 0 ? `${modalProducto.stock_cantidad} disponibles` : 'Sin stock' },
@@ -487,6 +491,7 @@ function ProductCard({ producto: p, onVerDetalle, onAgregarAlCarrito }: {
 }) {
   const [imgError, setImgError] = useState(false)
   const disponible = p.stock_cantidad > 0
+  const tipo = getTipo(p)
 
   return (
     <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', transition: 'box-shadow 0.2s, border-color 0.2s', cursor: 'pointer' }}
@@ -506,14 +511,14 @@ function ProductCard({ producto: p, onVerDetalle, onAgregarAlCarrito }: {
           </div>
         )}
         <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', gap: 6 }}>
-          <span style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 800, color: '#14008C', letterSpacing: '0.08em' }}>
-            {p.tela?.nombre?.toUpperCase()}
-          </span>
-          {p.tipo && (
-            <span style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 800, color: '#555', letterSpacing: '0.08em' }}>
-              {p.tipo.toUpperCase()}
+          {p.tela && (
+            <span style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 800, color: '#14008C', letterSpacing: '0.08em' }}>
+              {p.tela.nombre.toUpperCase()}
             </span>
           )}
+          <span style={{ background: 'rgba(255,255,255,0.95)', borderRadius: 6, padding: '4px 10px', fontSize: 11, fontWeight: 800, color: '#555', letterSpacing: '0.08em' }}>
+            {tipo.toUpperCase()}
+          </span>
         </div>
         {!disponible && (
           <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -524,7 +529,7 @@ function ProductCard({ producto: p, onVerDetalle, onAgregarAlCarrito }: {
 
       <div style={{ padding: '18px 18px 20px', flex: 1, display: 'flex', flexDirection: 'column', gap: 5 }}>
         <div style={{ fontSize: 16, fontWeight: 800, color: '#0A0A14', letterSpacing: '0.02em', lineHeight: 1.3 }}>
-          {p.nombre.toUpperCase()}
+          {limpiarNombre(p.nombre).toUpperCase()}
         </div>
         <div style={{ fontSize: 14, color: '#AAA' }}>{p.color?.nombre} · {p.ancho_cm} × {p.alto_cm} cm</div>
         <div style={{ fontSize: 30, fontWeight: 900, color: '#0A0A14', letterSpacing: '-0.03em', marginTop: 6 }}>

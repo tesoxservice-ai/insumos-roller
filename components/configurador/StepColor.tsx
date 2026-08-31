@@ -191,7 +191,9 @@ export default function StepColor({
   colorInterior, colorExterior, onSelectInterior, onSelectExterior,
   tipoNombre, caida, onCaidaChange, pasoActual, onClickPaso,
 }: StepColorProps) {
-  const lista = coloresFiltrados.length > 0 ? coloresFiltrados : colores
+  const COLORES_PERMITIDOS = ['Blanco', 'Natural', 'Gris', 'Negro']
+  const lista = (coloresFiltrados.length > 0 ? coloresFiltrados : colores)
+  .filter(c => COLORES_PERMITIDOS.includes(c.nombre))
   const esRoller = tipoNombre.toLowerCase().includes('roller')
   const esTradicional = tipoNombre.toLowerCase().includes('tradicional')
 

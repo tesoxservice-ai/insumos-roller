@@ -22,7 +22,6 @@ export async function POST(request: Request) {
 
     const supabase = createServerSupabaseClient()
 
-    // Buscar el producto verificando que esté activo y tenga stock
     const { data: producto, error: productoError } = await supabase
       .from('producto_stock')
       .select('id, nombre, precio, stock_cantidad, activo, ancho_cm, alto_cm')
@@ -47,17 +46,19 @@ export async function POST(request: Request) {
       )
     }
 
-    // Crear preferencia en Mercado Pago
     const client = new MercadoPagoConfig({
       accessToken: process.env.MP_ACCESS_TOKEN!,
     })
 
     const preference = new Preference(client)
 
+    const isLocal = process.env.NEXT_PUBLIC_BASE_URL?.includes('localhost')
+
     const response = await preference.create({
       body: {
         items: [
           {
+            id: productoId,
             title: producto.nombre,
             quantity: 1,
             unit_price: producto.precio,
@@ -72,8 +73,10 @@ export async function POST(request: Request) {
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/stock/pago/error`,
           pending: `${process.env.NEXT_PUBLIC_BASE_URL}/stock/pago/pendiente`,
         },
-        auto_return: 'approved',
-        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/pagos/webhook`,
+        ...(!isLocal && { auto_return: 'approved' }),
+        notification_url: !isLocal
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/pagos/webhook`
+          : undefined,
         external_reference: productoId,
       },
     })

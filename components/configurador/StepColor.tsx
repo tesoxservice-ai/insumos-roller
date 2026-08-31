@@ -320,4 +320,4 @@ export default function StepColor({
       `}</style>
     </div>
   )
-}
+} 

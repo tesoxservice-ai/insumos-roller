@@ -31,6 +31,7 @@ export default function ColoresPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<ColorForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const showFeedback = (msg: string) => {
     setFeedback(msg)
@@ -58,18 +59,12 @@ export default function ColoresPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  function openCreate() {
-    setEditingId(null)
-    setForm(EMPTY_FORM)
-    setModalOpen(true)
-  }
-
+  function openCreate() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true) }
   function openEdit(c: Color) {
     setEditingId(c.id)
     setForm({ tela_id: c.tela_id, nombre: c.nombre, hex: c.hex, activo: c.activo })
     setModalOpen(true)
   }
-
   function closeModal() { setModalOpen(false); setEditingId(null); setForm(EMPTY_FORM) }
 
   async function handleToggle(c: Color) {
@@ -81,8 +76,22 @@ export default function ColoresPage() {
       })
       if (!res.ok) throw new Error()
       showFeedback(`Color ${!c.activo ? 'activado' : 'desactivado'}`)
-      loadData()
+      setColores(prev => prev.map(col => col.id === c.id ? { ...col, activo: !c.activo } : col))
     } catch { showFeedback('Error al actualizar') }
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      const res = await fetch(`/api/admin/colores/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activo: false }),
+      })
+      if (!res.ok) throw new Error()
+      showFeedback('Color desactivado')
+      setConfirmDeleteId(null)
+      setColores(prev => prev.filter(c => c.id !== id))
+    } catch { showFeedback('Error al desactivar') }
   }
 
   async function handleSave() {
@@ -98,7 +107,7 @@ export default function ColoresPage() {
       if (!res.ok) throw new Error()
       showFeedback(editingId ? 'Color actualizado' : 'Color creado')
       closeModal()
-      loadData()
+      await loadData()
     } catch { showFeedback('Error al guardar') }
     finally { setSaving(false) }
   }
@@ -138,19 +147,21 @@ export default function ColoresPage() {
                   <td style={{ ...tdStyle, fontFamily: 'monospace', fontSize: 12 }}>{c.hex}</td>
                   <td style={tdStyle}>{c.tela?.nombre ?? '—'}</td>
                   <td style={tdStyle}>
-                    <button
-                      onClick={() => handleToggle(c)}
-                      style={{
-                        background: c.activo ? 'var(--green-soft)' : 'var(--surface2)',
-                        color: c.activo ? 'var(--green)' : 'var(--text-muted)',
-                        border: 'none', borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 500,
-                      }}
-                    >
+                    <button onClick={() => handleToggle(c)} style={{
+                      background: c.activo ? 'var(--green-soft)' : 'var(--surface2)',
+                      color: c.activo ? 'var(--green)' : 'var(--text-muted)',
+                      border: 'none', borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 500,
+                    }}>
                       {c.activo ? 'Activo' : 'Inactivo'}
                     </button>
                   </td>
-                  <td style={tdStyle}>
-                    <button onClick={() => openEdit(c)} style={btnSmall}>Editar</button>
+                  <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => openEdit(c)} style={btnSmall}>Editar</button>
+                      <button onClick={() => setConfirmDeleteId(c.id)} style={{ ...btnSmall, color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}>
+                        Eliminar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -159,6 +170,22 @@ export default function ColoresPage() {
         </div>
       )}
 
+      {/* Modal confirmar eliminación */}
+      {confirmDeleteId && (
+        <Modal title="Confirmar desactivación" onClose={() => setConfirmDeleteId(null)}>
+          <p style={{ color: 'var(--text-mid)', fontSize: 14, marginBottom: 24 }}>
+            ¿Seguro que querés desactivar este color? Va a dejar de aparecer en el configurador.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+            <button onClick={() => setConfirmDeleteId(null)} style={btnGhost}>Cancelar</button>
+            <button onClick={() => handleDelete(confirmDeleteId)} style={{ ...btnGold, background: '#ef4444' }}>
+              Sí, desactivar
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Modal crear/editar */}
       {modalOpen && (
         <Modal title={editingId ? 'Editar color' : 'Nuevo color'} onClose={closeModal}>
           <div className="flex flex-col gap-4">
@@ -173,18 +200,10 @@ export default function ColoresPage() {
             </Field>
             <Field label="Color">
               <div className="flex gap-2 items-center">
-                <input
-                  type="color"
-                  value={form.hex}
-                  onChange={e => setForm(f => ({ ...f, hex: e.target.value }))}
-                  style={{ width: 40, height: 36, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }}
-                />
-                <input
-                  style={{ ...inputStyle, flex: 1, fontFamily: 'monospace' }}
-                  value={form.hex}
-                  onChange={e => setForm(f => ({ ...f, hex: e.target.value }))}
-                  placeholder="#000000"
-                />
+                <input type="color" value={form.hex} onChange={e => setForm(f => ({ ...f, hex: e.target.value }))}
+                  style={{ width: 40, height: 36, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
+                <input style={{ ...inputStyle, flex: 1, fontFamily: 'monospace' }} value={form.hex}
+                  onChange={e => setForm(f => ({ ...f, hex: e.target.value }))} placeholder="#000000" />
               </div>
             </Field>
             <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-mid)', fontSize: 14, cursor: 'pointer' }}>

@@ -3,13 +3,13 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 
 async function checkAuth() {
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  return { supabase, session }
+  const { data: { user } } = await supabase.auth.getUser()
+  return { supabase, user }
 }
 
 export async function PUT(request: Request, { params }: { params: { id: string } }) {
-  const { supabase, session } = await checkAuth()
-  if (!session) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  const { supabase, user } = await checkAuth()
+  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
   const body: { tela_id: string; nombre: string; hex: string; activo: boolean } = await request.json()
 
@@ -20,13 +20,16 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    console.error('PUT color error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
   return NextResponse.json({ color: data })
 }
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
-  const { supabase, session } = await checkAuth()
-  if (!session) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  const { supabase, user } = await checkAuth()
+  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
 
   const body: { activo: boolean } = await request.json()
 
@@ -37,6 +40,25 @@ export async function PATCH(request: Request, { params }: { params: { id: string
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    console.error('PATCH color error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
   return NextResponse.json({ color: data })
+}
+
+export async function DELETE(_request: Request, { params }: { params: { id: string } }) {
+  const { supabase, user } = await checkAuth()
+  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+
+  const { error } = await supabase
+    .from('color')
+    .delete()
+    .eq('id', params.id)
+
+  if (error) {
+    console.error('DELETE color error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+  return NextResponse.json({ ok: true })
 }

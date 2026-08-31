@@ -7,7 +7,6 @@ interface ComprarBody {
   emailPagador: string
 }
 
-// POST /api/stock/comprar — Crea una preferencia de pago en Mercado Pago para un producto de stock
 export async function POST(request: Request) {
   try {
     const body: ComprarBody = await request.json()
@@ -72,6 +71,9 @@ export async function POST(request: Request) {
           success: `${process.env.NEXT_PUBLIC_BASE_URL}/stock/pago/exitoso`,
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/stock/pago/error`,
           pending: `${process.env.NEXT_PUBLIC_BASE_URL}/stock/pago/pendiente`,
+        },
+        payment_methods: {
+          installments: 6,
         },
         ...(!isLocal && { auto_return: 'approved' }),
         notification_url: !isLocal

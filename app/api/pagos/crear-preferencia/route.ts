@@ -7,7 +7,6 @@ interface CrearPreferenciaBody {
   emailPagador: string
 }
 
-// POST /api/pagos/crear-preferencia – Crea una preferencia de pago en Mercado Pago
 export async function POST(request: Request) {
   try {
     const { items, emailPagador }: CrearPreferenciaBody = await request.json()
@@ -36,6 +35,9 @@ export async function POST(request: Request) {
           success: `${process.env.NEXT_PUBLIC_BASE_URL}/pago/exitoso`,
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/pago/error`,
           pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pago/pendiente`,
+        },
+        payment_methods: {
+          installments: 6,
         },
         ...(!isLocal && { auto_return: 'approved' }),
         notification_url: !isLocal

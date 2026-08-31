@@ -1,7 +1,7 @@
 const nextConfig = {
   images: {
     qualities: [85, 100],
-    unoptimized: true,  // ← agregá esto
+    unoptimized: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
@@ -10,3 +10,5 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 };
+
+module.exports = nextConfig;

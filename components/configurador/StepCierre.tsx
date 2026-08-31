@@ -58,7 +58,6 @@ const FILA_COLOR_EXTERIOR = {
   icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
 }
 
-// Mapeo color + tipo → imagen
 function getImagenColor(colorNombre: string, tipoNombre: string): string {
   const slug: Record<string, string> = {
     'Blanco': 'blanco',
@@ -86,17 +85,15 @@ export default function StepCierre({
   const medidaEspecial = state.ancho > MAX_ANCHO || state.alto > MAX_ALTO
   const esTradicional = state.tipo?.nombre.toLowerCase().includes('tradicional')
 
-  // Imagen a mostrar
   const imagenColor = esTradicional
     ? '/images/colores/tradicional-referencia.jpg'
     : (state.color ? getImagenColor(state.color.nombre, state.tipo?.nombre ?? '') : '')
 
-  // Filas dinámicas según tipo
   const filas = [
-    FILAS_BASE[0], // tipo
-    FILAS_BASE[1], // tela
+    FILAS_BASE[0],
+    FILAS_BASE[1],
     ...(esTradicional ? [FILA_COLOR_INTERIOR, FILA_COLOR_EXTERIOR] : [FILA_COLOR]),
-    ...FILAS_BASE.slice(2), // medidas, sistema, instalacion, plazo
+    ...FILAS_BASE.slice(2),
   ]
 
   const handleAgregarAlCarrito = () => {
@@ -123,7 +120,7 @@ export default function StepCierre({
       id: `medida-${Date.now()}`,
       nombre: `Cortina ${state.tipo?.nombre ?? 'a medida'}`,
       descripcion,
-      precio: precioEstimado,
+      precio: precioEstimado ?? 0,  // fix: null → 0
       tipo: 'medida',
       medidaEspecial,
       imagen_url: imagenColor || undefined,
@@ -145,12 +142,14 @@ export default function StepCierre({
       case 'colorExterior': return state.colorExterior?.nombre ?? '—'
       case 'medidas':
         return state.ancho && state.alto ? `${state.ancho} × ${state.alto} cm` : '—'
-      case 'sistema':
-        if (state.sistema === 'motorizado' || state.sistema === 'Motorizada')
+      case 'sistema': {
+        const s = state.sistema
+        if (s === 'motorizado')
           return `Motorizado (+$${state.sistemaExtra.toLocaleString('es-AR')})`
-        if (state.sistema === 'manual' || state.sistema === 'Cadena')
+        if (s === 'manual')
           return 'Cadena manual'
         return '—'
+      }
       case 'instalacion':
         return state.instalacion
           ? `Instalación profesional (+$${state.instExtra.toLocaleString('es-AR')})`

@@ -13,14 +13,20 @@ export default function StockCard({ producto, onComprar }: StockCardProps) {
   const { agregarItem } = useCart()
   const [agregado, setAgregado] = useState(false)
 
+  const tela = (producto as unknown as Record<string, string>).tela ?? ''
+  const color = (producto as unknown as Record<string, string>).color ?? ''
+  const ancho = (producto as unknown as Record<string, number>).ancho ?? producto.ancho_cm
+  const alto = (producto as unknown as Record<string, number>).alto ?? producto.alto_cm
+  const stockDisponible = (producto as unknown as Record<string, number>).stock_disponible ?? producto.stock_cantidad
+
   function handleAgregar() {
     agregarItem({
       id: `stock-${producto.id}`,
       nombre: producto.nombre ?? 'Cortina roller',
       descripcion: [
-        producto.tela ?? '',
-        producto.color ?? '',
-        producto.ancho && producto.alto ? `${producto.ancho} × ${producto.alto} cm` : '',
+        tela,
+        color,
+        ancho && alto ? `${ancho} × ${alto} cm` : '',
       ].filter(Boolean).join(' · '),
       precio: producto.precio ?? 0,
       tipo: 'stock',
@@ -53,7 +59,7 @@ export default function StockCard({ producto, onComprar }: StockCardProps) {
           <rect x="3" y="3" width="18" height="18" rx="2"/>
           <path d="M3 9h18M9 21V9"/>
         </svg>
-        {producto.stock_disponible !== undefined && producto.stock_disponible <= 3 && (
+        {stockDisponible !== undefined && stockDisponible <= 3 && (
           <span style={{
             position: 'absolute', top: 12, right: 12,
             background: '#FFF3CD', color: '#856404',
@@ -72,7 +78,7 @@ export default function StockCard({ producto, onComprar }: StockCardProps) {
             {producto.nombre ?? 'Cortina Roller'}
           </p>
           <p style={{ fontSize: 13, color: '#888', margin: 0, lineHeight: 1.5 }}>
-            {[producto.tela, producto.color, producto.ancho && producto.alto ? `${producto.ancho} × ${producto.alto} cm` : null]
+            {[tela, color, ancho && alto ? `${ancho} × ${alto} cm` : null]
               .filter(Boolean).join(' · ')}
           </p>
         </div>

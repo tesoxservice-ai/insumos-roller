@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import type { ConfiguradorState } from '@/types'
 
 export interface CartItem {
   id: string
@@ -11,6 +12,7 @@ export interface CartItem {
   tipo: 'stock' | 'medida'
   medidaEspecial?: boolean
   imagen_url?: string
+  configuracion?: Partial<ConfiguradorState>
 }
 
 interface CartContextType {

@@ -18,12 +18,15 @@ export async function POST(request: Request) {
 
     const preference = new Preference(client)
 
-    const mpItems = items.map((item) => ({
+    const mpItems = items.map((item, idx) => ({
+      id: String(idx + 1),
       title: `${item.ambiente} – ${item.configuracion?.tela?.nombre ?? 'Cortina Roller'}`,
       quantity: 1,
       unit_price: item.precioEstimado,
       currency_id: 'ARS',
     }))
+
+    const isLocal = process.env.NEXT_PUBLIC_BASE_URL?.includes('localhost')
 
     const response = await preference.create({
       body: {
@@ -34,8 +37,10 @@ export async function POST(request: Request) {
           failure: `${process.env.NEXT_PUBLIC_BASE_URL}/pago/error`,
           pending: `${process.env.NEXT_PUBLIC_BASE_URL}/pago/pendiente`,
         },
-        auto_return: 'approved',
-        notification_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/pagos/webhook`,
+        ...(!isLocal && { auto_return: 'approved' }),
+        notification_url: !isLocal
+          ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/pagos/webhook`
+          : undefined,
       },
     })
 

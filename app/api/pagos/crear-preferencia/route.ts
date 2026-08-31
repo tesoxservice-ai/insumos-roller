@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const preference = new Preference(client)
 
     const mpItems = items.map((item) => ({
-      title: `${item.ambiente} – ${item.configuracion.tela?.nombre ?? 'Cortina Roller'}`,
+      title: `${item.ambiente} – ${item.configuracion?.tela?.nombre ?? 'Cortina Roller'}`,
       quantity: 1,
       unit_price: item.precioEstimado,
       currency_id: 'ARS',
@@ -40,9 +40,10 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ init_point: response.init_point })
-  } catch {
+  } catch (error) {
+    console.error('MP Error completo:', JSON.stringify(error, null, 2))
     return NextResponse.json(
-      { error: 'Error al crear preferencia de pago' },
+      { error: 'Error al crear preferencia de pago', detalle: String(error) },
       { status: 500 }
     )
   }

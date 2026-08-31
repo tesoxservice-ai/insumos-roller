@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { useCart } from '@/context/CartContext'
 
@@ -26,6 +27,36 @@ export default function CartDrawer() {
     items, total, count, drawerOpen, hayMedidasEspeciales,
     cerrarDrawer, quitarItem, vaciarCarrito,
   } = useCart()
+
+  const [cargando, setCargando] = useState(false)
+
+  const handlePagar = async () => {
+    setCargando(true)
+    try {
+      const res = await fetch('/api/pagos/crear-preferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            ambiente: item.nombre,
+            configuracion: item.configuracion ?? {},
+            precioEstimado: item.precio * item.cantidad,
+          })),
+          emailPagador: 'cliente@insumosroller.com',
+        }),
+      })
+      const data = await res.json()
+      if (data.init_point) {
+        window.location.href = data.init_point
+      } else {
+        alert('Error al procesar el pago. Intentá de nuevo.')
+      }
+    } catch {
+      alert('Error de conexión. Intentá de nuevo.')
+    } finally {
+      setCargando(false)
+    }
+  }
 
   return (
     <>
@@ -146,7 +177,6 @@ export default function CartDrawer() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
               {items.map((item, idx) => {
-                // Determinar imagen: primero imagen_url, si no buscar por color en descripción
                 const imgSrc = item.imagen_url || (item.tipo === 'medida' ? getImagenColor(item.descripcion, item.nombre) : '')
 
                 return (
@@ -193,7 +223,6 @@ export default function CartDrawer() {
                           </p>
                         </div>
 
-                        {/* Descripción con íconos */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                           {item.descripcion.split(' · ').map((parte, i) => (
                             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -218,7 +247,6 @@ export default function CartDrawer() {
                           ))}
                         </div>
 
-                        {/* Tipo + acciones */}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                           <span style={{
                             fontSize: 10, fontWeight: 700, letterSpacing: '0.1em',
@@ -246,7 +274,6 @@ export default function CartDrawer() {
                           </button>
                         </div>
 
-                        {/* Aviso medida especial */}
                         {item.medidaEspecial && (
                           <div style={{
                             background: 'rgba(245,158,11,0.07)',
@@ -310,9 +337,10 @@ export default function CartDrawer() {
               </div>
             )}
 
-            {/* Pagar ahora */}
+            {/* Botón pagar */}
             <button
-              disabled={hayMedidasEspeciales}
+              onClick={handlePagar}
+              disabled={hayMedidasEspeciales || cargando}
               style={{
                 width: '100%',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -321,15 +349,16 @@ export default function CartDrawer() {
                 border: 'none', borderRadius: 12,
                 padding: '16px 24px',
                 fontSize: 15, fontWeight: 700,
-                cursor: hayMedidasEspeciales ? 'not-allowed' : 'pointer',
+                cursor: hayMedidasEspeciales || cargando ? 'not-allowed' : 'pointer',
                 fontFamily: 'inherit', letterSpacing: '0.02em',
                 transition: 'opacity 0.15s',
+                opacity: cargando ? 0.7 : 1,
               }}
-              onMouseEnter={e => { if (!hayMedidasEspeciales) e.currentTarget.style.opacity = '0.85' }}
-              onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
+              onMouseEnter={e => { if (!hayMedidasEspeciales && !cargando) e.currentTarget.style.opacity = '0.85' }}
+              onMouseLeave={e => { e.currentTarget.style.opacity = cargando ? '0.7' : '1' }}
             >
-              <span>Finalizar pedido</span>
-              <span style={{ fontSize: 20 }}>→</span>
+              <span>{cargando ? 'Procesando...' : 'Finalizar pedido'}</span>
+              <span style={{ fontSize: 20 }}>{cargando ? '⏳' : '→'}</span>
             </button>
 
             {/* WhatsApp */}

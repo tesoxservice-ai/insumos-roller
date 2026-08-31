@@ -1,22 +1,20 @@
 import { Resend } from 'resend'
 import type { ItemPresupuesto } from '@/types'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 interface EnviarPresupuestoParams {
   email: string
   nombreCliente?: string
   items: ItemPresupuesto[]
 }
 
-/**
- * Envía el presupuesto por email al cliente usando Resend.
- */
 export async function enviarPresupuestoPorEmail({
   email,
   nombreCliente = 'Cliente',
   items,
 }: EnviarPresupuestoParams): Promise<{ success: boolean; error?: string }> {
+  // Inicializar dentro de la función para evitar error en build time
+  const resend = new Resend(process.env.RESEND_API_KEY)
+
   const totalGeneral = items.reduce((acc, item) => acc + item.precioEstimado, 0)
 
   const filasItems = items

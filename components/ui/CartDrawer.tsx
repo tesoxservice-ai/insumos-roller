@@ -13,7 +13,8 @@ function getImagenColor(descripcion: string, nombreItem: string): string {
     'Gris Marengo': 'gris-marengo',
     'Negro': 'negro',
   }
-  const prefix = nombreItem.toLowerCase().includes('vertical') ? 'vertical' : 'roller'
+  const tipo = nombreItem.toLowerCase()
+  const prefix = tipo.includes("vertical") || tipo.includes("banda") ? "vertical" : tipo.includes("romana") ? "romana" : "roller"
   for (const [nombre, slug] of Object.entries(slugs)) {
     if (descripcion.includes(nombre)) return `/images/colores/${prefix}-${slug}.jpg`
   }

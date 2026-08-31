@@ -9,6 +9,8 @@ const estadoInicial: ConfiguradorState = {
   tela: null,
   color: null,
   colorHex: '',
+  colorInterior: null,
+  colorExterior: null,
   ancho: 0,
   alto: 0,
   sistema: '',
@@ -23,6 +25,8 @@ interface UseConfiguradorReturn {
   setTipo: (tipo: TipoCortina) => void
   setTela: (tela: Tela) => void
   setColor: (color: Color) => void
+  setColorInterior: (color: Color) => void
+  setColorExterior: (color: Color) => void
   setMedidas: (ancho: number, alto: number) => void
   setSistema: (sistema: 'manual' | 'motorizado', extra?: number) => void
   setInstalacion: (activa: boolean, extra?: number) => void
@@ -41,6 +45,8 @@ export function useConfigurador(): UseConfiguradorReturn {
       tela: null,
       color: null,
       colorHex: '',
+      colorInterior: null,
+      colorExterior: null,
     }))
   }, [])
 
@@ -50,6 +56,8 @@ export function useConfigurador(): UseConfiguradorReturn {
       tela,
       color: null,
       colorHex: '',
+      colorInterior: null,
+      colorExterior: null,
     }))
   }, [])
 
@@ -59,6 +67,14 @@ export function useConfigurador(): UseConfiguradorReturn {
       color,
       colorHex: color.hex,
     }))
+  }, [])
+
+  const setColorInterior = useCallback((color: Color) => {
+    setState(prev => ({ ...prev, colorInterior: color }))
+  }, [])
+
+  const setColorExterior = useCallback((color: Color) => {
+    setState(prev => ({ ...prev, colorExterior: color }))
   }, [])
 
   const setMedidas = useCallback((ancho: number, alto: number) => {
@@ -91,6 +107,8 @@ export function useConfigurador(): UseConfiguradorReturn {
     setTipo,
     setTela,
     setColor,
+    setColorInterior,
+    setColorExterior,
     setMedidas,
     setSistema,
     setInstalacion,

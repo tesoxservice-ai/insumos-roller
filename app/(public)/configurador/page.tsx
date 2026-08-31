@@ -25,6 +25,8 @@ export default function ConfiguradorPage() {
     setTipo,
     setTela,
     setColor,
+    setColorInterior,
+    setColorExterior,
     setMedidas,
     setSistema,
     setInstalacion,
@@ -46,7 +48,6 @@ export default function ConfiguradorPage() {
   const [error, setError] = useState<string | null>(null)
   const [precio, setPrecio] = useState<number | null>(null)
 
-  // Cargar catálogo
   useEffect(() => {
     fetch('/api/catalogo')
       .then(res => res.json())
@@ -55,15 +56,12 @@ export default function ConfiguradorPage() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Fetch precio exacto cuando cambian medidas, sistema o instalación
   const fetchPrecio = useCallback(async () => {
     const { ancho, alto, sistemaExtra, instExtra } = state
-
     if (!ancho || !alto || !estaEnRango(ancho, alto)) {
       setPrecio(null)
       return
     }
-
     try {
       const params = new URLSearchParams({
         ancho: String(ancho),
@@ -129,10 +127,7 @@ export default function ConfiguradorPage() {
 
   if (loading) {
     return (
-      <main style={{
-        background: '#fff', minHeight: '100vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
+      <main style={{ background: '#fff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{ color: '#BBB', fontSize: 14 }}>Cargando configurador…</p>
       </main>
     )
@@ -140,10 +135,7 @@ export default function ConfiguradorPage() {
 
   if (error || !catalogo) {
     return (
-      <main style={{
-        background: '#fff', minHeight: '100vh',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
+      <main style={{ background: '#fff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{ color: '#ef4444', fontSize: 14 }}>{error ?? 'Error inesperado'}</p>
       </main>
     )
@@ -151,9 +143,7 @@ export default function ConfiguradorPage() {
 
   return (
     <main style={{ background: '#FAFAFA', height: 'auto', paddingBottom: 100 }}>
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px 0' }}>
-
         {items.length > 0 && (
           <div style={{ marginBottom: 24 }}>
             <PresupuestoPanel
@@ -167,12 +157,7 @@ export default function ConfiguradorPage() {
           </div>
         )}
 
-        <div style={{
-          background: '#fff',
-          border: '1px solid #EBEBEB',
-          borderRadius: 8,
-          padding: '40px 40px',
-        }}>
+        <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 8, padding: '40px 40px' }}>
           {paso === 0 && (
             <StepTipo
               tipos={catalogo.tipos}
@@ -200,6 +185,10 @@ export default function ConfiguradorPage() {
               coloresFiltrados={coloresFiltrados}
               seleccionado={state.color}
               onSelect={(color: Color) => setColor(color)}
+              colorInterior={state.colorInterior}
+              colorExterior={state.colorExterior}
+              onSelectInterior={setColorInterior}
+              onSelectExterior={setColorExterior}
               tipoNombre={state.tipo?.nombre ?? ''}
               telaNombre={state.tela?.nombre ?? ''}
               caida={state.caida}
@@ -229,6 +218,7 @@ export default function ConfiguradorPage() {
               onSistemaChange={(sis, extra) => setSistema(sis, extra)}
               onInstalacionChange={(activa, extra) => setInstalacion(activa, extra)}
               regla={catalogo.precios.find(p => p.tela_id === state.tela?.id) ?? null}
+              telaNombre={state.tela?.nombre ?? ''}
               pasoActual={paso}
               onClickPaso={handleClickPaso}
             />

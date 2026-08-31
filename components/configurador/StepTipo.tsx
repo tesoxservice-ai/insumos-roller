@@ -18,28 +18,30 @@ interface StepTipoProps {
 const DESCRIPCIONES: Record<string, string> = {
   'Roller': 'Minimalistas, prácticas y versátiles. Ideales para cualquier ambiente.',
   'Verticales': 'Elegantes y funcionales. Ideales para grandes ventanales.',
-  'Tradicionales': 'Clásicas y decorativas. Aportan calidez y estilo.',
+  'Tradicionales': 'Clásicas y decorativas. Aportan calidez y estilo a cualquier espacio.',
   'Horizontales': 'Control de luz y privacidad. Calidad y durabilidad.',
   'Dúo': 'Diseño innovador que combina transparencia y privacidad.',
-  'Textiles': 'Elegantes y decorativas. Filtran la luz con suavidad.',
   'Bandas': 'Elegantes y funcionales. Ideales para grandes ventanales.',
+  'Romanas': 'Sofisticadas y atemporales. Se pliegan en pliegues horizontales creando un efecto visual premium.',
 }
 
 const CHECKS: Record<string, string[]> = {
   'Roller': ['Fácil de operar', 'Ideal para cualquier ambiente', 'Amplia variedad de telas'],
   'Verticales': ['Perfectas para ventanales grandes', 'Control preciso de luz', 'Diseño moderno'],
-  'Textiles': ['Filtran la luz suavemente', 'Aportan calidez decorativa', 'Variedad de texturas'],
-  'Bandas': ['Perfectas para ventanales grandes', 'Control preciso de luz', 'Diseño moderno'],
   'Tradicionales': ['Clásicas y atemporales', 'Gran variedad de diseños', 'Fácil mantenimiento'],
+  'Bandas': ['Perfectas para ventanales grandes', 'Control preciso de luz', 'Diseño moderno'],
   'Horizontales': ['Control total de luz', 'Muy duraderas', 'Aptas para cocina y baño'],
   'Dúo': ['Privacidad + vista exterior', 'Un solo mecanismo', 'Máxima versatilidad'],
+  'Romanas': ['Estética premium y elegante', 'Se pliegan en pliegues horizontales', 'Ideales para living y dormitorios'],
 }
 
 const IMAGEN_MAP: Record<string, string> = {
-  'roller':   '/images/ROLLER.png',
-  'vertical': '/images/VERTICALES.png',
-  'banda':    '/images/VERTICALES.png',
-  'textil':   '/images/TEXTILES.png',
+  'roller':       '/images/ROLLER.png',
+  'vertical':     '/images/VERTICALES.png',
+  'banda':        '/images/VERTICALES.png',
+  'tradicional':  '/images/TEXTILES.png',
+  'textil':       '/images/TEXTILES.png',
+  'romana':       '/images/ROMANAS.png',
 }
 
 function getImagenSrc(nombre: string): string | null {
@@ -86,13 +88,27 @@ const PLACEHOLDERS: Record<string, React.ReactNode> = {
       ))}
     </svg>
   ),
-  Textiles: (
+  Tradicionales: (
     <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
       <rect x="15" y="18" width="110" height="6" rx="3" fill="#C8C0B0"/>
       {[28, 44, 60, 76, 92, 108].map((y, i) => (
         <rect key={i} x="20" y={y} width="100" height="12" rx="1" fill="#E8E0D0" stroke="#D0C8B8" strokeWidth="0.5"/>
       ))}
       <rect x="20" y="120" width="100" height="8" rx="2" fill="#C8C0B0"/>
+    </svg>
+  ),
+  Romanas: (
+    <svg viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <rect x="15" y="16" width="110" height="8" rx="3" fill="#C8C0B0"/>
+      <rect x="20" y="24" width="100" height="100" rx="2" fill="#E8E0D0"/>
+      {[44, 64, 84, 104].map((y, i) => (
+        <g key={i}>
+          <rect x="20" y={y} width="100" height="6" rx="1" fill="#C8C0B0" opacity="0.6"/>
+          <rect x="20" y={y + 2} width="100" height="10" rx="1" fill="#E8E0D0" opacity="0.8"/>
+        </g>
+      ))}
+      <rect x="20" y="122" width="100" height="14" rx="2" fill="#D8D0C0"/>
+      <line x1="108" y1="24" x2="108" y2="122" stroke="#C8C0B0" strokeWidth="1.5"/>
     </svg>
   ),
   Dúo: (

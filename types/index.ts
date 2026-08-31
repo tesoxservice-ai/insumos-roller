@@ -77,6 +77,9 @@ export interface ConfiguradorState {
   tela: Tela | null
   color: Color | null
   colorHex: string
+  // Para cortinas Tradicionales (dos capas)
+  colorInterior: Color | null
+  colorExterior: Color | null
   ancho: number
   alto: number
   sistema: 'manual' | 'motorizado' | ''

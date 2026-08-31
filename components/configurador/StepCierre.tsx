@@ -14,9 +14,9 @@ interface StepCierreProps {
 }
 
 const MAX_ANCHO = 300
-const MAX_ALTO = 300
+const MAX_ALTO = 350
 
-const FILAS = [
+const FILAS_BASE = [
   {
     label: 'Tipo de cortina', key: 'tipo',
     icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
@@ -24,10 +24,6 @@ const FILAS = [
   {
     label: 'Tela', key: 'tela',
     icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-  },
-  {
-    label: 'Color', key: 'color',
-    icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
   },
   {
     label: 'Medidas', key: 'medidas',
@@ -47,6 +43,21 @@ const FILAS = [
   },
 ]
 
+const FILA_COLOR = {
+  label: 'Color', key: 'color',
+  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+}
+
+const FILA_COLOR_INTERIOR = {
+  label: 'Color interior', key: 'colorInterior',
+  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+}
+
+const FILA_COLOR_EXTERIOR = {
+  label: 'Color exterior', key: 'colorExterior',
+  icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 010 20"/></svg>
+}
+
 // Mapeo color + tipo → imagen
 function getImagenColor(colorNombre: string, tipoNombre: string): string {
   const slug: Record<string, string> = {
@@ -59,8 +70,11 @@ function getImagenColor(colorNombre: string, tipoNombre: string): string {
   }
   const key = slug[colorNombre]
   if (!key) return ''
-  const prefix = tipoNombre.toLowerCase().includes('vertical') ? 'vertical' : 'roller'
-  return `/images/colores/${prefix}-${key}.jpg`
+
+  const tipo = tipoNombre.toLowerCase()
+  if (tipo.includes('vertical') || tipo.includes('banda')) return `/images/colores/vertical-${key}.jpg`
+  if (tipo.includes('romana')) return `/images/colores/romana-${key}.jpg`
+  return `/images/colores/roller-${key}.jpg`
 }
 
 export default function StepCierre({
@@ -70,16 +84,40 @@ export default function StepCierre({
   const { agregarItem } = useCart()
 
   const medidaEspecial = state.ancho > MAX_ANCHO || state.alto > MAX_ALTO
-  const imagenColor = state.color ? getImagenColor(state.color.nombre, state.tipo?.nombre ?? '') : ''
+  const esTradicional = state.tipo?.nombre.toLowerCase().includes('tradicional')
+
+  // Imagen a mostrar
+  const imagenColor = esTradicional
+    ? '/images/colores/tradicional-referencia.jpg'
+    : (state.color ? getImagenColor(state.color.nombre, state.tipo?.nombre ?? '') : '')
+
+  // Filas dinámicas según tipo
+  const filas = [
+    FILAS_BASE[0], // tipo
+    FILAS_BASE[1], // tela
+    ...(esTradicional ? [FILA_COLOR_INTERIOR, FILA_COLOR_EXTERIOR] : [FILA_COLOR]),
+    ...FILAS_BASE.slice(2), // medidas, sistema, instalacion, plazo
+  ]
 
   const handleAgregarAlCarrito = () => {
-    const descripcion = [
-      state.tela?.nombre ?? '',
-      state.color?.nombre ?? '',
-      state.ancho && state.alto ? `${state.ancho} × ${state.alto} cm` : '',
-      state.sistema ? `Sistema: ${state.sistema}` : '',
-      state.instalacion ? 'Con instalación' : '',
-    ].filter(Boolean).join(' · ')
+    const descripcionPartes = esTradicional
+      ? [
+          state.tela?.nombre ?? '',
+          state.colorInterior ? `Interior: ${state.colorInterior.nombre}` : '',
+          state.colorExterior ? `Exterior: ${state.colorExterior.nombre}` : '',
+          state.ancho && state.alto ? `${state.ancho} × ${state.alto} cm` : '',
+          state.sistema ? `Sistema: ${state.sistema}` : '',
+          state.instalacion ? 'Con instalación' : '',
+        ]
+      : [
+          state.tela?.nombre ?? '',
+          state.color?.nombre ?? '',
+          state.ancho && state.alto ? `${state.ancho} × ${state.alto} cm` : '',
+          state.sistema ? `Sistema: ${state.sistema}` : '',
+          state.instalacion ? 'Con instalación' : '',
+        ]
+
+    const descripcion = descripcionPartes.filter(Boolean).join(' · ')
 
     agregarItem({
       id: `medida-${Date.now()}`,
@@ -103,6 +141,8 @@ export default function StepCierre({
       case 'tipo': return state.tipo?.nombre ?? '—'
       case 'tela': return state.tela?.nombre ?? '—'
       case 'color': return state.color?.nombre ?? '—'
+      case 'colorInterior': return state.colorInterior?.nombre ?? '—'
+      case 'colorExterior': return state.colorExterior?.nombre ?? '—'
       case 'medidas':
         return state.ancho && state.alto ? `${state.ancho} × ${state.alto} cm` : '—'
       case 'sistema':
@@ -126,14 +166,9 @@ export default function StepCierre({
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <h2 style={{
-          fontSize: 'clamp(32px, 4vw, 52px)',
-          fontWeight: 300,
-          color: '#0A0A14',
-          letterSpacing: '-0.01em',
-          margin: '0 0 14px 0',
-          fontStyle: 'italic',
-          fontFamily: 'var(--font-cormorant), Cormorant Garamond, serif',
-          lineHeight: 1.1,
+          fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 300, color: '#0A0A14',
+          letterSpacing: '-0.01em', margin: '0 0 14px 0',
+          fontStyle: 'italic', fontFamily: 'var(--font-cormorant), Cormorant Garamond, serif', lineHeight: 1.1,
         }}>
           Resumen de tu cortina
         </h2>
@@ -152,13 +187,13 @@ export default function StepCierre({
             <span style={{ fontSize: 11, fontWeight: 700, color: '#14008C', letterSpacing: '0.16em' }}>CONFIGURACIÓN</span>
           </div>
 
-          {FILAS.map((fila, i) => {
+          {filas.map((fila, i) => {
             const valor = getValor(fila.key)
             return (
               <div key={fila.key} style={{
                 display: 'flex', alignItems: 'center', gap: 14,
                 padding: '15px 24px',
-                borderBottom: i < FILAS.length - 1 ? '1px solid #F5F5F5' : 'none',
+                borderBottom: i < filas.length - 1 ? '1px solid #F5F5F5' : 'none',
               }}>
                 <span style={{ color: '#BBBBCC', flexShrink: 0, display: 'flex' }}>{fila.icon}</span>
                 <span style={{ fontSize: 14, color: '#888', flex: 1 }}>{fila.label}</span>
@@ -173,10 +208,8 @@ export default function StepCierre({
               PRECIO ORIENTATIVO
             </div>
             <div style={{
-              fontSize: 'clamp(32px, 4vw, 44px)',
-              fontWeight: 900, color: '#0A0A14',
-              letterSpacing: '-0.04em', marginBottom: 6,
-              fontFamily: 'var(--font-cormorant), serif',
+              fontSize: 'clamp(32px, 4vw, 44px)', fontWeight: 900, color: '#0A0A14',
+              letterSpacing: '-0.04em', marginBottom: 6, fontFamily: 'var(--font-cormorant), serif',
             }}>
               {precioEstimado !== null ? `$\u00A0${precioEstimado.toLocaleString('es-AR')}` : '—'}
             </div>
@@ -186,20 +219,14 @@ export default function StepCierre({
           </div>
         </div>
 
-        {/* Imagen del color */}
-        <div style={{
-          background: '#F5F0E8', border: '1px solid #EBEBEB',
-          borderRadius: 16, overflow: 'hidden',
-          display: 'flex', flexDirection: 'column',
-        }}>
+        {/* Imagen */}
+        <div style={{ background: '#F5F0E8', border: '1px solid #EBEBEB', borderRadius: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
           <div style={{ flex: 1, position: 'relative', minHeight: 280 }}>
             {imagenColor ? (
               <Image
                 src={imagenColor}
                 alt={`Cortina ${state.color?.nombre ?? ''}`}
-                fill
-                style={{ objectFit: 'cover' }}
-                sizes="450px"
+                fill style={{ objectFit: 'cover' }} sizes="450px"
               />
             ) : (
               <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
@@ -226,12 +253,7 @@ export default function StepCierre({
 
       {/* Aviso medida especial */}
       {medidaEspecial && (
-        <div style={{
-          background: 'rgba(245,158,11,0.06)',
-          border: '1px solid rgba(245,158,11,0.25)',
-          borderRadius: 12, padding: '16px 20px', marginBottom: 16,
-          display: 'flex', alignItems: 'flex-start', gap: 12,
-        }}>
+        <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 12, padding: '16px 20px', marginBottom: 16, display: 'flex', alignItems: 'flex-start', gap: 12 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 1 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           <p style={{ fontSize: 14, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
             Esta cortina tiene medidas especiales. Nuestro equipo te va a confirmar el precio final al recibir tu pedido por WhatsApp.
@@ -251,8 +273,7 @@ export default function StepCierre({
             fontSize: 16, fontWeight: 700,
             cursor: !agregadoAlCarrito ? 'pointer' : 'not-allowed',
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            fontFamily: 'inherit', transition: 'background 0.2s, opacity 0.15s',
-            letterSpacing: '0.02em',
+            fontFamily: 'inherit', transition: 'background 0.2s, opacity 0.15s', letterSpacing: '0.02em',
           }}
           onMouseEnter={e => { if (!agregadoAlCarrito) e.currentTarget.style.opacity = '0.88' }}
           onMouseLeave={e => { e.currentTarget.style.opacity = '1' }}
@@ -274,8 +295,7 @@ export default function StepCierre({
             width: '100%', padding: '14px', background: 'none', border: 'none',
             color: '#BBB', fontSize: 14, cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 8, fontFamily: 'inherit', transition: 'color 0.15s',
-            letterSpacing: '0.02em',
+            gap: 8, fontFamily: 'inherit', transition: 'color 0.15s', letterSpacing: '0.02em',
           }}
           onMouseEnter={e => e.currentTarget.style.color = '#14008C'}
           onMouseLeave={e => e.currentTarget.style.color = '#BBB'}

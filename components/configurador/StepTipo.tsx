@@ -41,7 +41,7 @@ const IMAGEN_MAP: Record<string, string> = {
   'banda':        '/images/VERTICALES.png',
   'tradicional':  '/images/TEXTILES.png',
   'textil':       '/images/TEXTILES.png',
-  'romana':       '/images/ROMANAS.png',
+  'romana': '/images/Romanas.png',
 }
 
 function getImagenSrc(nombre: string): string | null {

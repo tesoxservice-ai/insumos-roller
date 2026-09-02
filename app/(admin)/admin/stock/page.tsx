@@ -33,7 +33,7 @@ interface StockForm {
 }
 
 const EMPTY_FORM: StockForm = { nombre: '', tipo: '', tela_id: '', color_id: '', ancho_cm: '', alto_cm: '', precio: '', stock_cantidad: '1', activo: true, imagen_url: '' }
-const TIPOS_CORTINA = ['Roller', 'Verticales', 'Romana', 'Textiles']
+const TIPOS_CORTINA = ['Roller', 'Verticales', 'Romana']
 const PAGE_SIZE = 10
 
 const IMAGENES_DISPONIBLES: Record<string, Record<string, string>> = {
@@ -81,7 +81,10 @@ export default function StockPage() {
 
   useEffect(() => { loadData() }, [loadData])
 
-  const filteredColors = colores.filter(c => c.tela_id === form.tela_id)
+  const filteredColors = colores.filter(c => 
+    c.tela_id === form.tela_id &&
+    !['beige', 'gris marengo', 'natural'].includes(c.nombre.toLowerCase())
+  )
 
   function openCreate() { setEditingId(null); setForm(EMPTY_FORM); setModalOpen(true) }
   function openEdit(p: ProductoStock) {

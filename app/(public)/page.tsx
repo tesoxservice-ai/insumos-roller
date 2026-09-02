@@ -278,6 +278,46 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── TICKER ── */}
+      <div style={{ marginTop: 48 }}>
+        <div style={{ background: '#F5F0E8', overflow: 'hidden', height: 56, display: 'flex', alignItems: 'center', borderTop: '1px solid #E8E0D4', borderBottom: '1px solid #E8E0D4' }}>
+          <div style={{
+            display: 'flex',
+            animation: 'ticker 28s linear infinite',
+            whiteSpace: 'nowrap',
+          }}>
+            {[...Array(4)].map((_, rep) => (
+              <span key={rep} style={{ display: 'flex', alignItems: 'center' }}>
+                {[
+                  '3 Y 6 CUOTAS SIN INTERÉS',
+                  '30% DE DESCUENTO EN EFECTIVO O TRANSFERENCIA',
+                ].map((text, i) => (
+                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
+                    <span style={{
+                      color: '#0A0A14',
+                      fontWeight: 600,
+                      letterSpacing: '0.2em',
+                      padding: '0 48px',
+                      fontFamily: 'var(--font-cormorant), Cormorant Garamond, serif',
+                      fontSize: 15,
+                    }}>
+                      {text}
+                    </span>
+                    <span style={{ color: 'rgba(10,10,20,0.2)', fontSize: 10 }}>✦</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+          <style>{`
+            @keyframes ticker {
+              0%   { transform: translateX(0); }
+              100% { transform: translateX(-25%); }
+            }
+          `}</style>
+        </div>
+      </div>
+
       {/* ── GALERÍA AMBIENTES ── */}
       <section id="inspiracion" style={{ padding: '64px 0 0', background: 'var(--bg)' }}>
         <div style={{ textAlign: 'center', marginBottom: 32, padding: '0 48px' }}>
@@ -294,7 +334,7 @@ export default function HomePage() {
                   borderRadius: 'var(--radius)',
                   overflow: 'hidden',
                   border: '1px solid var(--border)',
-                  background: '#fff',
+                  background: 'var(--surface)',
                   transition: 'box-shadow 0.2s',
                   cursor: a.fotos.length > 0 ? 'pointer' : 'default',
                 }}
@@ -326,7 +366,7 @@ export default function HomePage() {
               <div
                 className="acceso-card-new"
                 style={{
-                  background: '#fff',
+                  background: 'var(--surface)',
                   border: '1px solid var(--border)',
                   borderRadius: 16,
                   padding: '32px 28px',
@@ -355,7 +395,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer style={{ background: '#fff', color: '#0A0A14' }}>
+      <footer style={{ background: '#E8E2D9', color: '#0A0A14' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '60px 32px 40px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '200px repeat(4, 1fr)', gap: 32, marginBottom: 48, paddingBottom: 48, borderBottom: '1px solid rgba(0,0,0,0.08)' }} className="footer-grid">
             <div>
@@ -504,7 +544,7 @@ export default function HomePage() {
 function HeroCard({ href, icon, label }: { href: string; icon: React.ReactNode; label: string }) {
   return (
     <Link href={href} style={{ textDecoration: 'none' }}>
-      <div className="hero-card" style={{ background: '#fff', borderRadius: 8, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, cursor: 'pointer', transition: 'background 0.2s', boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
+      <div className="hero-card" style={{ background: 'rgba(250,248,245,0.96)', borderRadius: 8, padding: '20px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, cursor: 'pointer', transition: 'background 0.2s', boxShadow: '0 4px 24px rgba(0,0,0,0.15)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
           <div data-text="" style={{ color: '#14008C', flexShrink: 0, transition: 'color 0.2s' }}>{icon}</div>
           <span data-text="" style={{ fontSize: 'clamp(12px, 1.2vw, 15px)', fontWeight: 800, letterSpacing: '0.08em', color: '#0D0D0D', transition: 'color 0.2s' }}>{label}</span>

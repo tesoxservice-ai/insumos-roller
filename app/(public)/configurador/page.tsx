@@ -1,10 +1,7 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useConfigurador } from '@/hooks/useConfigurador'
-import { usePresupuesto } from '@/hooks/usePresupuesto'
-import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
-import { estaEnRango } from '@/lib/precio'
 import type { CatalogoCompleto, Color } from '@/types'
 
 import StepTipo from '@/components/configurador/StepTipo'
@@ -13,9 +10,7 @@ import StepColor from '@/components/configurador/StepColor'
 import StepMedidas from '@/components/configurador/StepMedidas'
 import StepSistema from '@/components/configurador/StepSistema'
 import StepCierre from '@/components/configurador/StepCierre'
-import PriceBar from '@/components/configurador/PriceBar'
-import PresupuestoPanel from '@/components/presupuesto/PresupuestoPanel'
-import { generarPDF } from '@/lib/pdf'
+import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
 
 const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
 
@@ -34,19 +29,10 @@ export default function ConfiguradorPage() {
     resetear,
   } = useConfigurador()
 
-  const {
-    items,
-    agregarItem,
-    eliminarItem,
-    totalGeneral,
-    limpiarPresupuesto,
-  } = usePresupuesto()
-
   const [paso, setPaso] = useState(0)
   const [catalogo, setCatalogo] = useState<CatalogoCompleto | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [precio, setPrecio] = useState<number | null>(null)
 
   useEffect(() => {
     fetch('/api/catalogo')
@@ -55,32 +41,6 @@ export default function ConfiguradorPage() {
       .catch(() => setError('Error al cargar el catálogo'))
       .finally(() => setLoading(false))
   }, [])
-
-  const fetchPrecio = useCallback(async () => {
-    const { ancho, alto, sistemaExtra, instExtra } = state
-    if (!ancho || !alto || !estaEnRango(ancho, alto)) {
-      setPrecio(null)
-      return
-    }
-    try {
-      const params = new URLSearchParams({
-        ancho: String(ancho),
-        alto: String(alto),
-        sistemaExtra: String(sistemaExtra),
-        instExtra: String(instExtra),
-      })
-      const res = await fetch(`/api/precio?${params}`)
-      const data = await res.json()
-      setPrecio(data.fueraDeRango ? null : data.precio)
-    } catch {
-      setPrecio(null)
-    }
-  }, [state.ancho, state.alto, state.sistemaExtra, state.instExtra])
-
-  useEffect(() => {
-    const timer = setTimeout(fetchPrecio, 300)
-    return () => clearTimeout(timer)
-  }, [fetchPrecio])
 
   const coloresFiltrados: Color[] = (catalogo?.colores ?? []).filter(
     c => c.tela_id === state.tela?.id
@@ -106,25 +66,6 @@ export default function ConfiguradorPage() {
     window.open(url, '_blank')
   }
 
-  function handleAgregarAlPresupuesto(ambiente: string) {
-    if (!precio) return
-    agregarItem({ ambiente, configuracion: state, precioEstimado: precio })
-    resetear()
-    setPaso(0)
-  }
-
-  async function handleDescargarPDF() {
-    await generarPDF(items)
-  }
-
-  async function handleEnviarEmail(email: string) {
-    await fetch('/api/email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, items }),
-    })
-  }
-
   if (loading) {
     return (
       <main style={{ background: '#fff', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -142,21 +83,8 @@ export default function ConfiguradorPage() {
   }
 
   return (
-    <main style={{ background: '#FAFAFA', height: 'auto', paddingBottom: 100 }}>
+    <main style={{ background: '#fff', minHeight: '100vh', paddingBottom: 60 }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 32px 0' }}>
-        {items.length > 0 && (
-          <div style={{ marginBottom: 24 }}>
-            <PresupuestoPanel
-              items={items}
-              totalGeneral={totalGeneral}
-              onEliminar={eliminarItem}
-              onLimpiar={limpiarPresupuesto}
-              onDescargarPDF={handleDescargarPDF}
-              onEnviarEmail={handleEnviarEmail}
-            />
-          </div>
-        )}
-
         <div style={{ background: '#fff', border: '1px solid #EBEBEB', borderRadius: 8, padding: '40px 40px' }}>
           {paso === 0 && (
             <StepTipo
@@ -227,25 +155,70 @@ export default function ConfiguradorPage() {
           {paso === 5 && (
             <StepCierre
               state={state}
-              precioEstimado={precio}
-              reglas={catalogo.precios}
-              onAgregarAlPresupuesto={handleAgregarAlPresupuesto}
               onNuevoProducto={() => { resetear(); setPaso(0) }}
             />
           )}
+
+          {/* Navegación inferior — visible en pasos intermedios */}
+          {paso > 0 && paso < PASOS.length - 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: 40,
+              paddingTop: 24,
+              borderTop: '1px solid #F0F0F0',
+            }}>
+              <button
+                onClick={() => irA(paso - 1)}
+                style={{
+                  padding: '10px 24px',
+                  background: 'transparent',
+                  border: '1.5px solid #D0D0D0',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: '#555',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.15s, color 0.15s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = '#14008C'
+                  e.currentTarget.style.color = '#14008C'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#D0D0D0'
+                  e.currentTarget.style.color = '#555'
+                }}
+              >
+                ← Atrás
+              </button>
+
+              <button
+                onClick={() => irA(paso + 1)}
+                style={{
+                  padding: '11px 28px',
+                  background: '#14008C',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  letterSpacing: '0.02em',
+                  transition: 'opacity 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                {paso === PASOS.length - 2 ? 'Ver resumen →' : 'Siguiente →'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
-
-      {paso < PASOS.length - 1 && (
-        <PriceBar
-          state={state}
-          precio={precio}
-          onNext={() => irA(paso + 1)}
-          nextLabel={paso === PASOS.length - 2 ? 'Ver resumen →' : 'Siguiente →'}
-          onBack={() => irA(paso - 1)}
-          showBack={paso > 0}
-        />
-      )}
     </main>
   )
 }

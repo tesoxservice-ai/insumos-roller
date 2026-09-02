@@ -30,7 +30,7 @@ interface StockForm {
 }
 
 const EMPTY_FORM: StockForm = {
-  nombre: '', tela_id: '', color_id: '', ancho_cm: '', alto_cm: '', precio: '', stock_cantidad: '', activo: true,
+  nombre: '', tela_id: '', color_id: '', ancho_cm: '', alto_cm: '', precio: '', stock_cantidad: '1', activo: true,
 }
 
 const ar = (n: number) => `$${n.toLocaleString('es-AR')}`
@@ -41,15 +41,17 @@ export default function StockPage() {
   const [colores, setColores] = useState<Color[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [feedback, setFeedback] = useState<string | null>(null)
+  const [feedback, setFeedback] = useState<{ msg: string; ok: boolean } | null>(null)
   const [modalOpen, setModalOpen] = useState(false)
-  const [stockModalId, setStockModalId] = useState<string | null>(null)
-  const [stockInput, setStockInput] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [form, setForm] = useState<StockForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
-  const showFeedback = (msg: string) => { setFeedback(msg); setTimeout(() => setFeedback(null), 3000) }
+  const showFeedback = (msg: string, ok = true) => {
+    setFeedback({ msg, ok })
+    setTimeout(() => setFeedback(null), 3000)
+  }
 
   const loadData = useCallback(async () => {
     setLoading(true); setError(null)
@@ -59,9 +61,7 @@ export default function StockPage() {
         fetch('/api/admin/telas'),
         fetch('/api/admin/colores'),
       ])
-      const sData = await sRes.json()
-      const tData = await tRes.json()
-      const cData = await cRes.json()
+      const [sData, tData, cData] = await Promise.all([sRes.json(), tRes.json(), cRes.json()])
       setProductos(sData.productos ?? [])
       setTelas(tData.telas ?? [])
       setColores(cData.colores ?? [])
@@ -83,8 +83,10 @@ export default function StockPage() {
     })
     setModalOpen(true)
   }
-  function openStockEdit(p: ProductoStock) { setStockModalId(p.id); setStockInput(String(p.stock_cantidad)) }
   function closeModal() { setModalOpen(false); setEditingId(null); setForm(EMPTY_FORM) }
+  function setF(key: keyof StockForm, value: string | boolean) {
+    setForm(f => ({ ...f, [key]: value }))
+  }
 
   async function handleToggle(p: ProductoStock) {
     try {
@@ -93,36 +95,37 @@ export default function StockPage() {
         body: JSON.stringify({ activo: !p.activo }),
       })
       if (!res.ok) throw new Error()
-      showFeedback(`Producto ${!p.activo ? 'activado' : 'desactivado'}`)
-      loadData()
-    } catch { showFeedback('Error al actualizar') }
+      showFeedback(`Producto ${!p.activo ? 'publicado' : 'ocultado'}`)
+      setProductos(prev => prev.map(x => x.id === p.id ? { ...x, activo: !p.activo } : x))
+    } catch { showFeedback('Error al actualizar', false) }
   }
 
-  async function handleStockSave() {
-    if (!stockModalId) return
-    setSaving(true)
+  async function handleDelete(id: string) {
     try {
-      const res = await fetch(`/api/admin/stock/${stockModalId}`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock_cantidad: Number(stockInput) }),
-      })
+      const res = await fetch(`/api/admin/stock/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error()
-      showFeedback('Stock actualizado')
-      setStockModalId(null)
-      loadData()
-    } catch { showFeedback('Error al actualizar stock') }
-    finally { setSaving(false) }
+      showFeedback('Producto eliminado')
+      setConfirmDeleteId(null)
+      setProductos(prev => prev.filter(p => p.id !== id))
+    } catch { showFeedback('Error al eliminar', false) }
   }
 
   async function handleSave() {
+    if (!form.nombre || !form.tela_id || !form.precio) {
+      showFeedback('Completá nombre, tela y precio', false)
+      return
+    }
     setSaving(true)
     try {
       const payload = {
-        ...form,
-        ancho_cm: Number(form.ancho_cm),
-        alto_cm: Number(form.alto_cm),
+        nombre: form.nombre,
+        tela_id: form.tela_id,
+        color_id: form.color_id || null,
+        ancho_cm: Number(form.ancho_cm) || 0,
+        alto_cm: Number(form.alto_cm) || 0,
         precio: Number(form.precio),
-        stock_cantidad: Number(form.stock_cantidad),
+        stock_cantidad: Number(form.stock_cantidad) || 0,
+        activo: form.activo,
       }
       const url = editingId ? `/api/admin/stock/${editingId}` : '/api/admin/stock'
       const method = editingId ? 'PUT' : 'POST'
@@ -131,56 +134,80 @@ export default function StockPage() {
       showFeedback(editingId ? 'Producto actualizado' : 'Producto creado')
       closeModal()
       loadData()
-    } catch { showFeedback('Error al guardar') }
+    } catch { showFeedback('Error al guardar', false) }
     finally { setSaving(false) }
   }
 
-  function setF(key: keyof StockForm, value: string | boolean) {
-    setForm(f => ({ ...f, [key]: value }))
-  }
+  const activos = productos.filter(p => p.activo)
+  const inactivos = productos.filter(p => !p.activo)
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 style={{ color: 'var(--text)', fontSize: 22, fontWeight: 700 }}>Stock</h2>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <h2 style={{ color: 'var(--text)', fontSize: 22, fontWeight: 700, margin: 0 }}>Stock</h2>
+          <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: '4px 0 0 0' }}>
+            {activos.length} publicado{activos.length !== 1 ? 's' : ''} · {inactivos.length} oculto{inactivos.length !== 1 ? 's' : ''}
+          </p>
+        </div>
         <button onClick={openCreate} style={btnGold}>+ Nuevo producto</button>
       </div>
 
-      {feedback && <div style={feedbackStyle}>{feedback}</div>}
+      {feedback && (
+        <div style={{
+          ...feedbackStyle,
+          background: feedback.ok ? 'var(--green-soft)' : 'rgba(239,68,68,0.1)',
+          color: feedback.ok ? 'var(--green)' : '#ef4444',
+          border: `1px solid ${feedback.ok ? 'rgba(74,155,111,0.3)' : 'rgba(239,68,68,0.3)'}`,
+        }}>
+          {feedback.msg}
+        </div>
+      )}
 
       {loading ? (
         <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Cargando…</p>
       ) : error ? (
         <p style={{ color: '#ef4444', fontSize: 14 }}>{error}</p>
       ) : productos.length === 0 ? (
-        <p style={{ color: 'var(--text-muted)', fontSize: 14 }}>Sin productos en stock.</p>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: 15, marginBottom: 12 }}>Sin productos en stock todavía.</p>
+          <button onClick={openCreate} style={btnGold}>+ Agregar el primero</button>
+        </div>
       ) : (
         <div style={tableWrapper}>
           <table style={tableStyle}>
             <thead>
               <tr style={{ background: 'var(--surface2)' }}>
-                {['Nombre', 'Tela', 'Color', 'Medidas', 'Precio', 'Stock', 'Activo', 'Acciones'].map(h => (
+                {['Nombre', 'Tela · Color', 'Medidas', 'Precio', 'Stock', 'Visible', 'Acciones'].map(h => (
                   <th key={h} style={thStyle}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {productos.map((p, i) => (
-                <tr key={p.id} style={{ borderTop: i > 0 ? '1px solid var(--border)' : undefined }}>
-                  <td style={{ ...tdStyle, color: 'var(--text)', fontWeight: 500 }}>{p.nombre}</td>
-                  <td style={tdStyle}>{p.tela?.nombre ?? '—'}</td>
+                <tr key={p.id} style={{
+                  borderTop: i > 0 ? '1px solid var(--border)' : undefined,
+                  opacity: p.activo ? 1 : 0.5,
+                }}>
+                  <td style={{ ...tdStyle, color: 'var(--text)', fontWeight: 600 }}>{p.nombre}</td>
                   <td style={tdStyle}>
-                    <div className="flex items-center gap-2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       {p.color?.hex && (
-                        <div style={{ width: 16, height: 16, borderRadius: '50%', background: p.color.hex, border: '1px solid var(--border)', flexShrink: 0 }} />
+                        <div style={{ width: 14, height: 14, borderRadius: '50%', background: p.color.hex, border: '1px solid var(--border)', flexShrink: 0 }} />
                       )}
-                      {p.color?.nombre ?? '—'}
+                      <span>{p.tela?.nombre ?? '—'}{p.color?.nombre ? ` · ${p.color.nombre}` : ''}</span>
                     </div>
                   </td>
-                  <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>{p.ancho_cm} × {p.alto_cm} cm</td>
-                  <td style={{ ...tdStyle, color: 'var(--gold)' }}>{ar(p.precio)}</td>
+                  <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
+                    {p.ancho_cm && p.alto_cm ? `${p.ancho_cm} × ${p.alto_cm} cm` : '—'}
+                  </td>
+                  <td style={{ ...tdStyle, color: 'var(--gold)', fontWeight: 600 }}>{ar(p.precio)}</td>
                   <td style={tdStyle}>
-                    <span style={{ color: p.stock_cantidad > 0 ? 'var(--green)' : '#ef4444', fontWeight: 600 }}>
+                    <span style={{
+                      fontWeight: 700, fontSize: 15,
+                      color: p.stock_cantidad === 0 ? '#ef4444' : p.stock_cantidad <= 2 ? '#f59e0b' : 'var(--green)',
+                    }}>
                       {p.stock_cantidad}
                     </span>
                   </td>
@@ -188,15 +215,21 @@ export default function StockPage() {
                     <button onClick={() => handleToggle(p)} style={{
                       background: p.activo ? 'var(--green-soft)' : 'var(--surface2)',
                       color: p.activo ? 'var(--green)' : 'var(--text-muted)',
-                      border: 'none', borderRadius: 999, padding: '4px 12px', fontSize: 12, cursor: 'pointer', fontWeight: 500,
+                      border: 'none', borderRadius: 999, padding: '4px 12px',
+                      fontSize: 12, cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap',
                     }}>
-                      {p.activo ? 'Activo' : 'Inactivo'}
+                      {p.activo ? '👁 Visible' : '🙈 Oculto'}
                     </button>
                   </td>
                   <td style={{ ...tdStyle, whiteSpace: 'nowrap' }}>
-                    <div className="flex gap-2">
-                      <button onClick={() => openStockEdit(p)} style={btnSmall}>Stock</button>
+                    <div style={{ display: 'flex', gap: 6 }}>
                       <button onClick={() => openEdit(p)} style={btnSmall}>Editar</button>
+                      <button
+                        onClick={() => setConfirmDeleteId(p.id)}
+                        style={{ ...btnSmall, color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -206,53 +239,97 @@ export default function StockPage() {
         </div>
       )}
 
-      {/* Quick stock modal */}
-      {stockModalId && (
-        <Modal title="Actualizar stock" onClose={() => setStockModalId(null)}>
-          <div className="flex flex-col gap-4">
-            <Field label="Cantidad en stock">
-              <input type="number" style={inputStyle} value={stockInput} onChange={e => setStockInput(e.target.value)} />
-            </Field>
-            <div className="flex justify-end gap-3 mt-2">
-              <button onClick={() => setStockModalId(null)} style={btnGhost}>Cancelar</button>
-              <button onClick={handleStockSave} disabled={saving} style={btnGold}>{saving ? 'Guardando…' : 'Guardar'}</button>
+      {/* Modal confirmar eliminación */}
+      {confirmDeleteId && (() => {
+        const p = productos.find(x => x.id === confirmDeleteId)
+        return (
+          <Modal title="Eliminar producto" onClose={() => setConfirmDeleteId(null)}>
+            <p style={{ color: 'var(--text-mid)', fontSize: 14, marginBottom: 8 }}>
+              ¿Seguro que querés eliminar <strong style={{ color: 'var(--text)' }}>{p?.nombre}</strong>?
+            </p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 24 }}>
+              Esta acción no se puede deshacer. Si querés sacarlo temporalmente de la tienda usá "Oculto".
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button onClick={() => setConfirmDeleteId(null)} style={btnGhost}>Cancelar</button>
+              <button onClick={() => handleDelete(confirmDeleteId)} style={{ ...btnGold, background: '#ef4444' }}>
+                Sí, eliminar
+              </button>
             </div>
-          </div>
-        </Modal>
-      )}
+          </Modal>
+        )
+      })()}
 
-      {/* Full edit modal */}
+      {/* Modal crear / editar */}
       {modalOpen && (
         <Modal title={editingId ? 'Editar producto' : 'Nuevo producto'} onClose={closeModal}>
-          <div className="flex flex-col gap-4">
-            <Field label="Nombre"><input style={inputStyle} value={form.nombre} onChange={e => setF('nombre', e.target.value)} /></Field>
-            <Field label="Tela">
-              <select style={inputStyle} value={form.tela_id} onChange={e => { setF('tela_id', e.target.value); setF('color_id', '') }}>
-                <option value="">Seleccionar…</option>
-                {telas.map(t => <option key={t.id} value={t.id}>{t.nombre}</option>)}
-              </select>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+            <Field label="Nombre del producto">
+              <input style={inputStyle} value={form.nombre}
+                onChange={e => setF('nombre', e.target.value)}
+                placeholder="Ej: Roller Blackout Blanco 120×160" />
             </Field>
-            <Field label="Color">
-              <select style={inputStyle} value={form.color_id} onChange={e => setF('color_id', e.target.value)} disabled={!form.tela_id}>
-                <option value="">Seleccionar…</option>
-                {filteredColors.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-              </select>
-            </Field>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Ancho (cm)"><input type="number" style={inputStyle} value={form.ancho_cm} onChange={e => setF('ancho_cm', e.target.value)} /></Field>
-              <Field label="Alto (cm)"><input type="number" style={inputStyle} value={form.alto_cm} onChange={e => setF('alto_cm', e.target.value)} /></Field>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <Field label="Tela">
+                <select style={inputStyle} value={form.tela_id}
+                  onChange={e => { setF('tela_id', e.target.value); setF('color_id', '') }}>
+                  <option value="">Seleccionar…</option>
+                  {telas.map(t => <option key={t.id} value={t.id}>{t.nombre}</option>)}
+                </select>
+              </Field>
+              <Field label="Color">
+                <select style={inputStyle} value={form.color_id}
+                  onChange={e => setF('color_id', e.target.value)}
+                  disabled={!form.tela_id}>
+                  <option value="">Sin color</option>
+                  {filteredColors.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
+                </select>
+              </Field>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Precio ($)"><input type="number" style={inputStyle} value={form.precio} onChange={e => setF('precio', e.target.value)} /></Field>
-              <Field label="Stock"><input type="number" style={inputStyle} value={form.stock_cantidad} onChange={e => setF('stock_cantidad', e.target.value)} /></Field>
+
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.1em', margin: '0 0 12px 0' }}>MEDIDAS</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Ancho (cm)">
+                  <input type="number" style={inputStyle} value={form.ancho_cm}
+                    onChange={e => setF('ancho_cm', e.target.value)} placeholder="120" />
+                </Field>
+                <Field label="Alto (cm)">
+                  <input type="number" style={inputStyle} value={form.alto_cm}
+                    onChange={e => setF('alto_cm', e.target.value)} placeholder="160" />
+                </Field>
+              </div>
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-mid)', fontSize: 14, cursor: 'pointer' }}>
+
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+              <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', letterSpacing: '0.1em', margin: '0 0 12px 0' }}>PRECIO Y STOCK</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Precio ($)">
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: 14 }}>$</span>
+                    <input type="number" style={{ ...inputStyle, paddingLeft: 24 }} value={form.precio}
+                      onChange={e => setF('precio', e.target.value)} placeholder="0" />
+                  </div>
+                </Field>
+                <Field label="Cantidad en stock">
+                  <input type="number" style={inputStyle} value={form.stock_cantidad}
+                    onChange={e => setF('stock_cantidad', e.target.value)} placeholder="1" min="0" />
+                </Field>
+              </div>
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-mid)', fontSize: 14, cursor: 'pointer', userSelect: 'none' }}>
               <input type="checkbox" checked={form.activo} onChange={e => setF('activo', e.target.checked)} />
-              Activo
+              Visible en la tienda al guardar
             </label>
-            <div className="flex justify-end gap-3 mt-2">
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, paddingTop: 4 }}>
               <button onClick={closeModal} style={btnGhost}>Cancelar</button>
-              <button onClick={handleSave} disabled={saving} style={btnGold}>{saving ? 'Guardando…' : 'Guardar'}</button>
+              <button onClick={handleSave} disabled={saving} style={btnGold}>
+                {saving ? 'Guardando…' : editingId ? 'Guardar cambios' : 'Crear producto'}
+              </button>
             </div>
           </div>
         </Modal>
@@ -263,7 +340,7 @@ export default function StockPage() {
 
 function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose() }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
@@ -280,16 +357,22 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
     </div>
   )
 }
+
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="flex flex-col gap-1"><label style={{ color: 'var(--text-mid)', fontSize: 13 }}>{label}</label>{children}</div>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <label style={{ color: 'var(--text-mid)', fontSize: 13 }}>{label}</label>
+      {children}
+    </div>
+  )
 }
 
 const tableWrapper: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', overflowX: 'auto' }
 const tableStyle: React.CSSProperties = { width: '100%', borderCollapse: 'collapse' }
 const thStyle: React.CSSProperties = { padding: '10px 16px', textAlign: 'left', fontSize: 12, color: 'var(--text-muted)', fontWeight: 500, letterSpacing: '0.03em', whiteSpace: 'nowrap' }
-const tdStyle: React.CSSProperties = { padding: '12px 16px', fontSize: 13, color: 'var(--text-mid)' }
-const inputStyle: React.CSSProperties = { background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text)', padding: '9px 12px', fontSize: 14, outline: 'none', width: '100%' }
+const tdStyle: React.CSSProperties = { padding: '13px 16px', fontSize: 13, color: 'var(--text-mid)' }
+const inputStyle: React.CSSProperties = { background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', color: 'var(--text)', padding: '9px 12px', fontSize: 14, outline: 'none', width: '100%', boxSizing: 'border-box' }
 const btnGold: React.CSSProperties = { background: 'var(--gold)', color: '#0F0E0C', border: 'none', borderRadius: 'var(--radius-sm)', padding: '9px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }
 const btnGhost: React.CSSProperties = { background: 'transparent', color: 'var(--text-mid)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '9px 18px', fontSize: 13, cursor: 'pointer' }
 const btnSmall: React.CSSProperties = { background: 'var(--surface2)', color: 'var(--text-mid)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', padding: '5px 12px', fontSize: 12, cursor: 'pointer' }
-const feedbackStyle: React.CSSProperties = { background: 'var(--green-soft)', color: 'var(--green)', border: '1px solid rgba(74,155,111,0.3)', borderRadius: 'var(--radius-sm)', padding: '10px 14px', fontSize: 13, marginBottom: 16 }
+const feedbackStyle: React.CSSProperties = { borderRadius: 'var(--radius-sm)', padding: '10px 14px', fontSize: 13, marginBottom: 16 }

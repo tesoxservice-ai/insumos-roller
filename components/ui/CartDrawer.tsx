@@ -300,132 +300,168 @@ export default function CartDrawer() {
         </div>
 
         {/* Footer */}
-        {items.length > 0 && (
-          <div style={{
-            padding: '24px 32px 32px',
-            borderTop: '1px solid #EBEBEB',
-            flexShrink: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 14,
-          }}>
-            {/* Total */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ fontSize: 15, color: '#888', margin: '0 0 3px 0', fontWeight: 500 }}>Total estimado</p>
-                <p style={{ fontSize: 12, color: '#CCC', margin: 0 }}>
-                  El precio final se confirma antes de realizar el pago.
-                </p>
+        {items.length > 0 && (() => {
+          const hayMedida = items.some(i => i.tipo === 'medida')
+          const soloStock = items.every(i => i.tipo === 'stock')
+
+          const mensajeWsp = hayMedida
+            ? '¡Hola! Quiero pedir una cotización para las siguientes cortinas:\n\n' +
+              items.map(i =>
+                `• ${i.nombre}\n  ${i.descripcion}${i.cantidad > 1 ? ` x${i.cantidad}` : ''}${i.medidaEspecial ? ' ⚠️ medida especial' : ''}`
+              ).join('\n') +
+              '\n\n¿Me pueden confirmar precios y disponibilidad? ¡Gracias!'
+            : '¡Hola! Quiero confirmar el siguiente pedido:\n\n' +
+              items.map(i =>
+                `• ${i.nombre}\n  ${i.descripcion}${i.cantidad > 1 ? ` x${i.cantidad}` : ''} — $${(i.precio * i.cantidad).toLocaleString('es-AR')}`
+              ).join('\n') +
+              `\n\nTotal: $${total.toLocaleString('es-AR')}`
+
+          return (
+            <div style={{
+              padding: '24px 32px 32px',
+              borderTop: '1px solid #EBEBEB',
+              flexShrink: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 14,
+            }}>
+              {/* Total */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ fontSize: 15, color: '#888', margin: '0 0 3px 0', fontWeight: 500 }}>
+                    {hayMedida ? 'Total orientativo' : 'Total'}
+                  </p>
+                  <p style={{ fontSize: 12, color: '#CCC', margin: 0 }}>
+                    {hayMedida
+                      ? 'El precio final se confirma por WhatsApp.'
+                      : 'El precio final se confirma antes de realizar el pago.'}
+                  </p>
+                </div>
+                <span style={{ fontSize: 26, fontWeight: 900, color: '#0A0A14', letterSpacing: '-0.03em' }}>
+                  ${total.toLocaleString('es-AR')}
+                </span>
               </div>
-              <span style={{ fontSize: 26, fontWeight: 900, color: '#0A0A14', letterSpacing: '-0.03em' }}>
-                ${total.toLocaleString('es-AR')}
-              </span>
-            </div>
 
-            {/* Aviso medidas especiales */}
-            {hayMedidasEspeciales && (
-              <div style={{
-                background: 'rgba(245,158,11,0.07)',
-                border: '1px solid rgba(245,158,11,0.25)',
-                borderRadius: 8, padding: '10px 14px',
-                display: 'flex', alignItems: 'flex-start', gap: 8,
-              }}>
-                <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
-                <p style={{ fontSize: 12, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
-                  Debido al excedente de medida de una o más cortinas, el pedido debe confirmarse por WhatsApp antes de procesar el pago.
-                </p>
-              </div>
-            )}
+              {/* Aviso cuando hay items a medida */}
+              {hayMedida && (
+                <div style={{
+                  background: 'rgba(20,0,140,0.04)',
+                  border: '1px solid rgba(20,0,140,0.12)',
+                  borderRadius: 8, padding: '10px 14px',
+                  display: 'flex', alignItems: 'flex-start', gap: 8,
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#14008C" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                    <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+                  </svg>
+                  <p style={{ fontSize: 12, color: '#14008C', margin: 0, lineHeight: 1.5 }}>
+                    Tu pedido incluye cortinas a medida. Te enviamos la cotización por WhatsApp y coordinamos juntos.
+                  </p>
+                </div>
+              )}
 
-            {/* Botón pagar */}
-            <button
-              onClick={handlePagar}
-              disabled={hayMedidasEspeciales || cargando}
-              style={{
-                width: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                background: hayMedidasEspeciales ? '#E5E5E5' : '#14008C',
-                color: hayMedidasEspeciales ? '#AAA' : '#fff',
-                border: 'none', borderRadius: 12,
-                padding: '16px 24px',
-                fontSize: 15, fontWeight: 700,
-                cursor: hayMedidasEspeciales || cargando ? 'not-allowed' : 'pointer',
-                fontFamily: 'inherit', letterSpacing: '0.02em',
-                transition: 'opacity 0.15s',
-                opacity: cargando ? 0.7 : 1,
-              }}
-              onMouseEnter={e => { if (!hayMedidasEspeciales && !cargando) e.currentTarget.style.opacity = '0.85' }}
-              onMouseLeave={e => { e.currentTarget.style.opacity = cargando ? '0.7' : '1' }}
-            >
-              <span>{cargando ? 'Procesando...' : 'Finalizar pedido'}</span>
-              <span style={{ fontSize: 20 }}>{cargando ? '⏳' : '→'}</span>
-            </button>
+              {/* Aviso medidas especiales */}
+              {hayMedidasEspeciales && (
+                <div style={{
+                  background: 'rgba(245,158,11,0.07)',
+                  border: '1px solid rgba(245,158,11,0.25)',
+                  borderRadius: 8, padding: '10px 14px',
+                  display: 'flex', alignItems: 'flex-start', gap: 8,
+                }}>
+                  <span style={{ fontSize: 14, flexShrink: 0 }}>⚠️</span>
+                  <p style={{ fontSize: 12, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
+                    Una o más cortinas tienen medidas especiales. El precio a confirmar por WhatsApp.
+                  </p>
+                </div>
+              )}
 
-            {/* WhatsApp */}
-            <a
-              href={`https://wa.me/541133802658?text=${encodeURIComponent(
-                '¡Hola! Quiero confirmar el siguiente pedido:\n\n' +
-                items.map(i =>
-                  `• ${i.nombre}\n  ${i.descripcion}${i.cantidad > 1 ? ` x${i.cantidad}` : ''} — $${(i.precio * i.cantidad).toLocaleString('es-AR')}${i.medidaEspecial ? ' ⚠️ medida especial, precio a confirmar' : ''}`
-                ).join('\n') +
-                `\n\nTotal estimado: $${total.toLocaleString('es-AR')}`
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                width: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 10,
-                background: '#fff',
-                color: '#1B5E3B',
-                border: '1.5px solid #1B5E3B',
-                borderRadius: 12,
-                padding: '14px 24px',
-                fontSize: 15, fontWeight: 700,
-                textDecoration: 'none', fontFamily: 'inherit',
-                letterSpacing: '0.02em',
-                transition: 'background 0.15s, color 0.15s',
-                boxSizing: 'border-box',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = '#1B5E3B'
-                e.currentTarget.style.color = '#fff'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = '#fff'
-                e.currentTarget.style.color = '#1B5E3B'
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-              </svg>
-              Confirmar por WhatsApp
-            </a>
+              {/* Botón pagar — solo si hay ÚNICAMENTE items de stock */}
+              {soloStock && (
+                <button
+                  onClick={handlePagar}
+                  disabled={cargando}
+                  style={{
+                    width: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    background: '#14008C',
+                    color: '#fff',
+                    border: 'none', borderRadius: 12,
+                    padding: '16px 24px',
+                    fontSize: 15, fontWeight: 700,
+                    cursor: cargando ? 'not-allowed' : 'pointer',
+                    fontFamily: 'inherit', letterSpacing: '0.02em',
+                    transition: 'opacity 0.15s',
+                    opacity: cargando ? 0.7 : 1,
+                  }}
+                  onMouseEnter={e => { if (!cargando) e.currentTarget.style.opacity = '0.85' }}
+                  onMouseLeave={e => { e.currentTarget.style.opacity = cargando ? '0.7' : '1' }}
+                >
+                  <span>{cargando ? 'Procesando...' : 'Finalizar pedido'}</span>
+                  <span style={{ fontSize: 20 }}>{cargando ? '⏳' : '→'}</span>
+                </button>
+              )}
 
-            {/* Sello seguridad */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: '#F5F5F5',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0,
-              }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AAA" strokeWidth="2">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0110 0v4"/>
+              {/* Botón WhatsApp */}
+              <a
+                href={`https://wa.me/541133802658?text=${encodeURIComponent(mensajeWsp)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 10,
+                  background: hayMedida ? '#1B5E3B' : '#fff',
+                  color: hayMedida ? '#fff' : '#1B5E3B',
+                  border: '1.5px solid #1B5E3B',
+                  borderRadius: 12,
+                  padding: '14px 24px',
+                  fontSize: 15, fontWeight: 700,
+                  textDecoration: 'none', fontFamily: 'inherit',
+                  letterSpacing: '0.02em',
+                  transition: 'background 0.15s, color 0.15s',
+                  boxSizing: 'border-box',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = '#1B5E3B'
+                  e.currentTarget.style.color = '#fff'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = hayMedida ? '#1B5E3B' : '#fff'
+                  e.currentTarget.style.color = hayMedida ? '#fff' : '#1B5E3B'
+                }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                 </svg>
-              </div>
-              <div>
-                <p style={{ fontSize: 12, fontWeight: 700, color: '#555', margin: '0 0 2px 0' }}>
-                  Tu información está protegida
-                </p>
-                <p style={{ fontSize: 11, color: '#AAA', margin: 0 }}>
-                  Usamos cifrado SSL para garantizar la seguridad de tus datos.
-                </p>
-              </div>
+                {hayMedida ? 'Pedir cotización por WhatsApp' : 'Confirmar por WhatsApp'}
+              </a>
+
+              {/* Sello seguridad — solo si va a pagar online */}
+              {soloStock && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 4 }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: '#F5F5F5',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#AAA" strokeWidth="2">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                      <path d="M7 11V7a5 5 0 0110 0v4"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: '#555', margin: '0 0 2px 0' }}>
+                      Tu información está protegida
+                    </p>
+                    <p style={{ fontSize: 11, color: '#AAA', margin: 0 }}>
+                      Usamos cifrado SSL para garantizar la seguridad de tus datos.
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )
+        })()}
       </div>
     </>
   )

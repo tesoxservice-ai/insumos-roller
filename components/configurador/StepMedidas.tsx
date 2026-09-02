@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import type { Tela, ReglaPrecio } from '@/types'
-import { estaEnRango, fetchPrecio, MIN_ANCHO, MAX_ANCHO, MIN_ALTO, MAX_ALTO } from '@/lib/precio'
+import { estaEnRango, MIN_ANCHO, MAX_ANCHO, MIN_ALTO, MAX_ALTO } from '@/lib/precio'
 import StepHeader from '@/components/configurador/StepHeader'
 
 const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
@@ -32,47 +32,15 @@ export default function StepMedidas({
   const [altoLocal, setAltoLocal] = useState(alto > 0 ? String(alto) : '')
   const [anchoFocus, setAnchoFocus] = useState(false)
   const [altoFocus, setAltoFocus] = useState(false)
-  const [precioBase, setPrecioBase] = useState<number | null>(null)
-  const [anchoRedondeado, setAnchoRedondeado] = useState<number | null>(null)
-  const [altoRedondeado, setAltoRedondeado] = useState<number | null>(null)
-  const [cargandoPrecio, setCargandoPrecio] = useState(false)
 
   const anchoNum = Number(anchoLocal)
   const altoNum = Number(altoLocal)
   const ambosIngresados = anchoNum > 0 && altoNum > 0
   const fueraDeRango = ambosIngresados && !estaEnRango(anchoNum, altoNum)
 
-  // Fetch precio cuando cambian las medidas
-  const buscarPrecio = useCallback(async () => {
-    if (!ambosIngresados || fueraDeRango) {
-      setPrecioBase(null)
-      setAnchoRedondeado(null)
-      setAltoRedondeado(null)
-      return
-    }
-    setCargandoPrecio(true)
-    const result = await fetchPrecio(anchoNum, altoNum)
-    setCargandoPrecio(false)
-    if (result.fueraDeRango) {
-      setPrecioBase(null)
-    } else {
-      setPrecioBase(result.precio)
-      setAnchoRedondeado(result.anchoRedondeado ?? null)
-      setAltoRedondeado(result.altoRedondeado ?? null)
-    }
-  }, [anchoNum, altoNum, ambosIngresados, fueraDeRango])
-
-  useEffect(() => {
-    const timer = setTimeout(buscarPrecio, 400)
-    return () => clearTimeout(timer)
-  }, [buscarPrecio])
-
   useEffect(() => {
     if (ambosIngresados) onChange(anchoNum, altoNum)
   }, [anchoNum, altoNum, onChange, ambosIngresados])
-
-  const mostrarRedondeo = anchoRedondeado !== null && altoRedondeado !== null &&
-    (anchoRedondeado !== anchoNum || altoRedondeado !== altoNum)
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -149,27 +117,6 @@ export default function StepMedidas({
               Mínimo {MIN_ALTO} cm · Máximo {MAX_ALTO} cm
             </p>
           </div>
-
-          {/* Precio base */}
-          {cargandoPrecio && (
-            <div style={{ background: '#F7F7FB', borderRadius: 8, padding: '14px 18px', marginBottom: 20 }}>
-              <p style={{ fontSize: 15, color: '#BBB', margin: 0 }}>Calculando precio…</p>
-            </div>
-          )}
-
-          {!cargandoPrecio && precioBase !== null && (
-            <div style={{ background: 'rgba(13,122,78,0.06)', border: '1px solid rgba(13,122,78,0.2)', borderRadius: 8, padding: '14px 18px', marginBottom: 20 }}>
-              <p style={{ fontSize: 16, color: '#0D7A4E', margin: 0, fontWeight: 500 }}>
-                Precio estimado base: <strong>${precioBase.toLocaleString('es-AR')}</strong>
-                <span style={{ opacity: 0.7, fontWeight: 400 }}> (sin sistema ni instalación)</span>
-              </p>
-              {mostrarRedondeo && (
-                <p style={{ fontSize: 12, color: '#888', margin: '6px 0 0 0' }}>
-                  Calculado para {anchoRedondeado} × {altoRedondeado} cm (redondeado al múltiplo de 10 superior)
-                </p>
-              )}
-            </div>
-          )}
 
           {/* Fuera de rango */}
           {fueraDeRango && (

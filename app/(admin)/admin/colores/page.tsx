@@ -114,7 +114,7 @@ export default function ColoresPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <h2 style={{ color: 'var(--text)', fontSize: 22, fontWeight: 700 }}>Colores</h2>
         <button onClick={openCreate} style={btnGold}>+ Nuevo color</button>
       </div>
@@ -188,7 +188,7 @@ export default function ColoresPage() {
       {/* Modal crear/editar */}
       {modalOpen && (
         <Modal title={editingId ? 'Editar color' : 'Nuevo color'} onClose={closeModal}>
-          <div className="flex flex-col gap-4">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Field label="Tela">
               <select style={inputStyle} value={form.tela_id} onChange={e => setForm(f => ({ ...f, tela_id: e.target.value }))}>
                 <option value="">Seleccionar tela…</option>
@@ -199,7 +199,7 @@ export default function ColoresPage() {
               <input style={inputStyle} value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
             </Field>
             <Field label="Color">
-              <div className="flex gap-2 items-center">
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <input type="color" value={form.hex} onChange={e => setForm(f => ({ ...f, hex: e.target.value }))}
                   style={{ width: 40, height: 36, border: 'none', borderRadius: 6, cursor: 'pointer', background: 'none' }} />
                 <input style={{ ...inputStyle, flex: 1, fontFamily: 'monospace' }} value={form.hex}
@@ -210,7 +210,7 @@ export default function ColoresPage() {
               <input type="checkbox" checked={form.activo} onChange={e => setForm(f => ({ ...f, activo: e.target.checked }))} />
               Activo
             </label>
-            <div className="flex justify-end gap-3 mt-2">
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 8 }}>
               <button onClick={closeModal} style={btnGhost}>Cancelar</button>
               <button onClick={handleSave} disabled={saving} style={btnGold}>{saving ? 'Guardando…' : 'Guardar'}</button>
             </div>
@@ -241,7 +241,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   )
 }
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="flex flex-col gap-1"><label style={{ color: 'var(--text-mid)', fontSize: 13 }}>{label}</label>{children}</div>
+  return <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}><label style={{ color: 'var(--text-mid)', fontSize: 13 }}>{label}</label>{children}</div>
 }
 
 const tableWrapper: React.CSSProperties = { background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', overflow: 'hidden', overflowX: 'auto' }

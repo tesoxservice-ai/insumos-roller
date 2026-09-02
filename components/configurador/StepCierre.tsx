@@ -2,14 +2,11 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import type { ConfiguradorState, ReglaPrecio } from '@/types'
+import type { ConfiguradorState } from '@/types'
 import { useCart } from '@/context/CartContext'
 
 interface StepCierreProps {
   state: ConfiguradorState
-  precioEstimado: number | null
-  reglas: ReglaPrecio[]
-  onAgregarAlPresupuesto: (ambiente: string) => void
   onNuevoProducto: () => void
 }
 
@@ -77,7 +74,7 @@ function getImagenColor(colorNombre: string, tipoNombre: string): string {
 }
 
 export default function StepCierre({
-  state, precioEstimado, onNuevoProducto,
+  state, onNuevoProducto,
 }: StepCierreProps) {
   const [agregadoAlCarrito, setAgregadoAlCarrito] = useState(false)
   const { agregarItem } = useCart()
@@ -120,7 +117,7 @@ export default function StepCierre({
       id: `medida-${Date.now()}`,
       nombre: `Cortina ${state.tipo?.nombre ?? 'a medida'}`,
       descripcion,
-      precio: precioEstimado ?? 0,  // fix: null → 0
+      precio: 0,
       tipo: 'medida',
       medidaEspecial,
       imagen_url: imagenColor || undefined,
@@ -173,7 +170,7 @@ export default function StepCierre({
         </h2>
         <div style={{ width: 32, height: 2, background: '#14008C', borderRadius: 2, margin: '0 auto 16px' }} />
         <p style={{ fontSize: 16, color: '#AAA', margin: 0, fontFamily: 'var(--font-cormorant), serif' }}>
-          Revisá los detalles antes de agregar al carrito.
+          Revisá los detalles y consultanos el precio por WhatsApp.
         </p>
       </div>
 
@@ -201,20 +198,16 @@ export default function StepCierre({
             )
           })}
 
-          {/* Precio */}
+          {/* Nota de cotización */}
           <div style={{ padding: '20px 24px', borderTop: '1px solid #EBEBEB', background: '#FAFAFA' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#BBB', letterSpacing: '0.14em', marginBottom: 8 }}>
-              PRECIO ORIENTATIVO
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#14008C" strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 2 }}>
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+              </svg>
+              <p style={{ fontSize: 13, color: '#555', margin: 0, lineHeight: 1.6 }}>
+                Agregá esta cortina al carrito y consultanos por WhatsApp para recibir el precio y coordinar el pedido.
+              </p>
             </div>
-            <div style={{
-              fontSize: 'clamp(32px, 4vw, 44px)', fontWeight: 900, color: '#0A0A14',
-              letterSpacing: '-0.04em', marginBottom: 6, fontFamily: 'var(--font-cormorant), serif',
-            }}>
-              {precioEstimado !== null ? `$\u00A0${precioEstimado.toLocaleString('es-AR')}` : '—'}
-            </div>
-            <p style={{ fontSize: 12, color: '#CCC', margin: 0, lineHeight: 1.5 }}>
-              El precio es orientativo y puede variar según disponibilidad.
-            </p>
           </div>
         </div>
 

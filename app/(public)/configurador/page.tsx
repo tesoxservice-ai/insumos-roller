@@ -156,6 +156,7 @@ export default function ConfiguradorPage() {
             <StepCierre
               state={state}
               onNuevoProducto={() => { resetear(); setPaso(0) }}
+              onVolver={() => irA(4)}
             />
           )}
 

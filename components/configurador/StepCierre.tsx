@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext'
 interface StepCierreProps {
   state: ConfiguradorState
   onNuevoProducto: () => void
+  onVolver: () => void
 }
 
 const MAX_ANCHO = 300
@@ -74,7 +75,7 @@ function getImagenColor(colorNombre: string, tipoNombre: string): string {
 }
 
 export default function StepCierre({
-  state, onNuevoProducto,
+  state, onNuevoProducto, onVolver,
 }: StepCierreProps) {
   const [agregadoAlCarrito, setAgregadoAlCarrito] = useState(false)
   const { agregarItem } = useCart()
@@ -281,19 +282,34 @@ export default function StepCierre({
           <span style={{ fontSize: 20 }}>→</span>
         </button>
 
-        <button
-          onClick={onNuevoProducto}
-          style={{
-            width: '100%', padding: '14px', background: 'none', border: 'none',
-            color: '#BBB', fontSize: 14, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 8, fontFamily: 'inherit', transition: 'color 0.15s', letterSpacing: '0.02em',
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = '#14008C'}
-          onMouseLeave={e => e.currentTarget.style.color = '#BBB'}
-        >
-          ↺ Configurar otra cortina
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button
+            onClick={onVolver}
+            style={{
+              flex: 1, padding: '14px', background: 'none',
+              border: '1.5px solid #D0D0D0', borderRadius: 12,
+              color: '#555', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+              fontFamily: 'inherit', transition: 'border-color 0.15s, color 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#14008C'; e.currentTarget.style.color = '#14008C' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#D0D0D0'; e.currentTarget.style.color = '#555' }}
+          >
+            ← Atrás
+          </button>
+          <button
+            onClick={onNuevoProducto}
+            style={{
+              flex: 1, padding: '14px', background: 'none', border: 'none',
+              color: '#BBB', fontSize: 14, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              gap: 8, fontFamily: 'inherit', transition: 'color 0.15s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#14008C'}
+            onMouseLeave={e => e.currentTarget.style.color = '#BBB'}
+          >
+            ↺ Nueva cortina
+          </button>
+        </div>
       </div>
 
       <style>{`

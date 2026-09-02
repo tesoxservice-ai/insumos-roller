@@ -39,7 +39,7 @@ export default function Nav() {
       position: 'fixed',
       top: 0, left: 0, right: 0,
       zIndex: 50,
-      backgroundColor: transparente ? 'transparent' : 'rgba(255,255,255,0.97)',
+      backgroundColor: transparente ? 'transparent' : 'rgba(240,235,227,0.97)',
       backdropFilter: transparente ? 'none' : 'blur(12px)',
       borderBottom: transparente ? '1px solid transparent' : '1px solid var(--border)',
       boxShadow: transparente ? 'none' : '0 1px 12px rgba(20,0,140,0.06)',

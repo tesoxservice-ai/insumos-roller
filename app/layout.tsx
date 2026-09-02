@@ -12,14 +12,14 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: {
-    default: 'MaxRoller – Cortinas Roller a Medida',
-    template: '%s | MaxRoller',
+    default: 'Insumos Roller – Cortinas Roller a Medida',
+    template: '%s | Insumos Roller',
   },
   description:
     'Configurá tu cortina roller a medida. Amplio catálogo de telas, colores y sistemas. Instalación profesional en toda la zona.',
-  keywords: ['cortinas roller', 'cortinas a medida', 'MaxRoller'],
+  keywords: ['cortinas roller', 'cortinas a medida', 'Insumos Roller'],
   openGraph: {
-    title: 'MaxRoller – Cortinas Roller a Medida',
+    title: 'Insumos Roller – Cortinas Roller a Medida',
     description: 'Configurá tu cortina roller a medida con nuestro configurador interactivo.',
     type: 'website',
     locale: 'es_AR',

@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCart } from '@/context/CartContext'
+import { useIsMobile } from '@/hooks/useIsMobile'
+import StockMobile from '@/components/mobile/StockMobile'
 
 interface ProductoStockCompleto {
   id: string
@@ -41,6 +43,7 @@ function getTipo(p: ProductoStockCompleto): string {
 }
 
 export default function StockPage() {
+  const isMobile = useIsMobile()
   const [productos, setProductos] = useState<ProductoStockCompleto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -140,6 +143,10 @@ export default function StockPage() {
 
   const hayFiltrosActivos = filtroTipo !== 'Todos' || filtroTela !== 'Todas' || filtroColor !== 'Todos' ||
     precioMin || precioMax || anchoMin || anchoMax || altoMin || altoMax || soloDisponibles
+
+  if (isMobile && !loading && !error) {
+    return <StockMobile productos={productos} loadingPago={loadingPago} onComprar={(p) => { setModalProducto(p); handleComprar() }} />
+  }
 
   return (
     <main style={{ background: '#FAFAFA', minHeight: '100vh', paddingTop: 76 }}>

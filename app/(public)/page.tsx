@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useIsMobile } from '@/hooks/useIsMobile'
+import HomeMobile from '@/components/mobile/HomeMobile'
 
 const AMBIENTES = [
   {
@@ -198,6 +200,7 @@ const FOOTER_LINKS = {
 }
 
 export default function HomePage() {
+  const isMobile = useIsMobile()
   const [modalAbierto, setModalAbierto] = useState(false)
   const [ambienteActivo, setAmbienteActivo] = useState<typeof AMBIENTES[0] | null>(null)
   const [fotoActiva, setFotoActiva] = useState(0)
@@ -241,6 +244,8 @@ export default function HomePage() {
     document.body.style.overflow = modalAbierto ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [modalAbierto])
+
+  if (isMobile) return <HomeMobile />
 
   return (
     <main style={{ background: 'var(--bg)', color: 'var(--text)' }}>

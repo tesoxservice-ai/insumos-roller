@@ -3,9 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useIsMobile } from '@/hooks/useIsMobile'
 
 export default function SimuladorPage() {
   const [posicion, setPosicion] = useState(50)
+  const isMobile = useIsMobile()
   const [arrastrando, setArrastrando] = useState(false)
   const contenedorRef = useRef<HTMLDivElement>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
@@ -85,7 +87,7 @@ export default function SimuladorPage() {
             position: 'relative',
             borderRadius: 20,
             overflow: 'hidden',
-            aspectRatio: '16/9',
+            aspectRatio: isMobile ? '4/3' : '16/9',
             boxShadow: '0 8px 48px rgba(0,0,0,0.12)',
             cursor: 'crosshair',
             border: '1px solid #EBEBEB',

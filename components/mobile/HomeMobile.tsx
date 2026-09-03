@@ -107,7 +107,7 @@ export default function HomeMobile() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {AMBIENTES.map(a => (
             <div key={a.key} onClick={() => abrirModal(a)} style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer' }}>
-              <div style={{ position: 'relative', aspectRatio: '3/2' }}>
+              <div style={{ position: 'relative', aspectRatio: '1/1' }}>
                 <Image src={a.img} alt={a.label} fill style={{ objectFit: 'cover' }} />
               </div>
               <div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

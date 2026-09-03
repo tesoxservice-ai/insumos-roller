@@ -90,12 +90,12 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
   }
 
   const coloresFiltrados = catalogo.colores.filter(c => c.tela_id === state.tela?.id)
-  const telasFiltradas = catalogo.telas.filter(t => t.tipo_id === (tipoSeleccionado?.id ?? state.tipo?.id))
+  const telasFiltradas = catalogo.telas
 
   // Estilos reutilizables
   const cardBtn = (seleccionado: boolean): React.CSSProperties => ({
     display: 'flex', alignItems: 'center', gap: 16,
-    padding: '16px 20px', width: '100%',
+    padding: "20px 20px", width: "100%"',
     background: seleccionado ? '#EEF0FF' : '#FAFAFA',
     border: `2px solid ${seleccionado ? '#14008C' : '#EBEBEB'}`,
     borderRadius: 16, cursor: 'pointer', textAlign: 'left',
@@ -162,10 +162,10 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               const sel = state.tipo?.id === tipo.id
               return (
                 <button key={tipo.id} onClick={() => handleSelectTipo(tipo)} style={cardBtn(sel)}>
-                  <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }}>
+                  <div style={{ width: 96, height: 96, position: 'relative', flexShrink: 0 }}>
                     {imagen
                       ? <Image src={imagen} alt={tipo.nombre} fill style={{ objectFit: 'contain' }} />
-                      : <div style={{ width: 64, height: 64, borderRadius: 10, background: '#E8E0D0' }} />
+                      : <div style={{ width: 96, height: 96, borderRadius: 10, background: '#E8E0D0' }} />
                     }
                   </div>
                   <div style={{ flex: 1, textAlign: 'left' }}>
@@ -199,7 +199,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               return (
                 <button key={tela.id} onClick={() => { setTela(tela); irA(2) }} style={cardBtn(sel)}>
                   <div style={{
-                    width: 64, height: 64, borderRadius: 12, flexShrink: 0,
+                    width: 96, height: 96, borderRadius: 12, flexShrink: 0,
                     overflow: 'hidden', position: 'relative',
                     background: esOscuro ? '#2A2520' : '#F0EAE0',
                   }}>
@@ -261,7 +261,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               return (
                 <button key={color.id} onClick={() => { setColor(color); irA(3) }} style={cardBtn(sel)}>
                   <div style={{
-                    width: 48, height: 48, borderRadius: '50%',
+                    width: 72, height: 72, borderRadius: '50%',
                     background: color.hex, border: '3px solid rgba(0,0,0,0.08)', flexShrink: 0,
                   }} />
                   <p style={{ fontSize: 16, fontWeight: 700, color: '#0A0A14', margin: 0, flex: 1, textAlign: 'left' }}>
@@ -345,7 +345,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               const sel = state.sistema === key
               return (
                 <button key={key} onClick={() => setSistema(key, 0)} style={cardBtn(sel)}>
-                  <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0, borderRadius: 10, overflow: 'hidden', background: '#F5F3EF' }}>
+                  <div style={{ width: 96, height: 96, position: 'relative', flexShrink: 0, borderRadius: 10, overflow: 'hidden', background: '#F5F3EF' }}>
                     <Image src={img} alt={label} fill style={{ objectFit: 'contain' }} />
                   </div>
                   <div style={{ flex: 1, textAlign: 'left' }}>
@@ -372,7 +372,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               const sel = state.instalacion === activa
               return (
                 <button key={label} onClick={() => setInstalacion(activa, 0)} style={cardBtn(sel)}>
-                  <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0, borderRadius: 10, overflow: 'hidden', background: '#F5F3EF' }}>
+                  <div style={{ width: 96, height: 96, position: 'relative', flexShrink: 0, borderRadius: 10, overflow: 'hidden', background: '#F5F3EF' }}>
                     <Image src={img} alt={label} fill style={{ objectFit: 'contain' }} />
                   </div>
                   <div style={{ flex: 1, textAlign: 'left' }}>

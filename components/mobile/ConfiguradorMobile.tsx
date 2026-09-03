@@ -81,8 +81,16 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
     }, 1200)
   }
 
+  const [tipoSeleccionado, setTipoSeleccionado] = useState(state.tipo)
+
+  function handleSelectTipo(tipo: any) {
+    setTipo(tipo)
+    setTipoSeleccionado(tipo)
+    irA(1)
+  }
+
   const coloresFiltrados = catalogo.colores.filter(c => c.tela_id === state.tela?.id)
-  const telasFiltradas = catalogo.telas.filter(t => t.tipo_id === state.tipo?.id)
+  const telasFiltradas = catalogo.telas.filter(t => t.tipo_id === (tipoSeleccionado?.id ?? state.tipo?.id))
 
   // Estilos reutilizables
   const cardBtn = (seleccionado: boolean): React.CSSProperties => ({
@@ -153,7 +161,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
               const imagen = getImagen(tipo.nombre, IMAGEN_TIPO)
               const sel = state.tipo?.id === tipo.id
               return (
-                <button key={tipo.id} onClick={() => { setTipo(tipo); irA(1) }} style={cardBtn(sel)}>
+                <button key={tipo.id} onClick={() => handleSelectTipo(tipo)} style={cardBtn(sel)}>
                   <div style={{ width: 64, height: 64, position: 'relative', flexShrink: 0 }}>
                     {imagen
                       ? <Image src={imagen} alt={tipo.nombre} fill style={{ objectFit: 'contain' }} />

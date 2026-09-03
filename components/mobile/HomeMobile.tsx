@@ -30,14 +30,6 @@ export default function HomeMobile() {
   const [ambienteActivo, setAmbienteActivo] = useState<typeof AMBIENTES[0] | null>(null)
   const [fotoActiva, setFotoActiva] = useState(0)
   const [footerAbierto, setFooterAbierto] = useState<string | null>(null)
-  const [heroH, setHeroH] = useState(600)
-
-  useEffect(() => {
-    const set = () => setHeroH(window.innerHeight - 64)
-    set()
-    window.addEventListener('resize', set)
-    return () => window.removeEventListener('resize', set)
-  }, [])
 
   const abrirModal = (a: typeof AMBIENTES[0]) => { setAmbienteActivo(a); setFotoActiva(0); setModalAbierto(true) }
   const cerrarModal = () => { setModalAbierto(false); setAmbienteActivo(null) }
@@ -49,8 +41,15 @@ export default function HomeMobile() {
     <main style={{ background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', height: heroH, minHeight: 500, overflow: 'hidden' }}>
-        <Image src="/images/LIVING.png" alt="Living" fill style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
+      <section style={{
+        position: 'relative',
+        height: '100vh',
+        minHeight: 500,
+        overflow: 'hidden',
+        backgroundImage: 'url(/images/LIVING.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}>
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%)' }} />
 
         <div style={{ position: 'absolute', top: '36%', left: 0, right: 0, padding: '0 28px', transform: 'translateY(-50%)' }}>
@@ -108,7 +107,7 @@ export default function HomeMobile() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {AMBIENTES.map(a => (
             <div key={a.key} onClick={() => abrirModal(a)} style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border)', background: 'var(--surface)', cursor: 'pointer' }}>
-              <div style={{ position: 'relative', aspectRatio: '4/3' }}>
+              <div style={{ position: 'relative', aspectRatio: '3/2' }}>
                 <Image src={a.img} alt={a.label} fill style={{ objectFit: 'cover' }} />
               </div>
               <div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

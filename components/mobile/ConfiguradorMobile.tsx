@@ -95,7 +95,7 @@ export default function ConfiguradorMobile({ catalogo }: Props) {
   // Estilos reutilizables
   const cardBtn = (seleccionado: boolean): React.CSSProperties => ({
     display: 'flex', alignItems: 'center', gap: 16,
-    padding: "20px 20px", width: "100%"',
+    padding: '16px 20px', width: '100%',
     background: seleccionado ? '#EEF0FF' : '#FAFAFA',
     border: `2px solid ${seleccionado ? '#14008C' : '#EBEBEB'}`,
     borderRadius: 16, cursor: 'pointer', textAlign: 'left',

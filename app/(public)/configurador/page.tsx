@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useConfigurador } from '@/hooks/useConfigurador'
+import { useIsMobile } from '@/hooks/useIsMobile'
 import type { CatalogoCompleto, Color } from '@/types'
 
 import StepTipo from '@/components/configurador/StepTipo'
@@ -10,6 +11,7 @@ import StepColor from '@/components/configurador/StepColor'
 import StepMedidas from '@/components/configurador/StepMedidas'
 import StepSistema from '@/components/configurador/StepSistema'
 import StepCierre from '@/components/configurador/StepCierre'
+import ConfiguradorMobile from '@/components/mobile/ConfiguradorMobile'
 import { generarMensajeWhatsApp, generarUrlWhatsApp } from '@/lib/whatsapp'
 
 const PASOS = ['Tipo', 'Tela', 'Color', 'Medidas', 'Sistema', 'Resumen']
@@ -29,6 +31,7 @@ export default function ConfiguradorPage() {
     resetear,
   } = useConfigurador()
 
+  const isMobile = useIsMobile()
   const [paso, setPaso] = useState(0)
   const [catalogo, setCatalogo] = useState<CatalogoCompleto | null>(null)
   const [loading, setLoading] = useState(true)
@@ -81,6 +84,8 @@ export default function ConfiguradorPage() {
       </main>
     )
   }
+
+  if (isMobile) return <ConfiguradorMobile catalogo={catalogo} />
 
   return (
     <main style={{ background: '#fff', minHeight: '100vh', paddingBottom: 60 }}>

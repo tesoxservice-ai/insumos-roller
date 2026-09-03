@@ -78,7 +78,7 @@ export default function SimuladorPage() {
         </p>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 48px 80px' }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '0 12px 60px' : '0 48px 80px' }}>
 
         {/* IMAGEN */}
         <div
@@ -87,7 +87,7 @@ export default function SimuladorPage() {
             position: 'relative',
             borderRadius: 20,
             overflow: 'hidden',
-            aspectRatio: isMobile ? '4/3' : '16/9',
+            aspectRatio: '16/9',
             boxShadow: '0 8px 48px rgba(0,0,0,0.12)',
             cursor: 'crosshair',
             border: '1px solid #EBEBEB',

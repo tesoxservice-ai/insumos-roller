@@ -128,7 +128,7 @@ export default function HomeMobile() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           {ACCESOS.map(a => (
             <Link key={a.titulo} href={a.href} style={{ textDecoration: 'none' }}>
-              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 14px', display: 'flex', flexDirection: 'column', height: '100%', boxSizing: 'border-box' }}>
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '16px 14px', display: 'flex', flexDirection: 'column', aspectRatio: '1/1', boxSizing: 'border-box' }}>
                 <div style={{ width: 38, height: 38, background: 'rgba(20,0,140,0.05)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#14008C', marginBottom: 10 }}>
                   {a.icon}
                 </div>

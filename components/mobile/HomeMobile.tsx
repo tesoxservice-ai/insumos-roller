@@ -42,7 +42,7 @@ export default function HomeMobile() {
     <main style={{ background: 'var(--bg)', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', height: '100svh', minHeight: 600, overflow: 'hidden' }}>
+      <section style={{ position: 'relative', height: 'calc(100dvh - 64px)', minHeight: 500, overflow: 'hidden' }}>
         <Image src="/images/LIVING.png" alt="Living con cortinas Insumos Roller" fill style={{ objectFit: 'cover', objectPosition: 'center' }} priority />
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.5) 100%)' }} />
 

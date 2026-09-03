@@ -144,6 +144,7 @@ export default function StockPage() {
   const hayFiltrosActivos = filtroTipo !== 'Todos' || filtroTela !== 'Todas' || filtroColor !== 'Todos' ||
     precioMin || precioMax || anchoMin || anchoMax || altoMin || altoMax || soloDisponibles
 
+  if (isMobile === null) return null
   if (isMobile && !loading && !error) {
     return <StockMobile productos={productos} loadingPago={loadingPago} onComprar={(p) => { setModalProducto(p); handleComprar() }} />
   }

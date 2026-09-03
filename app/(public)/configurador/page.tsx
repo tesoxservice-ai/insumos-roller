@@ -85,6 +85,7 @@ export default function ConfiguradorPage() {
     )
   }
 
+  if (isMobile === null) return null
   if (isMobile) return <ConfiguradorMobile catalogo={catalogo} />
 
   return (

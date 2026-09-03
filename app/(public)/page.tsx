@@ -245,6 +245,7 @@ export default function HomePage() {
     return () => { document.body.style.overflow = '' }
   }, [modalAbierto])
 
+  if (isMobile === null) return null
   if (isMobile) return <HomeMobile />
 
   return (

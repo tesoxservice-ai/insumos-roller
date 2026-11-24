@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useCart } from '@/context/CartContext'
 import { useIsMobile } from '@/hooks/useIsMobile'
+import { ANNOUNCEMENT_BAR_HEIGHT } from '@/components/ui/AnnouncementBar'
 
 const LINKS = [
   { label: 'Productos', href: '/#productos' },
@@ -21,6 +22,15 @@ export default function Nav() {
   const pathname = usePathname()
   const isMobile = useIsMobile()
 
+  const [topOffset, setTopOffset] = useState(ANNOUNCEMENT_BAR_HEIGHT)
+
+  useEffect(() => {
+    const update = () => setTopOffset(Math.max(0, ANNOUNCEMENT_BAR_HEIGHT - window.scrollY))
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+
   useEffect(() => { setMenuOpen(false) }, [pathname])
   useEffect(() => { document.body.style.overflow = menuOpen ? 'hidden' : ''; return () => { document.body.style.overflow = '' } }, [menuOpen])
 
@@ -30,7 +40,7 @@ export default function Nav() {
   return (
     <>
       <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
+        position: 'fixed', top: topOffset, left: 0, right: 0, zIndex: 50,
         backgroundColor: 'rgba(240,235,227,0.97)',
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border)',
@@ -101,7 +111,7 @@ export default function Nav() {
 
       {/* Mobile menu overlay */}
       {isMobile && menuOpen && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(240,235,227,0.98)', backdropFilter: 'blur(12px)', display: 'flex', flexDirection: 'column', paddingTop: 64 }} onClick={() => setMenuOpen(false)}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 40, background: 'rgba(240,235,227,0.98)', backdropFilter: 'blur(12px)', display: 'flex', flexDirection: 'column', paddingTop: 64 + topOffset }} onClick={() => setMenuOpen(false)}>
           <div style={{ display: 'flex', flexDirection: 'column', padding: '32px 28px', gap: 4 }} onClick={e => e.stopPropagation()}>
             {LINKS.map(link => (
               <Link key={link.href} href={link.href}

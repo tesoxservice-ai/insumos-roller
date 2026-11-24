@@ -252,7 +252,7 @@ export default function HomePage() {
     <main style={{ background: 'var(--bg)', color: 'var(--text)' }}>
 
       {/* ── HERO ── */}
-      <section style={{ position: 'relative', height: '100vh', minHeight: 600, overflow: 'hidden' }}>
+      <section style={{ position: 'relative', height: 'calc(100vh - 36px)', minHeight: 600, overflow: 'hidden' }}>
         <Image
           src="/images/LIVING.png"
           alt="Living con cortinas Insumos Roller"
@@ -283,46 +283,6 @@ export default function HomePage() {
           <HeroCard href="/stock" icon={<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>} label="LISTAS PARA LLEVAR" />
         </div>
       </section>
-
-      {/* ── TICKER ── */}
-      <div style={{ marginTop: 48 }}>
-        <div style={{ background: '#F5F0E8', overflow: 'hidden', height: 56, display: 'flex', alignItems: 'center', borderTop: '1px solid #E8E0D4', borderBottom: '1px solid #E8E0D4' }}>
-          <div style={{
-            display: 'flex',
-            animation: 'ticker 28s linear infinite',
-            whiteSpace: 'nowrap',
-          }}>
-            {[...Array(4)].map((_, rep) => (
-              <span key={rep} style={{ display: 'flex', alignItems: 'center' }}>
-                {[
-                  '3 Y 6 CUOTAS SIN INTERÉS',
-                  '30% DE DESCUENTO EN EFECTIVO O TRANSFERENCIA',
-                ].map((text, i) => (
-                  <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                    <span style={{
-                      color: '#0A0A14',
-                      fontWeight: 600,
-                      letterSpacing: '0.2em',
-                      padding: '0 48px',
-                      fontFamily: 'var(--font-cormorant), Cormorant Garamond, serif',
-                      fontSize: 15,
-                    }}>
-                      {text}
-                    </span>
-                    <span style={{ color: 'rgba(10,10,20,0.2)', fontSize: 10 }}>✦</span>
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-          <style>{`
-            @keyframes ticker {
-              0%   { transform: translateX(0); }
-              100% { transform: translateX(-25%); }
-            }
-          `}</style>
-        </div>
-      </div>
 
       {/* ── GALERÍA AMBIENTES ── */}
       <section id="inspiracion" style={{ padding: '64px 0 0', background: 'var(--bg)' }}>

@@ -43,7 +43,7 @@ export default function HomeMobile() {
       {/* ── HERO ── */}
       <section style={{
         position: 'relative',
-        height: '100vh',
+        height: 'calc(100vh - 36px)',
         minHeight: 500,
         overflow: 'hidden',
         backgroundImage: 'url(/images/LIVING.png)',
@@ -82,23 +82,6 @@ export default function HomeMobile() {
           </Link>
         </div>
       </section>
-
-      {/* ── TICKER ── */}
-      <div style={{ background: '#F5F0E8', overflow: 'hidden', height: 44, display: 'flex', alignItems: 'center', borderTop: '1px solid #E8E0D4', borderBottom: '1px solid #E8E0D4' }}>
-        <div style={{ display: 'flex', animation: 'ticker 28s linear infinite', whiteSpace: 'nowrap' }}>
-          {[...Array(4)].map((_, rep) => (
-            <span key={rep} style={{ display: 'flex', alignItems: 'center' }}>
-              {['3 Y 6 CUOTAS SIN INTERÉS', '30% DE DESCUENTO EN EFECTIVO O TRANSFERENCIA'].map((text, i) => (
-                <span key={i} style={{ display: 'inline-flex', alignItems: 'center' }}>
-                  <span style={{ color: '#0A0A14', fontWeight: 600, letterSpacing: '0.15em', padding: '0 28px', fontFamily: 'var(--font-cormorant), Cormorant Garamond, serif', fontSize: 12 }}>{text}</span>
-                  <span style={{ color: 'rgba(10,10,20,0.2)', fontSize: 9 }}>✦</span>
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
-        <style>{`@keyframes ticker { 0% { transform: translateX(0) } 100% { transform: translateX(-25%) } }`}</style>
-      </div>
 
       {/* ── GALERÍA 2x2 ── */}
       <section style={{ padding: '40px 20px 0' }}>
